@@ -9,6 +9,7 @@ namespace ReportPortal.Services
         private IUserRepository _userRepository;
 
         public UserService(IUserRepository userRepository) => _userRepository = userRepository;
+
         public Task<UserDto> CreateAsync(Guid userId, UserForCreationDto accountForCreationDto, CancellationToken cancellationToken = default)
         {
             // creat user model from accountForCreationDto
