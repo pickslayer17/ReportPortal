@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
 using ReportPortal.DAL;
@@ -14,12 +15,14 @@ namespace ReportPortal.Controllers
         public UserController(IUserService userService) => _userService = userService;
 
         [HttpGet]
+        [Authorize]
         public IEnumerable<User> GetUsers()
         {
             return new List<User> { new User { Id = 1, Name = "asd"} };
         }
 
         [HttpPost]
+        [Authorize]
         public int CreateUser(User userModel)
         {
             // get guid
