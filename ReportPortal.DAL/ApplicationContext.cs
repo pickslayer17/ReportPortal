@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using ReportPortal.DAL.Models;
 
 namespace ReportPortal.DAL
 {
@@ -8,7 +8,6 @@ namespace ReportPortal.DAL
         public DbSet<User> Users { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
-            //Database.EnsureCreated();
         }
     }
 }

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="..\ReportPortal.BLR\ReportPortal.BL.csproj" />
     <ProjectReference Include="..\ReportPortal.DAL\ReportPortal.DAL.csproj" />
   </ItemGroup>
 

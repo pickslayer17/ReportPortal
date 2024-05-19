@@ -1,6 +1,6 @@
 ﻿using Models.Dto;
 
-namespace ReportPortal.Interfaces
+namespace ReportPortal.Services.Interfaces
 {
     public interface IUserService
     {

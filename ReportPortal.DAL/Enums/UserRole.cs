@@ -1,4 +1,4 @@
-﻿namespace ReportPortal.DAL
+﻿namespace ReportPortal.DAL.Enums
 {
     public enum UserRole
     {

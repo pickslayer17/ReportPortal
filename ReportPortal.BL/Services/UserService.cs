@@ -1,6 +1,7 @@
 ﻿using Models.Dto;
 using ReportPortal.DAL;
 using ReportPortal.Interfaces;
+using ReportPortal.Services.Interfaces;
 
 namespace ReportPortal.Services
 {

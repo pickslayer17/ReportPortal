@@ -1,41 +1,30 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
-using ReportPortal.DAL;
-using ReportPortal.Interfaces;
+using ReportPortal.Services.Interfaces;
 
 namespace ReportPortal.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class UserController : ControllerBase
+    [Route("api/[controller]")]
+    public class UserManagementController : ControllerBase
     {
         private IUserService _userService;
 
-        public UserController(IUserService userService) => _userService = userService;
+        public UserManagementController(IUserService userService) => _userService = userService;
 
-        [HttpGet]
-        [Authorize]
-        public IEnumerable<User> GetUsers()
+        [HttpGet("GetUsers")]
+        //[Authorize]
+        public IActionResult GetUsers()
         {
-            return new List<User> { new User { Id = 1, Name = "asd"} };
+            return Ok();
         }
 
-        [HttpPost]
-        [Authorize]
-        public int CreateUser(User userModel)
+        [HttpPost("CreateUser")]
+        //[Authorize(Roles = "Admin")]
+        public IActionResult CreateUser(UserForCreationDto userModel)
         {
-            // get guid
-            var guid = new Guid();
-
-            //create UserForCreationModelDto
-            var userForCreationDto = new UserForCreationDto();
-            //map fields from userModel
-
-            var result = _userService.CreateAsync(guid, userForCreationDto);
-            var createdUserId = result.Result.Id;
-
-            return 0;
+            _userService.CreateAsync(userModel);
+            return Ok();
         }
     }
 }
