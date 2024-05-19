@@ -1,4 +1,5 @@
 ﻿using Models.Dto;
+using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
 using ReportPortal.DAL.Models;
 using ReportPortal.Interfaces;
@@ -8,9 +9,14 @@ namespace ReportPortal.Services
 {
     public class UserService : IUserService
     {
-        private IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationService _authenticationService;
 
-        public UserService(IUserRepository userRepository) => _userRepository = userRepository;
+        public UserService(IUserRepository userRepository, IAuthenticationService authenticationService)
+        {
+            _userRepository = userRepository;
+            _authenticationService = authenticationService;
+        }
 
         public async Task<UserDto> CreateAsync(UserForCreationDto userForCreationDto, CancellationToken cancellationToken = default)
         {
@@ -21,8 +27,8 @@ namespace ReportPortal.Services
 
             var userDbModel = new User();
             userDbModel.Email = userForCreationDto.Email;
-            userDbModel.PasswordSalt = ""; /// generate Salt
-            userDbModel.Password = ""; /// encrypt password using salt
+            //userDbModel.PasswordSalt = _authenticationService.GenerateSalt();
+            userDbModel.Password = _authenticationService.HashPassword(userForCreationDto.Password);
             userDbModel.UserRole = UserRole.User;
             _userRepository.InsertAsync(userDbModel);
 
