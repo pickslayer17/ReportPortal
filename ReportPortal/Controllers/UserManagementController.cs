@@ -20,15 +20,15 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("GetUsers")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetUsers()
         {
             return Ok();
         }
 
         [HttpPost("CreateUser")]
-        //[Authorize(Roles = "Admin")]
-        public IActionResult CreateUser(UserForCreationDto userModel)
+        [Authorize]
+        public IActionResult CreateUser([FromBody]UserForCreationDto userModel)
         {
             _userService.CreateAsync(userModel);
 
