@@ -20,14 +20,14 @@ namespace ReportPortal.Services
         {
             var userModel = _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            return await Task.Run(() => userModel);
+            return await userModel;
         }
 
         public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             var userModel = _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-            return await Task.Run(() => userModel);
+            return await userModel;
         }
 
         public async Task InsertAsync(User user)

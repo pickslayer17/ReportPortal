@@ -1,4 +1,6 @@
 ﻿using Models.Dto;
+using ReportPortal.DAL.Enums;
+using ReportPortal.DAL.Models;
 using ReportPortal.Interfaces;
 using ReportPortal.Services.Interfaces;
 
@@ -14,11 +16,25 @@ namespace ReportPortal.Services
         {
             var userByEmailResult = _userRepository.GetByEmailAsync(userForCreationDto.Email);
 
-            if (userByEmailResult != null) return Task.Run(() => new UserDto());
+            /// verify if user could be inserted into DB
+            if (userByEmailResult.Result != null) return Task.Run(() => new UserDto());
 
+            var userDbModel = new User();
+            userDbModel.Email = userForCreationDto.Email;
+            userDbModel.PasswordSalt = ""; /// generate Salt
+            userDbModel.Password = ""; /// encrypt password using salt
+            userDbModel.UserRole = UserRole.User;
+            _userRepository.InsertAsync(userDbModel);
 
+            userByEmailResult = _userRepository.GetByEmailAsync(userForCreationDto.Email);
 
-            return Task.Run(() => new UserDto());
+            var userCreated = new UserDto
+            {
+                Email = userDbModel.Email,
+                Id = userByEmailResult.Result.Id.Value
+            };
+
+            return Task.Run(() => userCreated);
         }
 
         public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
