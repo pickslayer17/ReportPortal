@@ -39,7 +39,7 @@ namespace ReportPortal.Controllers
         [HttpPost("Login")]
         public IActionResult Login([FromBody] UserDto login)
         {
-            IActionResult response = null;// Unauthorized();
+            IActionResult response = Unauthorized();
             var user = _authenticationService.AuthenticateUser(login);
 
             if (user != null)

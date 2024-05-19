@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Models.Dto;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -11,24 +12,35 @@ namespace ReportPortal.BL.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IConfiguration _configuration; 
-        public AuthenticationService(IConfiguration configuration) => _configuration = configuration;
+        private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;
+
+        public AuthenticationService(IConfiguration configuration, IUserRepository userRepository)
+        {
+            _configuration = configuration;
+            _userRepository = userRepository;
+        }
 
         public UserDto AuthenticateUser(UserDto login)
         {
-            UserDto user = null;
+            var userFromDb = _userRepository.GetByEmailAsync(login.Email);
+            var hashPasswordFromDb = userFromDb.Result.Password;
 
-            if (true)//login.Email == "Jignesh")
+            UserDto user = null;
+            try
             {
-                user = new UserDto { Email = "test.btest@gmail.com" };
+                if (VerifyHash(hashPasswordFromDb, login.Password))
+                {
+                    user = new UserDto { Email = login.Email };
+                }
+
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return user;
             }
 
             return user;
-        }
-
-        public bool CheckPassword(string password, string decryptedPassword, string salt)
-        {
-            throw new NotImplementedException();
         }
 
         public string GenerateJSONWebToken(UserDto userInfo)
