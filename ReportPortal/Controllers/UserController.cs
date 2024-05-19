@@ -24,6 +24,7 @@ namespace ReportPortal.Controllers
         public IActionResult CreateUser(UserForCreationDto userModel)
         {
             _userService.CreateAsync(userModel);
+
             return Ok();
         }
     }

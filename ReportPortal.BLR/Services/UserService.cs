@@ -12,12 +12,12 @@ namespace ReportPortal.Services
 
         public UserService(IUserRepository userRepository) => _userRepository = userRepository;
 
-        public Task<UserDto> CreateAsync(UserForCreationDto userForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<UserDto> CreateAsync(UserForCreationDto userForCreationDto, CancellationToken cancellationToken = default)
         {
             var userByEmailResult = _userRepository.GetByEmailAsync(userForCreationDto.Email);
 
-            /// verify if user could be inserted into DB
-            if (userByEmailResult.Result != null) return Task.Run(() => new UserDto());
+            /// verify if user already exists in DB
+            if (userByEmailResult.Result != null) return await Task.Run(() => new UserDto());
 
             var userDbModel = new User();
             userDbModel.Email = userForCreationDto.Email;
@@ -27,6 +27,7 @@ namespace ReportPortal.Services
             _userRepository.InsertAsync(userDbModel);
 
             userByEmailResult = _userRepository.GetByEmailAsync(userForCreationDto.Email);
+            await userByEmailResult;
 
             var userCreated = new UserDto
             {
@@ -34,7 +35,7 @@ namespace ReportPortal.Services
                 Id = userByEmailResult.Result.Id.Value
             };
 
-            return Task.Run(() => userCreated);
+            return await Task.Run(() => userCreated);
         }
 
         public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
