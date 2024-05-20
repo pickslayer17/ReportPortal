@@ -18,9 +18,9 @@ namespace ReportPortal.Services
 
         public async Task<User> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var userModel = _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var userModel = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            return await userModel;
+            return  userModel;
         }
 
         public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
@@ -30,16 +30,18 @@ namespace ReportPortal.Services
             return await userModel;
         }
 
-        public async Task InsertAsync(User user)
+        public async Task<int> InsertAsync(User user)
         {
             _dbContext.Users.Add(user);
-            _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
+
+            return user.Id.Value;
         }
 
         public async Task RemoveAsync(User user)
         {
             _dbContext.Users.Remove(user);
-            _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

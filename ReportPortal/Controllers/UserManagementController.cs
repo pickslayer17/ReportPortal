@@ -27,12 +27,12 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("CreateUser")]
-        [Authorize]
-        public IActionResult CreateUser([FromBody]UserForCreationDto userModel)
+        //[Authorize]
+        public async Task<IActionResult> CreateUser([FromBody]UserForCreationDto userModel)
         {
-            _userService.CreateAsync(userModel);
+            var userCreated = await _userService.CreateAsync(userModel);
 
-            return Ok();
+            return Ok(userCreated);
         }
 
         [AllowAnonymous]
