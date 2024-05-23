@@ -2,6 +2,7 @@
 using ReportPortal.DAL;
 using ReportPortal.DAL.Models;
 using ReportPortal.Interfaces;
+using System.Linq.Expressions;
 
 namespace ReportPortal.Services
 {
@@ -16,20 +17,6 @@ namespace ReportPortal.Services
             throw new NotImplementedException();
         }
 
-        public async Task<User> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-        {
-            var userModel = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-
-            return  userModel;
-        }
-
-        public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
-        {
-            var userModel = _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
-
-            return await userModel;
-        }
-
         public async Task<int> InsertAsync(User user)
         {
             _dbContext.Users.Add(user);
@@ -42,6 +29,13 @@ namespace ReportPortal.Services
         {
             _dbContext.Users.Remove(user);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<User> GetByAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            var userModel = _dbContext.Users.FirstOrDefaultAsync(predicate);
+
+            return await userModel;
         }
     }
 }

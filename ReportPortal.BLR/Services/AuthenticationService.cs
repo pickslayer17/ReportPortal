@@ -23,7 +23,7 @@ namespace ReportPortal.BL.Services
 
         public UserDto AuthenticateUser(UserDto login)
         {
-            var userFromDb = _userRepository.GetByEmailAsync(login.Email);
+            var userFromDb = _userRepository.GetByAsync(u => u.Email == login.Email);
             var hashPasswordFromDb = userFromDb.Result.Password;
 
             UserDto user = null;

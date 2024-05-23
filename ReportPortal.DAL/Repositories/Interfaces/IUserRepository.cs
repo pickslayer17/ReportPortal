@@ -5,6 +5,5 @@ namespace ReportPortal.Interfaces
 {
     public interface IUserRepository : IReporitory<User>
     {
-        public Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     }
 }
