@@ -8,6 +8,6 @@ namespace ReportPortal.BL.Services.Interfaces
         public string GenerateJSONWebToken(UserDto userDto);
         public string GenerateSalt();
         public string HashPassword(string password);
-        public bool VerifyHash(string savedPasswordHash, string userEnteredPasword);
+        public bool VerifyHash(string savedPasswordHash, string userEnteredPassword);
     }
 }

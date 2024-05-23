@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.Constants;
 using ReportPortal.Services.Interfaces;
 
 namespace ReportPortal.Controllers
@@ -27,7 +28,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("CreateUser")]
-        //[Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> CreateUser([FromBody]UserForCreationDto userModel)
         {
             var userCreated = await _userService.CreateAsync(userModel);

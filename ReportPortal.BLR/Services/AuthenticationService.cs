@@ -24,6 +24,7 @@ namespace ReportPortal.BL.Services
         public UserDto AuthenticateUser(UserDto login)
         {
             var userFromDb = _userRepository.GetByAsync(u => u.Email == login.Email);
+            if (userFromDb.Result == null) throw new UnauthorizedAccessException();
             var hashPasswordFromDb = userFromDb.Result.Password;
 
             UserDto user = null;
@@ -49,9 +50,8 @@ namespace ReportPortal.BL.Services
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>();
 
-            claims.Add(new Claim("Name", "Denis"));
-
-            claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            claims.Add(new Claim("Name", userInfo.Email));
+            claims.Add(new Claim(ClaimTypes.Role, userInfo.Role == DAL.Enums.UserRole.Administrator? "Admin" : "User"));
 
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
