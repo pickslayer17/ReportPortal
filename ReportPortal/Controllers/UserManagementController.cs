@@ -11,7 +11,7 @@ namespace ReportPortal.Controllers
     [Route("api/[controller]")]
     public class UserManagementController : ControllerBase
     {
-        private IUserService _userService;
+        private readonly IUserService _userService;
         private readonly IAuthenticationService _authenticationService;
 
         public UserManagementController(IUserService userService, IAuthenticationService authenticationService)

@@ -7,6 +7,7 @@ namespace ReportPortal.DAL
     public class ApplicationContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+
         public DbSet<Project> Projects { get; set; }
         public DbSet<FolderRunItem> Folders { get; set; }
         public DbSet<TestRunItem> Tests { get; set; }

@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using ReportPortal.BL.Services;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL;
+using ReportPortal.DAL.Repositories;
+using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Interfaces;
 using ReportPortal.Services;
 using ReportPortal.Services.Interfaces;
@@ -24,6 +26,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+builder.Services.AddScoped<ITestRepository, TestRepository>();
+builder.Services.AddScoped<ITestResultRepository, TestResultRepository>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

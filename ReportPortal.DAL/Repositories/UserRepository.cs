@@ -1,18 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReportPortal.DAL;
 using ReportPortal.DAL.Models;
+using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Interfaces;
 using System.Linq.Expressions;
 
 namespace ReportPortal.Services
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : AbstractApplicationRepository, IUserRepository
     {
-        private readonly ApplicationContext _dbContext;
+        public UserRepository(ApplicationContext dbContext) : base(dbContext)
+        {
+        }
 
-        public UserRepository(ApplicationContext dbContext) => _dbContext = dbContext;
-
-        public Task<IEnumerable<User>> GetAllByIdAsync(int id, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<User>> GetAllByAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
