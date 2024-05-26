@@ -1,4 +1,5 @@
 ﻿using Models.Dto;
+using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
 using ReportPortal.DAL.Models;
@@ -18,9 +19,9 @@ namespace ReportPortal.Services
             _authenticationService = authenticationService;
         }
 
-        public async Task<UserDto> CreateAsync(UserForCreationDto userForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<UserCreatedDto> CreateAsync(UserForCreationDto userForCreationDto, CancellationToken cancellationToken = default)
         {
-            var userByEmailResult = await _userRepository.GetByAsync(u => u.Email == userForCreationDto.Email );
+            var userByEmailResult = await _userRepository.GetByAsync(u => u.Email == userForCreationDto.Email);
 
             if (userByEmailResult != null) throw new Exception("User already exists!");
 
@@ -31,7 +32,7 @@ namespace ReportPortal.Services
 
             var createdUserId = await _userRepository.InsertAsync(userDbModel);
 
-            var userCreated = new UserDto
+            var userCreated = new UserCreatedDto
             {
                 Email = userDbModel.Email,
                 Id = createdUserId

@@ -1,5 +1,5 @@
 ﻿using Models.Dto;
-using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.BL.Models;
 
 namespace ReportPortal.Services.Interfaces
 {
@@ -7,7 +7,7 @@ namespace ReportPortal.Services.Interfaces
     {
         Task<IEnumerable<UserDto>> GetAllByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<UserDto> GetByIdAsync(int id, CancellationToken cancellationToken);
-        Task<UserDto> CreateAsync(UserForCreationDto accountForCreationDto, CancellationToken cancellationToken = default);
+        Task<UserCreatedDto> CreateAsync(UserForCreationDto accountForCreationDto, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
     }
 }
