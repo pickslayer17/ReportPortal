@@ -2,7 +2,7 @@
 
 namespace ReportPortal.DAL.Repositories.Interfaces
 {
-    public interface ITestRepository : IReporitory<TestRunItem>
+    public interface ITestRepository : IRepository<TestRunItem>
     {
     }
 }

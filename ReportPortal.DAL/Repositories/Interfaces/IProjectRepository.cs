@@ -2,7 +2,7 @@
 
 namespace ReportPortal.DAL.Repositories.Interfaces
 {
-    public interface IProjectRepository : IReporitory<Project>
+    public interface IProjectRepository : IRepository<Project>
     {
     }
 }

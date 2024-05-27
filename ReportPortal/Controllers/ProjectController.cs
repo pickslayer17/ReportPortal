@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 
 namespace ReportPortal.Controllers
@@ -15,11 +15,18 @@ namespace ReportPortal.Controllers
             _projectService = projectService;
         }
 
-        [HttpGet("GetProject")]
+        [HttpGet("GetAllProject")]
         //[Authorize]
-        public async Task<IActionResult> GetProjects()
+        public async Task<IActionResult> GetAllProjects()
         {
             return Ok(await _projectService.GetAllAsync());
+        }
+
+        [HttpPost("AddProject")]
+        //[Authorize]
+        public async Task<IActionResult> AddProject([FromBody] ProjectForCreationDto projectForCreationDto)
+        {
+            return Ok(await _projectService.CreateAsync(projectForCreationDto));
         }
     }
 }

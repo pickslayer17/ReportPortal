@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
+using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Constants;
 using ReportPortal.Services.Interfaces;
@@ -51,7 +52,5 @@ namespace ReportPortal.Controllers
 
             return response;
         }
-
-
     }
 }

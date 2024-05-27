@@ -4,7 +4,7 @@ using ReportPortal.BL.Models.ForCreation;
 
 namespace ReportPortal.BL.Services.Interfaces
 {
-    public interface IProjectService : IServiceBase<ProjectDto, ProjectCreatedDto, ProjectForCreationDto>
+    public interface ITestResultService : IServiceBase<TestResultDto, TestResultCreatedDto, TestResultForCreationDto>
     {
     }
 }

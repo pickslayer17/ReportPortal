@@ -1,9 +1,11 @@
 ﻿using Models.Dto;
-using ReportPortal.BL.Models;
+using ReportPortal.BL.Models.Created;
+using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.Interfaces;
 using ReportPortal.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace ReportPortal.Services
 {
@@ -45,12 +47,17 @@ namespace ReportPortal.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<UserDto>> GetAllByIdAsync(int id, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<UserDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<UserDto> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public Task<IEnumerable<UserDto>> GetAllByAsync(Expression<Func<UserDto, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDto> GetByAsync(Expression<Func<UserDto, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

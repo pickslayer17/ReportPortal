@@ -1,6 +1,7 @@
 ﻿namespace ReportPortal.BL.Models
 {
-    public class ProjectForCreationDto
+    public class TestResultDto
     {
     }
+
 }

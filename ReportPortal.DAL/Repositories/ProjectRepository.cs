@@ -16,9 +16,9 @@ namespace ReportPortal.DAL.Repositories
             return await _dbContext.Projects.Where(predicate).ToListAsync();
         }
 
-        public Task<Project> GetByAsync(Expression<Func<Project, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<Project> GetByAsync(Expression<Func<Project, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Projects.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
         public async Task<int> InsertAsync(Project project)

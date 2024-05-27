@@ -1,13 +1,11 @@
 ﻿using Models.Dto;
-using ReportPortal.BL.Models;
+using ReportPortal.BL.Models.Created;
+using ReportPortal.BL.Models.ForCreation;
+using ReportPortal.BL.Services.Interfaces;
 
 namespace ReportPortal.Services.Interfaces
 {
-    public interface IUserService
+    public interface IUserService : IServiceBase<UserDto, UserCreatedDto, UserForCreationDto>
     {
-        Task<IEnumerable<UserDto>> GetAllByIdAsync(int id, CancellationToken cancellationToken = default);
-        Task<UserDto> GetByIdAsync(int id, CancellationToken cancellationToken);
-        Task<UserCreatedDto> CreateAsync(UserForCreationDto accountForCreationDto, CancellationToken cancellationToken = default);
-        Task DeleteAsync(int id, CancellationToken cancellationToken = default);
     }
 }

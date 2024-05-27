@@ -3,7 +3,7 @@ using ReportPortal.DAL.Repositories.Interfaces;
 
 namespace ReportPortal.Interfaces
 {
-    public interface IUserRepository : IReporitory<User>
+    public interface IUserRepository : IRepository<User>
     {
     }
 }

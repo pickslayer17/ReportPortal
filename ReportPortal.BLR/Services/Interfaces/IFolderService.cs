@@ -4,7 +4,9 @@ using ReportPortal.BL.Models.ForCreation;
 
 namespace ReportPortal.BL.Services.Interfaces
 {
-    public interface IProjectService : IServiceBase<ProjectDto, ProjectCreatedDto, ProjectForCreationDto>
+    public interface IFolderService : IServiceBase<FolderDto, FolderCreatedDto, FolderForCreationDto>
     {
+        public int AddOrGetId(string path);
     }
+
 }
