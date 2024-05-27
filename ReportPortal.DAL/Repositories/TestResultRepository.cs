@@ -1,4 +1,4 @@
-﻿using ReportPortal.DAL.Models.TestResult;
+﻿using ReportPortal.DAL.Models;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
 

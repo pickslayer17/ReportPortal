@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReportPortal.DAL.Models;
-using ReportPortal.DAL.Models.TestResult;
 
 namespace ReportPortal.DAL
 {

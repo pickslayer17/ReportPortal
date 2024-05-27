@@ -1,4 +1,4 @@
-﻿using ReportPortal.DAL.Models.TestResult;
+﻿using ReportPortal.DAL.Models;
 
 namespace ReportPortal.DAL.Repositories.Interfaces
 {
