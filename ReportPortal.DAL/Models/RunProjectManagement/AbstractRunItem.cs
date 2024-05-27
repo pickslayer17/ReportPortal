@@ -1,9 +1,9 @@
 ﻿using ReportPortal.DAL.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace ReportPortal.DAL.Models
+namespace ReportPortal.DAL.Models.RunProjectManagement
 {
-    public abstract class RunItem
+    public abstract class AbstractRunItem
     {
         [Key]
         public int Id { get; set; }

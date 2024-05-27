@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ReportPortal.DAL.Models;
+using ReportPortal.DAL.Models.RunProjectManagement;
+using ReportPortal.DAL.Models.UserManagement;
 
 namespace ReportPortal.DAL
 {

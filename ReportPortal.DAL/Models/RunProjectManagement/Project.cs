@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ReportPortal.DAL.Models
+namespace ReportPortal.DAL.Models.RunProjectManagement
 {
     public class Project
     {

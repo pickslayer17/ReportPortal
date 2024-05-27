@@ -1,4 +1,4 @@
-﻿using ReportPortal.DAL.Models;
+﻿using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 
 namespace ReportPortal.Interfaces

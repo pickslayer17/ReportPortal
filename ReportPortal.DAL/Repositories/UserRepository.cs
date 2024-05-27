@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReportPortal.DAL;
-using ReportPortal.DAL.Models;
+using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Interfaces;
 using System.Linq.Expressions;

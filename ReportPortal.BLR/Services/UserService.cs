@@ -1,8 +1,7 @@
 ﻿using Models.Dto;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
-using ReportPortal.DAL.Enums;
-using ReportPortal.DAL.Models;
+using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.Interfaces;
 using ReportPortal.Services.Interfaces;
 

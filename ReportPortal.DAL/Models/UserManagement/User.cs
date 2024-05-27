@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ReportPortal.DAL.Enums;
 
-namespace ReportPortal.DAL.Models
+namespace ReportPortal.DAL.Models.UserManagement
 {
     public class User
     {

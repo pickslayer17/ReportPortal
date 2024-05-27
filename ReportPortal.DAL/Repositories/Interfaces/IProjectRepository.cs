@@ -1,4 +1,4 @@
-﻿using ReportPortal.DAL.Models;
+﻿using ReportPortal.DAL.Models.RunProjectManagement;
 
 namespace ReportPortal.DAL.Repositories.Interfaces
 {
