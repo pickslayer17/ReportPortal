@@ -2,6 +2,7 @@
 {
     public class RunCreatedDto
     {
+        public int Id { get; set; }
     }
 
 }

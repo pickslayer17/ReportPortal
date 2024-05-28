@@ -72,13 +72,9 @@ namespace ReportPortal.BL.Services
             };
 
             int folderId = await _folderRepository.InsertAsync(folderRunItem);
-
-            if (folderParentId.HasValue)
-            {
-                var parentFolder = await _folderRepository.GetByAsync(f => f.Id == folderParentId);
-                parentFolder.ChildFolderIds.Add(folderId);
-                await _folderRepository.UpdateItem(parentFolder);
-            }
+            var parentFolder = await _folderRepository.GetByAsync(f => f.Id == folderParentId);
+            parentFolder.ChildFolderIds.Add(folderId);
+            await _folderRepository.UpdateItem(parentFolder);
 
             return folderId;
         }
