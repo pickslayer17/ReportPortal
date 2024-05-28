@@ -38,14 +38,13 @@ namespace ReportPortal.Controllers
                 return BadRequest(new { Message =  "There is no project with such id!" });
             }
 
-            var folderId = await _folderService.AddOrGetId(testForCreationDto.RunId, testForCreationDto.Path);
+            var folderId = await _folderService.GetIdOrAddFolderInRun(testForCreationDto.RunId, testForCreationDto.Path);
             var test = new TestRunItem
             {
                 Name = testForCreationDto.Name,
                 ParentId = folderId,
-                Type = DAL.Enums.RunItemType.Test,
             };
-            //_testService.CreateAsync
+            //_testService.CreateAsync()
 
             return Ok(await _testService.GetAllAsync());
         }

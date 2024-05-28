@@ -1,4 +1,5 @@
-﻿using ReportPortal.DAL.Models.RunProjectManagement;
+﻿using Microsoft.EntityFrameworkCore;
+using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
 
@@ -31,6 +32,13 @@ namespace ReportPortal.DAL.Repositories
         public Task RemoveAsync(FolderRunItem user)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task UpdateItem(FolderRunItem item)
+        {
+            var oldItem = await _dbContext.Folders.FirstOrDefaultAsync(f => f.Id == item.Id);
+            _dbContext.Folders.Entry(oldItem).CurrentValues.SetValues(item);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
