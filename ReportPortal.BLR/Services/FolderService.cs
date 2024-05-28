@@ -28,33 +28,39 @@ namespace ReportPortal.BL.Services
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
             var rootFolder = await _folderRepository.GetByAsync(f => f.Id == run.RootFolderId);
-            var rootFolderChildIds = rootFolder.ChildFolderIds.ToArray();
 
-            return await GetIdOrAddFolder(rootFolderChildIds, folderNames);
+            return await GetIdOrAddFolder(rootFolder, folderNames);
         }
 
-        private async Task<int> GetIdOrAddFolder(int[] childFolderIds, string[] folderNames)
+        private async Task<int> GetIdOrAddFolder(FolderRunItem parentFolder, string[] folderNames)
         {
-            var folderNameToAdd = folderNames[0];
-            var folderNamesToLookIn = await _folderRepository.GetAllByAsync(f => f.Name == folderNameToAdd);
-            if(folderNamesToLookIn.Any(fn => fn.Equals(folderNameToAdd)))
+            var parentFolderChildIds = parentFolder.ChildFolderIds.ToArray();
+            /// verify if parentFolderChildNames contain folderNames[0]
+            var parentFolderChilds = await _folderRepository.GetAllByAsync(f => parentFolderChildIds.Contains(f.Id));
+            var parentFolderChildNames = parentFolderChilds.Select(f => f.Name);
+
+            /// if no -> crate folder,  
+            if (!parentFolderChildNames.Contains(folderNames[0]))
             {
-                var existingFolder = folderNamesToLookIn.First(f => f.Name == folderNameToAdd);
-                if (folderNames.Count() == 1)
+                var newFolderId = await CreateFolder(parentFolder.Id, folderNames[0]);
+                var newFolder = await _folderRepository.GetByAsync(f => f.Id == newFolderId);
+
+                if(folderNames.Length == 1)
                 {
-                    return existingFolder.Id;
+                    return newFolder.Id;
                 }
                 else
                 {
-                    return await GetIdOrAddFolder(existingFolder.ChildFolderIds.ToArray(), folderNames.Skip(1).ToArray());
+                    return await GetIdOrAddFolder(newFolder, folderNames.Skip(1).ToArray());
                 }
             }
+            /// if yes -> choose folder, call GetIdOrAddFolder() again
             else
             {
-               
-            }
+                var folderToReturn = parentFolderChilds.FirstOrDefault(f => f.Name == folderNames[0]);
 
-            return 0;
+                return await GetIdOrAddFolder(folderToReturn, folderNames.Skip(1).ToArray());
+            }
         }
 
         private async Task<int> CreateFolder(int? folderParentId, string folderName)
