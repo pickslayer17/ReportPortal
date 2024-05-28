@@ -2,6 +2,7 @@
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
 
@@ -9,15 +10,24 @@ namespace ReportPortal.BL.Services
 {
     public class FolderService : IFolderService
     {
-        private readonly IProjectRepository _projectRepository;
+        private readonly IRunRepository _runRepository;
 
-        public FolderService(IProjectRepository projectRepository)
+        public FolderService(IRunRepository runRepository)
         {
-            _projectRepository = projectRepository;
+            _runRepository = runRepository;
         }
 
-        public int AddOrGetId(string path)
+        public async Task<int> AddOrGetId(int runId, string path)
         {
+            var run = await _runRepository.GetByAsync(r => r.Id == runId);
+            if (run == null) return 0;
+
+            var folderNames = path.Split('.');
+            //foreach (var childId in run.ChildrenIds)
+            //{
+            //    GetByAsync(f => f.)
+            //}
+
 
             return 0; 
         }
@@ -32,17 +42,17 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<FolderDto>> GetAllAsync(CancellationToken cancellationToken = default)
+        public Task<IEnumerable<FolderRunItem>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<FolderDto>> GetAllByAsync(Expression<Func<FolderDto, bool>> predicate, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<FolderRunItem>> GetAllByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<FolderDto> GetByAsync(Expression<Func<FolderDto, bool>> predicate, CancellationToken cancellationToken = default)
+        public Task<FolderRunItem> GetByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

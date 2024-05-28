@@ -38,7 +38,7 @@ namespace ReportPortal.Controllers
                 return BadRequest(new { Message =  "There is no project with such id!" });
             }
 
-            var folderId = _folderService.AddOrGetId(testForCreationDto.Path);
+            var folderId = await _folderService.AddOrGetId(testForCreationDto.RunId, testForCreationDto.Path);
             var test = new TestRunItem
             {
                 Name = testForCreationDto.Name,

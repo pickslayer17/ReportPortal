@@ -10,6 +10,6 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
         public string Name { get; set; }
         public RunItemType Type { get; set; }
         public int ParentId { get; set; }
-        public int[] ChildrenIds { get; set; }
+        public ICollection<int> ChildrenIds { get; set; }
     }
 }
