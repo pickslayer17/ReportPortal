@@ -1,8 +1,8 @@
 ﻿using ReportPortal.DAL.Enums;
 
-namespace ReportPortal.ViewModels.ForCreation
+namespace ReportPortal.ViewModels.UserManagement
 {
-    public class UserForCreationDto
+    public class UserVm
     {
         public string Email { get; set; }
         public string Password { get; set; }

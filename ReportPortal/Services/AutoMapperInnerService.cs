@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Models.Dto;
 using ReportPortal.Services.Interfaces;
-using ReportPortal.ViewModels.ForCreation;
+using ReportPortal.ViewModels.UserManagement;
 
 namespace ReportPortal.Services
 {
@@ -10,7 +10,7 @@ namespace ReportPortal.Services
         IMapper _mapper;
         public AutoMapperInnerService()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<UserForCreationDto, UserDto>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<UserVm, UserDto>());
             _mapper = config.CreateMapper();
         }
 

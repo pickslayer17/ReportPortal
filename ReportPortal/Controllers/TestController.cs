@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.RunProjectManagement;
-using ReportPortal.ViewModels.ForCreation;
+using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
 {
@@ -30,7 +30,7 @@ namespace ReportPortal.Controllers
 
         [HttpPost("AddTest")]
         //[Authorize]
-        public async Task<IActionResult> AddTest([FromBody]TestForCreationDto testForCreationDto)
+        public async Task<IActionResult> AddTest([FromBody]TestVm testForCreationDto)
         {
             var project = await _projectService.GetByAsync(pr => pr.Id == testForCreationDto.RunId);
             if (project == null)

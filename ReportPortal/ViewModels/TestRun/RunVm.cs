@@ -1,6 +1,6 @@
-﻿namespace ReportPortal.ViewModels.ForCreation
+﻿namespace ReportPortal.ViewModels.TestRun
 {
-    public class RunForCreationDto
+    public class RunVm
     {
         public string Name { get; set; }
         public int ProjectId { get; set; }

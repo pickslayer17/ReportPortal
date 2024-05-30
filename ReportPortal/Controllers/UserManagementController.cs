@@ -4,7 +4,7 @@ using Models.Dto;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Constants;
 using ReportPortal.Services.Interfaces;
-using ReportPortal.ViewModels.ForCreation;
+using ReportPortal.ViewModels.UserManagement;
 
 namespace ReportPortal.Controllers
 {
@@ -32,9 +32,9 @@ namespace ReportPortal.Controllers
 
         [HttpPost("CreateUser")]
         //[Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> CreateUser([FromBody] UserForCreationDto userModel)
+        public async Task<IActionResult> CreateUser([FromBody] UserVm userModel)
         {
-            var userDto = _autoMapperInnerService.Map<UserForCreationDto, UserDto>(userModel);
+            var userDto = _autoMapperInnerService.Map<UserVm, UserDto>(userModel);
 
             var userCreated = await _userService.CreateAsync(userDto);
 
