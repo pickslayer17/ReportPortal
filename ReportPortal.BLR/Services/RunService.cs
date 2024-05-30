@@ -1,9 +1,7 @@
 ﻿using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
-using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.RunProjectManagement;
-using ReportPortal.DAL.Repositories;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
 
@@ -20,7 +18,7 @@ namespace ReportPortal.BL.Services
             _folderRepository = folderRepository;
         }
 
-        public async Task<RunCreatedDto> CreateAsync(RunForCreationDto runForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
         {
             var folderRunItem = new FolderRunItem
             {
@@ -29,7 +27,7 @@ namespace ReportPortal.BL.Services
             };
 
             var rootFolderId = await _folderRepository.InsertAsync(folderRunItem);
-            
+
             var run = new Run
             {
                 Name = runForCreationDto.Name,
@@ -39,6 +37,11 @@ namespace ReportPortal.BL.Services
             var runId = await _runRepository.InsertAsync(run);
 
             return new RunCreatedDto { Id = runId };
+        }
+
+        public Task<RunCreatedDto> CreateAsync(RunCreatedDto projectForCreationDto, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
 
         public Task DeleteAsync(int id, CancellationToken cancellationToken = default)

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ReportPortal.BL.Models.ForCreation;
+using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.Services.Interfaces;
+using ReportPortal.ViewModels.ForCreation;
 
 namespace ReportPortal.Controllers
 {
@@ -9,10 +11,12 @@ namespace ReportPortal.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly IAutoMapperInnerService _autoMapperInnerService;
 
-        public ProjectController(IProjectService projectService)
+        public ProjectController(IProjectService projectService, IAutoMapperInnerService autoMapperInnerService)
         {
             _projectService = projectService;
+            _autoMapperInnerService = autoMapperInnerService;
         }
 
         [HttpGet("GetAllProject")]
@@ -26,7 +30,8 @@ namespace ReportPortal.Controllers
         //[Authorize]
         public async Task<IActionResult> AddProject([FromBody] ProjectForCreationDto projectForCreationDto)
         {
-            return Ok(await _projectService.CreateAsync(projectForCreationDto));
+            var projectDto = _autoMapperInnerService.Map<ProjectForCreationDto, ProjectDto>(projectForCreationDto);
+            return Ok(await _projectService.CreateAsync(projectDto));
         }
     }
 }

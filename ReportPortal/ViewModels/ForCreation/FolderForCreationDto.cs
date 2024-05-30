@@ -1,4 +1,4 @@
-﻿namespace ReportPortal.BL.Models.ForCreation
+﻿namespace ReportPortal.ViewModels.ForCreation
 {
     public class FolderForCreationDto
     {

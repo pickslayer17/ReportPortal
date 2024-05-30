@@ -1,6 +1,6 @@
 ﻿using ReportPortal.DAL.Enums;
 
-namespace ReportPortal.BL.Models.ForCreation
+namespace ReportPortal.ViewModels.ForCreation
 {
     public class UserForCreationDto
     {

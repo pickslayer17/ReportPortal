@@ -1,5 +1,5 @@
-﻿using ReportPortal.BL.Models.Created;
-using ReportPortal.BL.Models.ForCreation;
+﻿using ReportPortal.BL.Models;
+using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
@@ -84,7 +84,7 @@ namespace ReportPortal.BL.Services
             return await _folderRepository.GetByAsync(predicate, cancellationToken);
         }
 
-        public Task<FolderCreatedDto> CreateAsync(FolderForCreationDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public Task<FolderCreatedDto> CreateAsync(FolderDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

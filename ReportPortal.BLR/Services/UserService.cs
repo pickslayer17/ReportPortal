@@ -1,6 +1,5 @@
 ﻿using Models.Dto;
 using ReportPortal.BL.Models.Created;
-using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.Interfaces;
@@ -20,7 +19,7 @@ namespace ReportPortal.Services
             _authenticationService = authenticationService;
         }
 
-        public async Task<UserCreatedDto> CreateAsync(UserForCreationDto userForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<UserCreatedDto> CreateAsync(UserDto userForCreationDto, CancellationToken cancellationToken = default)
         {
             var userByEmailResult = await _userRepository.GetByAsync(u => u.Email == userForCreationDto.Email);
 

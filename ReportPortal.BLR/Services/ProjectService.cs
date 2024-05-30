@@ -1,6 +1,5 @@
 ﻿using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
-using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
 using ReportPortal.DAL.Models.RunProjectManagement;
@@ -24,7 +23,7 @@ namespace ReportPortal.BL.Services
             _testResultRepository = testResultRepository;
         }
 
-        public async Task<ProjectCreatedDto> CreateAsync(ProjectForCreationDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<ProjectCreatedDto> CreateAsync(ProjectDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             var existingProject = await _projectRepository.GetByAsync(pr => pr.Name == projectForCreationDto.Name);
 
@@ -58,11 +57,6 @@ namespace ReportPortal.BL.Services
         }
 
         public Task<IEnumerable<ProjectDto>> GetAllByAsync(Expression<Func<ProjectDto, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Project> GetByAsync(Expression<Func<Project, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

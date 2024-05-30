@@ -1,6 +1,5 @@
 ﻿using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
-using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using System.Linq.Expressions;
 
@@ -8,7 +7,7 @@ namespace ReportPortal.BL.Services
 {
     public class TestResultService : ITestResultService
     {
-        public Task<TestResultCreatedDto> CreateAsync(TestResultForCreationDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public Task<TestResultCreatedDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

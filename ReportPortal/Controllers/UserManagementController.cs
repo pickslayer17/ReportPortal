@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
-using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Constants;
 using ReportPortal.Services.Interfaces;
+using ReportPortal.ViewModels.ForCreation;
 
 namespace ReportPortal.Controllers
 {
@@ -14,11 +14,13 @@ namespace ReportPortal.Controllers
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IAutoMapperInnerService _autoMapperInnerService;
 
-        public UserManagementController(IUserService userService, IAuthenticationService authenticationService)
+        public UserManagementController(IUserService userService, IAuthenticationService authenticationService, IAutoMapperInnerService autoMapperInnerService)
         {
             _userService = userService;
             _authenticationService = authenticationService;
+            _autoMapperInnerService = autoMapperInnerService;
         }
 
         [HttpGet("GetUsers")]
@@ -29,10 +31,12 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("CreateUser")]
-        [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> CreateUser([FromBody]UserForCreationDto userModel)
+        //[Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> CreateUser([FromBody] UserForCreationDto userModel)
         {
-            var userCreated = await _userService.CreateAsync(userModel);
+            var userDto = _autoMapperInnerService.Map<UserForCreationDto, UserDto>(userModel);
+
+            var userCreated = await _userService.CreateAsync(userDto);
 
             return Ok(userCreated);
         }

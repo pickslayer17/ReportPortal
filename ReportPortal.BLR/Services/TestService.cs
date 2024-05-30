@@ -1,6 +1,5 @@
 ﻿using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
-using ReportPortal.BL.Models.ForCreation;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
@@ -16,7 +15,7 @@ namespace ReportPortal.BL.Services
             _testRepository = testRepository;
         }
 
-        public Task<TestCreatedDto> CreateAsync(TestForCreationDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public Task<TestCreatedDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
