@@ -21,24 +21,24 @@ namespace ReportPortal.BL.Services
             _userRepository = userRepository;
         }
 
-        public UserDto AuthenticateUser(UserDto login)
+        public async Task<UserDto> AuthenticateUser(UserDto login)
         {
-            var userFromDb = _userRepository.GetByAsync(u => u.Email == login.Email);
-            if (userFromDb.Result == null) throw new UnauthorizedAccessException();
-            var hashPasswordFromDb = userFromDb.Result.Password;
+            var userFromDb = await _userRepository.GetByAsync(u => u.Email == login.Email);
+            if (userFromDb == null) throw new UnauthorizedAccessException();
+            var hashPasswordFromDb = userFromDb.Password;
 
             UserDto user = null;
             try
             {
                 if (VerifyHash(hashPasswordFromDb, login.Password))
                 {
-                    user = new UserDto { Email = login.Email };
+                    user = new UserDto { Email = userFromDb.Email, Role = userFromDb.UserRole };
                 }
 
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                return user;
+                throw ex;
             }
 
             return user;

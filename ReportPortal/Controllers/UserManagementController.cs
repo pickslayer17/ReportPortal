@@ -39,10 +39,10 @@ namespace ReportPortal.Controllers
 
         [AllowAnonymous]
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] UserDto login)
+        public async Task<IActionResult> Login([FromBody] UserDto login)
         {
             IActionResult response = Unauthorized();
-            var user = _authenticationService.AuthenticateUser(login);
+            var user = await _authenticationService.AuthenticateUser(login);
 
             if (user != null)
             {
