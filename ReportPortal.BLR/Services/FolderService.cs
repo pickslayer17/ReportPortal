@@ -62,8 +62,14 @@ namespace ReportPortal.BL.Services
             else
             {
                 var foundFolder = await _folderRepository.GetByAsync(f => f.Name == folderNames[0] && parentFolder.ChildFolderIds.Contains(f.Id));
-
-                return await GetIdOrAddFolder(foundFolder, folderNames.Skip(1).ToArray());
+                if (folderNames.Length == 1)
+                {
+                    return foundFolder.Id;
+                }
+                else
+                {
+                    return await GetIdOrAddFolder(foundFolder, folderNames.Skip(1).ToArray());
+                }
             }
         }
 
