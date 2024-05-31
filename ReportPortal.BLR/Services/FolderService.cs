@@ -91,6 +91,24 @@ namespace ReportPortal.BL.Services
             return folderId;
         }
 
+
+        public async Task AttachTestToFolder(int folderId, int testId)
+        {
+            var folder = await _folderRepository.GetByAsync(f => f.Id == folderId);
+            if (folder == null) throw new DirectoryNotFoundException($"There is no folder with such id {folderId}!");
+
+            if(folder.TestIds == null)
+            {
+                folder.TestIds = new List<int> { testId  };
+            }
+            else
+            {
+                folder.TestIds.Add(testId);
+            }
+
+            await _folderRepository.UpdateItem(folder);
+        }
+
         private async Task<FolderRunItem> GetByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _folderRepository.GetByAsync(predicate, cancellationToken);

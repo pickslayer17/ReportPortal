@@ -29,7 +29,11 @@ namespace ReportPortal.Controllers
             var testDto = _autoMapperInnerService.Map<TestVm, TestDto>(testVm);
             testDto.FolderId = folderId;
 
-            return Ok(await _testService.CreateAsync(testDto));
+            var testCreated = await _testService.CreateAsync(testDto);
+
+            await _folderService.AttachTestToFolder(folderId, testCreated.Id);
+
+            return Ok(testCreated);
         }
     }
 }
