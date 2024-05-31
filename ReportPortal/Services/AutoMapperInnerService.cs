@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Models.Dto;
+using ReportPortal.BL.Models;
 using ReportPortal.Services.Interfaces;
+using ReportPortal.ViewModels.TestRun;
 using ReportPortal.ViewModels.UserManagement;
 
 namespace ReportPortal.Services
@@ -10,7 +12,11 @@ namespace ReportPortal.Services
         IMapper _mapper;
         public AutoMapperInnerService()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<UserVm, UserDto>());
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<UserVm, UserDto>();
+                cfg.CreateMap<TestVm, TestDto>();
+            });
             _mapper = config.CreateMapper();
         }
 

@@ -7,8 +7,9 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
     {
         [Key]
         public int Id { get; set; }
+        public int RunId { get; set; }
         public string Name { get; set; }
-        public int ParentId { get; set; }
+        public int FolderId { get; set; }
         public ICollection<int> TestResultIds { get; set; }
     }
 }
