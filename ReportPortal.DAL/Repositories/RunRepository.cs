@@ -20,9 +20,12 @@ namespace ReportPortal.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<int> InsertAsync(Run item)
+        public async Task<int> InsertAsync(Run item)
         {
-            throw new NotImplementedException();
+            _dbContext.Runs.Add(item);
+            await _dbContext.SaveChangesAsync();
+
+            return item.Id;
         }
 
         public Task RemoveAsync(Run item)

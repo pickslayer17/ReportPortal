@@ -16,6 +16,7 @@ namespace ReportPortal.Services
             {
                 cfg.CreateMap<UserVm, UserDto>();
                 cfg.CreateMap<TestVm, TestDto>();
+                cfg.CreateMap<RunVm, RunDto>();
             });
             _mapper = config.CreateMapper();
         }

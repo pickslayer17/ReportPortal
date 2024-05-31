@@ -8,6 +8,7 @@ namespace ReportPortal.DAL
     {
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Run> Runs { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<FolderRunItem> Folders { get; set; }
         public DbSet<TestRunItem> Tests { get; set; }
