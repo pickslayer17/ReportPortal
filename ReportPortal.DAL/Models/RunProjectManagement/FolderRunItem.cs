@@ -7,8 +7,8 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public int? ParentId { get; set; }
-        public ICollection<int> ChildFolderIds { get; set; }
-        public ICollection<int> TestIds { get; set; }
+        public Nullable<int> ParentId { get; set; }
+        public ICollection<int>? ChildFolderIds { get; set; }
+        public ICollection<int>? TestIds { get; set; }
     }
 }
