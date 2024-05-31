@@ -1,4 +1,5 @@
-﻿using ReportPortal.DAL.Models.RunProjectManagement;
+﻿using Microsoft.EntityFrameworkCore;
+using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
 
@@ -15,9 +16,9 @@ namespace ReportPortal.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Run> GetByAsync(Expression<Func<Run, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<Run> GetByAsync(Expression<Func<Run, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Runs.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
         public async Task<int> InsertAsync(Run item)

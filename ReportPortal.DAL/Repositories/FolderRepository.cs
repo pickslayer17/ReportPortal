@@ -16,9 +16,9 @@ namespace ReportPortal.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<FolderRunItem> GetByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<FolderRunItem> GetByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Folders.FirstOrDefaultAsync(predicate);
         }
 
         public async Task<int> InsertAsync(FolderRunItem folder)

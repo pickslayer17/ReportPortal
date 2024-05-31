@@ -34,10 +34,14 @@ namespace ReportPortal.BL.Services
 
         private async Task<int> GetIdOrAddFolder(FolderRunItem parentFolder, string[] folderNames)
         {
-            var parentFolderChildIds = parentFolder.ChildFolderIds.ToArray();
-            /// verify if parentFolderChildNames contain folderNames[0]
-            var parentFolderChilds = await _folderRepository.GetAllByAsync(f => parentFolderChildIds.Contains(f.Id));
-            var parentFolderChildNames = parentFolderChilds.Select(f => f.Name);
+            var parentFolderChildNames = new List<string>();
+            if (parentFolder.ChildFolderIds != null)
+            {
+                var parentFolderChildIds = parentFolder.ChildFolderIds.ToArray();
+                /// verify if parentFolderChildNames contain folderNames[0]
+                var parentFolderChilds = await _folderRepository.GetAllByAsync(f => parentFolderChildIds.Contains(f.Id));
+                parentFolderChildNames = parentFolderChilds.Select(f => f.Name).ToList();
+            }
 
             /// if no -> crate folder,  
             if (!parentFolderChildNames.Contains(folderNames[0]))
@@ -57,9 +61,9 @@ namespace ReportPortal.BL.Services
             /// if yes -> choose folder, call GetIdOrAddFolder() again
             else
             {
-                var folderToReturn = parentFolderChilds.FirstOrDefault(f => f.Name == folderNames[0]);
+                var foundFolder = await _folderRepository.GetByAsync(f => f.Name == folderNames[0] && parentFolder.ChildFolderIds.Contains(f.Id));
 
-                return await GetIdOrAddFolder(folderToReturn, folderNames.Skip(1).ToArray());
+                return await GetIdOrAddFolder(foundFolder, folderNames.Skip(1).ToArray());
             }
         }
 
@@ -73,7 +77,15 @@ namespace ReportPortal.BL.Services
 
             int folderId = await _folderRepository.InsertAsync(folderRunItem);
             var parentFolder = await _folderRepository.GetByAsync(f => f.Id == folderParentId);
-            parentFolder.ChildFolderIds.Add(folderId);
+            if(parentFolder.ChildFolderIds == null)
+            {
+                parentFolder.ChildFolderIds = new List<int> { folderId };
+            }
+            else
+            {
+                parentFolder.ChildFolderIds.Add(folderId);
+            }
+           
             await _folderRepository.UpdateItem(parentFolder);
 
             return folderId;
