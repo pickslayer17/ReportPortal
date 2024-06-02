@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Constants;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.Services.Interfaces;
 using ReportPortal.ViewModels.UserManagement;
 
@@ -39,6 +40,22 @@ namespace ReportPortal.Controllers
             var userCreated = await _userService.CreateAsync(userDto);
 
             return Ok(userCreated);
+        }
+
+        [HttpPost("DeleteUser")]
+        //[Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            try
+            {
+                await _userService.DeleteAsync(userId);
+            }
+            catch (UserNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
         }
 
         [AllowAnonymous]

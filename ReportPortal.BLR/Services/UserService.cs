@@ -41,9 +41,10 @@ namespace ReportPortal.Services
             return await Task.Run(() => userCreated);
         }
 
-        public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetByAsync(u => u.Id == id);
+            await _userRepository.RemoveAsync(user);
         }
 
         public Task<IEnumerable<UserDto>> GetAllAsync(CancellationToken cancellationToken = default)

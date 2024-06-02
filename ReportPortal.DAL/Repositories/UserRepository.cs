@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReportPortal.DAL;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Interfaces;
@@ -28,7 +29,15 @@ namespace ReportPortal.Services
 
         public async Task RemoveAsync(User user)
         {
-            _dbContext.Users.Remove(user);
+            try
+            {
+                _dbContext.Users.Remove(user);
+            }
+            catch (ArgumentNullException ex)
+            {
+                throw new UserNotFoundException($"User with userId {user.Id} isn't present.", ex);
+            }
+            
             await _dbContext.SaveChangesAsync();
         }
 
