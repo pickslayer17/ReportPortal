@@ -44,7 +44,7 @@ namespace ReportPortal.Services
             return await Task.Run(() => userCreated);
         }
 
-        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task DeleteByIdAsync(int id)
         {
             var user = await _userRepository.GetByAsync(u => u.Id == id);
             if (user != null)

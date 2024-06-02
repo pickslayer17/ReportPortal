@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Constants;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.Services.Interfaces;
 using ReportPortal.ViewModels.TestRun;
 
@@ -51,8 +52,16 @@ namespace ReportPortal.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> DeleteProject(int projectId)
         {
-            var projectDto = _autoMapperInnerService.Map<ProjectVm, ProjectDto>(projectForCreationDto);
-            return Ok(await _projectService.DeleteAsync(projectId));
+            try
+            {
+                await _projectService.DeleteByIdAsync(projectId);
+            }
+            catch (ProjectNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
         }
     }
 }

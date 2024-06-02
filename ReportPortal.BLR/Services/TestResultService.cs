@@ -12,7 +12,7 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public Task DeleteByIdAsync(int id)
         {
             throw new NotImplementedException();
         }

@@ -28,7 +28,7 @@ namespace ReportPortal.BL.Services
             return testCreated;
         }
 
-        public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public Task DeleteByIdAsync(int id)
         {
             throw new NotImplementedException();
         }

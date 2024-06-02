@@ -59,7 +59,7 @@ namespace ReportPortal.Controllers
         {
             try
             {
-                await _userService.DeleteAsync(userId);
+                await _userService.DeleteByIdAsync(userId);
             }
             catch (UserNotFoundException ex)
             {

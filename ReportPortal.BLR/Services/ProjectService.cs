@@ -41,7 +41,7 @@ namespace ReportPortal.BL.Services
             }
         }
 
-        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task DeleteByIdAsync(int id)
         {
             var existingProject = await _projectRepository.GetByAsync(pr => pr.Id == id);
             if (existingProject != null)
@@ -50,6 +50,13 @@ namespace ReportPortal.BL.Services
             }
 
             await _projectRepository.RemoveAsync(existingProject);
+        }
+
+        public async Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var project = await _projectRepository.GetByAsync(pr => pr.Id == id);
+
+            return _autoMapperService.Map<Project, ProjectDto>(project);
         }
 
         public async Task<IEnumerable<ProjectDto>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -68,13 +75,6 @@ namespace ReportPortal.BL.Services
         public async Task<ProjectDto> GetByAsync(Expression<Func<ProjectDto, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-        {
-            var project = await _projectRepository.GetByAsync(pr => pr.Id == id);
-
-            return _autoMapperService.Map<Project, ProjectDto>(project);
         }
     }
 }

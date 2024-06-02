@@ -9,7 +9,7 @@ namespace ReportPortal.BL.Services.Interfaces
         public Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         public Task<T> GetByAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         public Task<C> CreateAsync(T projectForCreationDto, CancellationToken cancellationToken = default);
-        public Task DeleteAsync(int id, CancellationToken cancellationToken = default);
+        public Task DeleteByIdAsync(int id);
     }
 
 }
