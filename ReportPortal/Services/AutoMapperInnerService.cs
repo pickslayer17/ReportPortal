@@ -18,6 +18,7 @@ namespace ReportPortal.Services
                 cfg.CreateMap<TestVm, TestDto>();
                 cfg.CreateMap<RunVm, RunDto>();
                 cfg.CreateMap<ProjectDto, ProjectVm>();
+                cfg.CreateMap<UserDto, UserVm>().ForMember(dest => dest.Password, opt => opt.Condition(src => false));
             });
             _mapper = config.CreateMapper();
         }

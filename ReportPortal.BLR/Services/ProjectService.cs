@@ -65,5 +65,10 @@ namespace ReportPortal.BL.Services
 
             //return _autoMapperService.Map<Project, ProjectDto>(project);
         }
+
+        public Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

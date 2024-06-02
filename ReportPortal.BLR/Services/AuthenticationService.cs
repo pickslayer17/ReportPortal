@@ -32,7 +32,7 @@ namespace ReportPortal.BL.Services
             {
                 if (VerifyHash(hashPasswordFromDb, login.Password))
                 {
-                    user = new UserDto { Email = userFromDb.Email, Role = userFromDb.UserRole };
+                    user = new UserDto { Email = userFromDb.Email, UserRole = userFromDb.UserRole };
                 }
 
             }
@@ -50,8 +50,8 @@ namespace ReportPortal.BL.Services
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>();
 
-            claims.Add(new Claim("Name", userInfo.Email));
-            claims.Add(new Claim(ClaimTypes.Role, userInfo.Role == DAL.Enums.UserRole.Administrator? "Admin" : "User"));
+            claims.Add(new Claim("Email", userInfo.Email));
+            claims.Add(new Claim(ClaimTypes.Role, userInfo.UserRole == DAL.Enums.UserRole.Administrator? "Admin" : "User"));
 
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],

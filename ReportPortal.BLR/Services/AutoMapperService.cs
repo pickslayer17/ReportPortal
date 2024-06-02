@@ -15,10 +15,11 @@ namespace ReportPortal.BL.Services
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<UserDto, User>();
                 cfg.CreateMap<TestDto, TestRunItem>();
                 cfg.CreateMap<TestRunItem, TestCreatedDto>();
                 cfg.CreateMap<Project, ProjectDto>();
+                cfg.CreateMap<UserDto, User>();
+                cfg.CreateMap<User, UserDto>();
             });
 
             _mapper = config.CreateMapper();

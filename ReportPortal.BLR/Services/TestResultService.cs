@@ -1,7 +1,6 @@
 ﻿using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
-using ReportPortal.DAL.Models.RunProjectManagement;
 using System.Linq.Expressions;
 
 namespace ReportPortal.BL.Services
@@ -30,6 +29,11 @@ namespace ReportPortal.BL.Services
 
 
         public Task<TestResultDto> GetByAsync(Expression<Func<TestResultDto, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TestResultDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

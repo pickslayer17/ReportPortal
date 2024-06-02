@@ -63,6 +63,11 @@ namespace ReportPortal.BL.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<RunDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

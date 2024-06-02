@@ -14,9 +14,9 @@ namespace ReportPortal.Services
         {
         }
 
-        public Task<IEnumerable<User>> GetAllByAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<User>> GetAllByAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Users.Where(predicate).ToListAsync();
         }
 
         public async Task<int> InsertAsync(User user)
@@ -35,9 +35,7 @@ namespace ReportPortal.Services
 
         public async Task<User> GetByAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            var userModel = _dbContext.Users.FirstOrDefaultAsync(predicate);
-
-            return await userModel;
+            return await _dbContext.Users.FirstOrDefaultAsync(predicate);
         }
     }
 }

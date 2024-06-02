@@ -47,6 +47,11 @@ namespace ReportPortal.BL.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<TestDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

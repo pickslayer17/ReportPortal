@@ -25,17 +25,21 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("GetUser")]
-        [Authorize]
-        public async Task<IActionResult> GetUser(string userId)
+        //[Authorize]
+        public async Task<IActionResult> GetUser(int userId)
         {
-            return Ok();
+            var userDto = await _userService.GetByIdAsync(userId);
+            var userVm = _autoMapperInnerService.Map<UserDto, UserVm>(userDto);
+            return Ok(userVm);
         }
 
         [HttpGet("GetUsers")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetUsers()
         {
-            return Ok();
+            var usersDto = await _userService.GetAllAsync();
+            var usersVm = usersDto.Select(u => _autoMapperInnerService.Map<UserDto, UserVm>(u));
+            return Ok(usersVm);
         }
 
         [HttpPost("CreateUser")]
@@ -50,7 +54,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("DeleteUser")]
-        //[Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> DeleteUser(int userId)
         {
             try
