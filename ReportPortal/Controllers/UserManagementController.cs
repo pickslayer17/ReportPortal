@@ -25,7 +25,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("GetUser")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetUser(int userId)
         {
             var userDto = await _userService.GetByIdAsync(userId);
@@ -34,7 +34,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("GetUsers")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetUsers()
         {
             var usersDto = await _userService.GetAllAsync();
@@ -43,7 +43,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("CreateUser")]
-        //[Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> CreateUser([FromBody] UserVm userModel)
         {
             var userDto = _autoMapperInnerService.Map<UserVm, UserDto>(userModel);

@@ -29,9 +29,10 @@ namespace ReportPortal.DAL.Repositories
             return project.Id;
         }
 
-        public Task RemoveAsync(Project user)
+        public async Task RemoveAsync(Project project)
         {
-            throw new NotImplementedException();
+            _dbContext.Projects.Remove(project);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

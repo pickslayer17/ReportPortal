@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Services.Interfaces;
@@ -21,7 +22,7 @@ namespace ReportPortal.Controllers
 
 
         [HttpPost("AddRun")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> AddRun([FromBody] RunVm runVm)
         {
             var runDto = _autoMapperInnerService.Map<RunVm, RunDto>(runVm);

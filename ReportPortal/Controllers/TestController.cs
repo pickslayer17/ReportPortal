@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Services.Interfaces;
@@ -22,7 +23,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("AddTest")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> AddTest([FromBody] TestVm testVm)
         {
             var folderId = await _folderService.GetIdOrAddFolderInRun(testVm.RunId, testVm.Path);

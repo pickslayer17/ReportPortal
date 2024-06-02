@@ -2,6 +2,7 @@
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
@@ -40,9 +41,15 @@ namespace ReportPortal.BL.Services
             }
         }
 
-        public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var existingProject = await _projectRepository.GetByAsync(pr => pr.Id == id);
+            if (existingProject != null)
+            {
+                throw new ProjectNotFoundException($"There is no project with such id {id}");
+            }
+
+            await _projectRepository.RemoveAsync(existingProject);
         }
 
         public async Task<IEnumerable<ProjectDto>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -61,14 +68,13 @@ namespace ReportPortal.BL.Services
         public async Task<ProjectDto> GetByAsync(Expression<Func<ProjectDto, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
-            //var project = await _projectRepository.GetByAsync(predicate);
-
-            //return _autoMapperService.Map<Project, ProjectDto>(project);
         }
 
-        public Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var project = await _projectRepository.GetByAsync(pr => pr.Id == id);
+
+            return _autoMapperService.Map<Project, ProjectDto>(project);
         }
     }
 }
