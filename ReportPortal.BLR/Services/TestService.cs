@@ -11,20 +11,30 @@ namespace ReportPortal.BL.Services
     {
         private readonly ITestRepository _testRepository;
         private readonly IAutoMapperService _autoMapperService;
+        private readonly IFolderService _folderService;
 
-        public TestService(ITestRepository testRepository, IAutoMapperService autoMapperService)
+        public TestService(ITestRepository testRepository, IAutoMapperService autoMapperService, IFolderService folderService)
         {
             _testRepository = testRepository;
             _autoMapperService = autoMapperService;
+            _folderService = folderService;
         }
 
-        public async Task<TestCreatedDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<TestCreatedDto> CreateAsync(TestDto testDto, CancellationToken cancellationToken = default)
         {
-            var testRunItem = _autoMapperService.Map<TestDto, TestRunItem>(projectForCreationDto);
-            var testCreatedId = await _testRepository.InsertAsync(testRunItem);
+            // create or take existing folder
+            var folderId = await _folderService.GetIdOrAddFolderInRun(testDto.RunId, testDto.Path);
+            testDto.FolderId = folderId;
 
+            // insert test to databse
+            var testRunItem = _autoMapperService.Map<TestDto, TestRunItem>(testDto);
+            var testCreatedId = await _testRepository.InsertAsync(testRunItem);
             var testCreated = _autoMapperService.Map<TestRunItem, TestCreatedDto>(testRunItem);
             testCreated.Id = testCreatedId;
+
+            // Set test to folder
+            await _folderService.AttachTestToFolder(folderId, testCreated.Id);
+
             return testCreated;
         }
 

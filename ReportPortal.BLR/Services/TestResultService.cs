@@ -7,7 +7,10 @@ namespace ReportPortal.BL.Services
 {
     public class TestResultService : ITestResultService
     {
-        public Task<TestResultCreatedDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public TestResultService()
+        {
+        }
+        public async Task<TestResultCreatedDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
