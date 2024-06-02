@@ -11,12 +11,12 @@ namespace ReportPortal.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProjectController : ControllerBase
+    public class ProjectManagementController : ControllerBase
     {
         private readonly IProjectService _projectService;
         private readonly IAutoMapperInnerService _autoMapperInnerService;
 
-        public ProjectController(IProjectService projectService, IAutoMapperInnerService autoMapperInnerService)
+        public ProjectManagementController(IProjectService projectService, IAutoMapperInnerService autoMapperInnerService)
         {
             _projectService = projectService;
             _autoMapperInnerService = autoMapperInnerService;
@@ -31,7 +31,7 @@ namespace ReportPortal.Controllers
             return Ok(allProjectsVm);
         }
 
-        [HttpGet("GetProject")]
+        [HttpGet("GetProject/{projectId:int}")]
         [Authorize]
         public async Task<IActionResult> GetProject(int projectId)
         {
@@ -48,7 +48,7 @@ namespace ReportPortal.Controllers
             return Ok(await _projectService.CreateAsync(projectDto));
         }
 
-        [HttpPost("DeleteProject")]
+        [HttpPost("DeleteProject/{projectId:int}")]
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> DeleteProject(int projectId)
         {

@@ -9,13 +9,13 @@ namespace ReportPortal.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TestController : ControllerBase
+    public class TestManagementController : ControllerBase
     {
         private readonly ITestService _testService;
         private readonly IFolderService _folderService;
         private readonly IAutoMapperInnerService _autoMapperInnerService;
 
-        public TestController(ITestService testService, IProjectService projectService, IFolderService folderService, IAutoMapperInnerService autoMapperInnerService)
+        public TestManagementController(ITestService testService, IProjectService projectService, IFolderService folderService, IAutoMapperInnerService autoMapperInnerService)
         {
             _testService = testService;
             _folderService = folderService;

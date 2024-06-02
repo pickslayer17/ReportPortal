@@ -24,7 +24,7 @@ namespace ReportPortal.Controllers
             _autoMapperInnerService = autoMapperInnerService;
         }
 
-        [HttpGet("GetUser")]
+        [HttpGet("GetUser/{userId:int}")]
         [Authorize]
         public async Task<IActionResult> GetUser(int userId)
         {
@@ -53,7 +53,7 @@ namespace ReportPortal.Controllers
             return Ok(userCreated);
         }
 
-        [HttpPost("DeleteUser")]
+        [HttpPost("DeleteUser/{userId:int}")]
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> DeleteUser(int userId)
         {

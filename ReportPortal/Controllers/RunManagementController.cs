@@ -11,12 +11,12 @@ namespace ReportPortal.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RunController : ControllerBase
+    public class RunManagementController : ControllerBase
     {
         private readonly IRunService _runService;
         private readonly IAutoMapperInnerService _autoMapperInnerService;
 
-        public RunController(IRunService runService, IAutoMapperInnerService autoMapperInnerService)
+        public RunManagementController(IRunService runService, IAutoMapperInnerService autoMapperInnerService)
         {
             _runService = runService;
             _autoMapperInnerService = autoMapperInnerService;
