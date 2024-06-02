@@ -18,6 +18,7 @@ namespace ReportPortal.BL.Services
                 cfg.CreateMap<UserDto, User>();
                 cfg.CreateMap<TestDto, TestRunItem>();
                 cfg.CreateMap<TestRunItem, TestCreatedDto>();
+                cfg.CreateMap<Project, ProjectDto>();
             });
 
             _mapper = config.CreateMapper();

@@ -24,9 +24,16 @@ namespace ReportPortal.Controllers
             _autoMapperInnerService = autoMapperInnerService;
         }
 
+        [HttpGet("GetUser")]
+        [Authorize]
+        public async Task<IActionResult> GetUser(string userId)
+        {
+            return Ok();
+        }
+
         [HttpGet("GetUsers")]
         [Authorize]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
             return Ok();
         }

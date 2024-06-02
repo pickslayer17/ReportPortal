@@ -23,7 +23,18 @@ namespace ReportPortal.Controllers
         //[Authorize]
         public async Task<IActionResult> GetAllProjects()
         {
-            return Ok(await _projectService.GetAllAsync());
+            var allProjectsDto = await _projectService.GetAllAsync();
+            var allProjectsVm = allProjectsDto.Select(pr => _autoMapperInnerService.Map<ProjectDto, ProjectVm>(pr));
+            return Ok(allProjectsVm);
+        }
+
+        [HttpGet("GetProject")]
+        //[Authorize]
+        public async Task<IActionResult> GetAProject(int projectId)
+        {
+            var projectDto = await _projectService.GetByAsync(pr => pr.Id == projectId);
+            var projectVm = _autoMapperInnerService.Map<ProjectDto, ProjectVm>(projectDto);
+            return Ok(projectVm);
         }
 
         [HttpPost("AddProject")]

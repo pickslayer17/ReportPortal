@@ -10,17 +10,13 @@ namespace ReportPortal.BL.Services
 {
     public class ProjectService : IProjectService
     {
-        private readonly IFolderRepository _folderRepository;
         private readonly IProjectRepository _projectRepository;
-        private readonly ITestRepository _testRepository;
-        private readonly ITestResultRepository _testResultRepository;
+        private readonly IAutoMapperService _autoMapperService;
 
-        public ProjectService(IFolderRepository folderRepository, IProjectRepository projectRepository, ITestRepository testRepository, ITestResultRepository testResultRepository)
+        public ProjectService(IProjectRepository projectRepository, IAutoMapperService autoMapperService)
         {
-            _folderRepository = folderRepository;
             _projectRepository = projectRepository;
-            _testRepository = testRepository;
-            _testResultRepository = testResultRepository;
+            _autoMapperService = autoMapperService;
         }
 
         public async Task<ProjectCreatedDto> CreateAsync(ProjectDto projectForCreationDto, CancellationToken cancellationToken = default)
@@ -51,9 +47,10 @@ namespace ReportPortal.BL.Services
 
         public async Task<IEnumerable<ProjectDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var allModels = await _projectRepository.GetAllByAsync(pr => pr.Id != 0);
+            var allProjects = await _projectRepository.GetAllByAsync(pr => true);
+            var allProjectsDto = allProjects.Select(pr => _autoMapperService.Map<Project, ProjectDto>(pr));
 
-            return allModels.Select(x => new ProjectDto { Id = x.Id });
+            return allProjectsDto;
         }
 
         public Task<IEnumerable<ProjectDto>> GetAllByAsync(Expression<Func<ProjectDto, bool>> predicate, CancellationToken cancellationToken = default)
@@ -61,9 +58,12 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task<ProjectDto> GetByAsync(Expression<Func<ProjectDto, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<ProjectDto> GetByAsync(Expression<Func<ProjectDto, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
+            //var project = await _projectRepository.GetByAsync(predicate);
+
+            //return _autoMapperService.Map<Project, ProjectDto>(project);
         }
     }
 }
