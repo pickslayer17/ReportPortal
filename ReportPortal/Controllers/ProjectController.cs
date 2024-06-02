@@ -48,7 +48,7 @@ namespace ReportPortal.Controllers
             return Ok(await _projectService.CreateAsync(projectDto));
         }
 
-        [HttpPost("AddProject")]
+        [HttpPost("DeleteProject")]
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> DeleteProject(int projectId)
         {
