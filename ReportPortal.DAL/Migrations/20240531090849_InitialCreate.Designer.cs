@@ -12,8 +12,8 @@ using ReportPortal.DAL;
 namespace ReportPortal.DAL.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240527092421_addTestClassesAgain")]
-    partial class addTestClassesAgain
+    [Migration("20240531090849_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,19 +33,18 @@ namespace ReportPortal.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ChildrenIds")
-                        .IsRequired()
+                    b.Property<string>("ChildFolderIds")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ParentId")
+                    b.Property<int?>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("TestIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -64,6 +63,12 @@ namespace ReportPortal.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProjectStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RunIds")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Projects");
@@ -77,28 +82,19 @@ namespace ReportPortal.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ChildrenIds")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ParentId")
+                    b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
+                    b.Property<int>("RootFolderId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Run");
+                    b.ToTable("Runs");
                 });
 
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.TestResult", b =>
@@ -140,23 +136,18 @@ namespace ReportPortal.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ChildrenIds")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("FolderId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ParentId")
+                    b.Property<int>("RunId")
                         .HasColumnType("int");
 
                     b.Property<string>("TestResultIds")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -183,18 +174,6 @@ namespace ReportPortal.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Run", b =>
-                {
-                    b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Project", null)
-                        .WithMany("Runs")
-                        .HasForeignKey("ProjectId");
-                });
-
-            modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Project", b =>
-                {
-                    b.Navigation("Runs");
                 });
 #pragma warning restore 612, 618
         }
