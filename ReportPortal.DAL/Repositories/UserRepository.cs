@@ -29,15 +29,7 @@ namespace ReportPortal.Services
 
         public async Task RemoveAsync(User user)
         {
-            try
-            {
-                _dbContext.Users.Remove(user);
-            }
-            catch (ArgumentNullException ex)
-            {
-                throw new UserNotFoundException($"User with userId {user.Id} isn't present.", ex);
-            }
-            
+            _dbContext.Users.Remove(user);
             await _dbContext.SaveChangesAsync();
         }
 

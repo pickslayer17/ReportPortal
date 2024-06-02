@@ -1,6 +1,7 @@
 ﻿using Models.Dto;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.Interfaces;
 using ReportPortal.Services.Interfaces;
@@ -44,7 +45,15 @@ namespace ReportPortal.Services
         public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
             var user = await _userRepository.GetByAsync(u => u.Id == id);
-            await _userRepository.RemoveAsync(user);
+            if(user != null)
+            {
+                await _userRepository.RemoveAsync(user);
+            }
+            else
+            {
+                throw new UserNotFoundException($"User with userId {id} isn't present.");
+            }
+            
         }
 
         public Task<IEnumerable<UserDto>> GetAllAsync(CancellationToken cancellationToken = default)
