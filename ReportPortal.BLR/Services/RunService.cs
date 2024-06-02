@@ -1,9 +1,11 @@
 ﻿using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace ReportPortal.BL.Services
 {
@@ -11,15 +13,24 @@ namespace ReportPortal.BL.Services
     {
         private readonly IFolderRepository _folderRepository;
         private readonly IRunRepository _runRepository;
+        private readonly IProjectService _projectService;
 
-        public RunService(IRunRepository runRepository, IFolderRepository folderRepository)
+
+        public RunService(IRunRepository runRepository, IFolderRepository folderRepository, IProjectService projectService)
         {
             _runRepository = runRepository;
             _folderRepository = folderRepository;
+            _projectService = projectService;
         }
 
         public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
         {
+            var project = await _projectService.GetByIdAsync(runForCreationDto.ProjectId);
+            if (project == null)
+            {
+                throw new ProjectNotFoundException($"No project to create a Run in with id {runForCreationDto.ProjectId}");
+            }
+
             var folderRunItem = new FolderRunItem
             {
                 Name = "Root",
