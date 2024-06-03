@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
@@ -14,12 +15,12 @@ namespace ReportPortal.Controllers
     public class ProjectManagementController : ControllerBase
     {
         private readonly IProjectService _projectService;
-        private readonly IAutoMapperInnerService _autoMapperInnerService;
+        private readonly IMapper _mapper;
 
-        public ProjectManagementController(IProjectService projectService, IAutoMapperInnerService autoMapperInnerService)
+        public ProjectManagementController(IProjectService projectService, IMapper mapper)
         {
             _projectService = projectService;
-            _autoMapperInnerService = autoMapperInnerService;
+            _mapper = mapper;
         }
 
         [HttpGet("GetAllProject")]
@@ -27,7 +28,7 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> GetAllProjects()
         {
             var allProjectsDto = await _projectService.GetAllAsync();
-            var allProjectsVm = allProjectsDto.Select(pr => _autoMapperInnerService.Map<ProjectDto, ProjectVm>(pr));
+            var allProjectsVm = allProjectsDto.Select(pr => _mapper.Map<ProjectVm>(pr));
             return Ok(allProjectsVm);
         }
 
@@ -36,7 +37,7 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> GetProject(int projectId)
         {
             var projectDto = await _projectService.GetByIdAsync(projectId);
-            var projectVm = _autoMapperInnerService.Map<ProjectDto, ProjectVm>(projectDto);
+            var projectVm = _mapper.Map<ProjectDto>(projectDto);
             return Ok(projectVm);
         }
 
@@ -44,7 +45,7 @@ namespace ReportPortal.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> AddProject([FromBody] ProjectVm projectForCreationDto)
         {
-            var projectDto = _autoMapperInnerService.Map<ProjectVm, ProjectDto>(projectForCreationDto);
+            var projectDto = _mapper.Map<ProjectDto>(projectForCreationDto);
             return Ok(await _projectService.CreateAsync(projectDto));
         }
 

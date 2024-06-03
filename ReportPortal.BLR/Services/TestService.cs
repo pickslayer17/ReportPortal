@@ -1,4 +1,5 @@
-﻿using ReportPortal.BL.Models;
+﻿using AutoMapper;
+using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.RunProjectManagement;
@@ -10,13 +11,13 @@ namespace ReportPortal.BL.Services
     public class TestService : ITestService
     {
         private readonly ITestRepository _testRepository;
-        private readonly IAutoMapperService _autoMapperService;
+        private readonly IMapper _mapper;
         private readonly IFolderService _folderService;
 
-        public TestService(ITestRepository testRepository, IAutoMapperService autoMapperService, IFolderService folderService)
+        public TestService(ITestRepository testRepository, IMapper mapper, IFolderService folderService)
         {
             _testRepository = testRepository;
-            _autoMapperService = autoMapperService;
+            _mapper = mapper;
             _folderService = folderService;
         }
 
@@ -27,9 +28,9 @@ namespace ReportPortal.BL.Services
             testDto.FolderId = folderId;
 
             // insert test to databse
-            var testRunItem = _autoMapperService.Map<TestDto, TestRunItem>(testDto);
+            var testRunItem = _mapper.Map<TestRunItem>(testDto);
             var testCreatedId = await _testRepository.InsertAsync(testRunItem);
-            var testCreated = _autoMapperService.Map<TestRunItem, TestCreatedDto>(testRunItem);
+            var testCreated = _mapper.Map<TestCreatedDto>(testRunItem);
             testCreated.Id = testCreatedId;
 
             // Set test to folder

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
@@ -13,20 +14,20 @@ namespace ReportPortal.Controllers
     {
         private readonly ITestService _testService;
         private readonly IFolderService _folderService;
-        private readonly IAutoMapperInnerService _autoMapperInnerService;
+        private readonly IMapper _mapper;
 
-        public TestManagementController(ITestService testService, IProjectService projectService, IFolderService folderService, IAutoMapperInnerService autoMapperInnerService)
+        public TestManagementController(ITestService testService, IProjectService projectService, IFolderService folderService, IMapper mapper)
         {
             _testService = testService;
             _folderService = folderService;
-            _autoMapperInnerService = autoMapperInnerService;
+            _mapper = mapper;
         }
 
         [HttpPost("AddTest")]
         [Authorize]
         public async Task<IActionResult> AddTest([FromBody] TestVm testVm)
         {
-            var testDto = _autoMapperInnerService.Map<TestVm, TestDto>(testVm);
+            var testDto = _mapper.Map<TestDto>(testVm);
             var testCreated = await _testService.CreateAsync(testDto);
 
             return Ok(testCreated);

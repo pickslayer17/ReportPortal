@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
@@ -14,19 +15,19 @@ namespace ReportPortal.Controllers
     public class RunManagementController : ControllerBase
     {
         private readonly IRunService _runService;
-        private readonly IAutoMapperInnerService _autoMapperInnerService;
+        private readonly IMapper _mapper;
 
-        public RunManagementController(IRunService runService, IAutoMapperInnerService autoMapperInnerService)
+        public RunManagementController(IRunService runService, IMapper mapper)
         {
             _runService = runService;
-            _autoMapperInnerService = autoMapperInnerService;
+            _mapper = mapper;
         }
 
         [HttpPost("AddRun")]
         [Authorize]
         public async Task<IActionResult> AddRun([FromBody] RunVm runVm)
         {
-            var runDto = _autoMapperInnerService.Map<RunVm, RunDto>(runVm);
+            var runDto = _mapper.Map<RunDto>(runVm);
             RunCreatedDto runCreatedDto = null;
             try
             {

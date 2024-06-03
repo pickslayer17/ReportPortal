@@ -1,13 +1,14 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ReportPortal.BL.Maps;
 using ReportPortal.BL.Services;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL;
 using ReportPortal.DAL.Repositories;
 using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Interfaces;
+using ReportPortal.Maps;
 using ReportPortal.Services;
 using ReportPortal.Services.Interfaces;
 using System.Text;
@@ -37,8 +38,10 @@ builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<IRunService, RunService>();
 builder.Services.AddScoped<ITestService, TestService>();
 builder.Services.AddScoped<ITestResultService, TestResultService>();
-builder.Services.AddScoped<IAutoMapperService, AutoMapperService>();
-builder.Services.AddScoped<IAutoMapperInnerService, AutoMapperInnerService>();
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(ServiceMappingProfile));
+builder.Services.AddAutoMapper(typeof(ControllerMappingProfile));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

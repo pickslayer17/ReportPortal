@@ -1,4 +1,5 @@
-﻿using ReportPortal.BL.Models;
+﻿using AutoMapper;
+using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
@@ -12,12 +13,12 @@ namespace ReportPortal.BL.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
-        private readonly IAutoMapperService _autoMapperService;
+        private readonly IMapper _mapper;
 
-        public ProjectService(IProjectRepository projectRepository, IAutoMapperService autoMapperService)
+        public ProjectService(IProjectRepository projectRepository, IMapper mapper)
         {
             _projectRepository = projectRepository;
-            _autoMapperService = autoMapperService;
+            _mapper = mapper;
         }
 
         public async Task<ProjectCreatedDto> CreateAsync(ProjectDto projectForCreationDto, CancellationToken cancellationToken = default)
@@ -56,13 +57,13 @@ namespace ReportPortal.BL.Services
         {
             var project = await _projectRepository.GetByAsync(pr => pr.Id == id);
 
-            return _autoMapperService.Map<Project, ProjectDto>(project);
+            return _mapper.Map<ProjectDto>(project);
         }
 
         public async Task<IEnumerable<ProjectDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var allProjects = await _projectRepository.GetAllByAsync(pr => true);
-            var allProjectsDto = allProjects.Select(pr => _autoMapperService.Map<Project, ProjectDto>(pr));
+            var allProjectsDto = allProjects.Select(pr => _mapper.Map<ProjectDto>(pr));
 
             return allProjectsDto;
         }

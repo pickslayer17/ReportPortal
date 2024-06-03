@@ -1,4 +1,5 @@
-﻿using Models.Dto;
+﻿using AutoMapper;
+using Models.Dto;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
@@ -13,13 +14,13 @@ namespace ReportPortal.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IAuthenticationService _authenticationService;
-        private readonly IAutoMapperService _autoMapperService;
+        private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, IAuthenticationService authenticationService, IAutoMapperService autoMapperService)
+        public UserService(IUserRepository userRepository, IAuthenticationService authenticationService, IMapper mapper)
         {
             _userRepository = userRepository;
             _authenticationService = authenticationService;
-            _autoMapperService = autoMapperService;
+            _mapper = mapper;
         }
 
         public async Task<UserCreatedDto> CreateAsync(UserDto userForCreationDto, CancellationToken cancellationToken = default)
@@ -60,7 +61,7 @@ namespace ReportPortal.Services
         public async Task<IEnumerable<UserDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var users = await _userRepository.GetAllByAsync(u => true, cancellationToken);
-            var usersDto = users.Select(u => _autoMapperService.Map<User, UserDto>(u));
+            var usersDto = users.Select(u => _mapper.Map<UserDto>(u));
 
             return usersDto;
         }
@@ -78,7 +79,7 @@ namespace ReportPortal.Services
         public async Task<UserDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var user = await _userRepository.GetByAsync(u => u.Id == id, cancellationToken);
-            return _autoMapperService.Map<User, UserDto>(user);
+            return _mapper.Map<UserDto>(user);
         }
     }
 }

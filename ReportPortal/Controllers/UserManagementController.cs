@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
@@ -15,13 +16,13 @@ namespace ReportPortal.Controllers
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authenticationService;
-        private readonly IAutoMapperInnerService _autoMapperInnerService;
+        private readonly IMapper _mapper;
 
-        public UserManagementController(IUserService userService, IAuthenticationService authenticationService, IAutoMapperInnerService autoMapperInnerService)
+        public UserManagementController(IUserService userService, IAuthenticationService authenticationService, IMapper mapper)
         {
             _userService = userService;
             _authenticationService = authenticationService;
-            _autoMapperInnerService = autoMapperInnerService;
+            _mapper = mapper;
         }
 
         [HttpGet("GetUser/{userId:int}")]
@@ -29,7 +30,7 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> GetUser(int userId)
         {
             var userDto = await _userService.GetByIdAsync(userId);
-            var userVm = _autoMapperInnerService.Map<UserDto, UserVm>(userDto);
+            var userVm = _mapper.Map<UserVm>(userDto);
             return Ok(userVm);
         }
 
@@ -38,7 +39,7 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> GetUsers()
         {
             var usersDto = await _userService.GetAllAsync();
-            var usersVm = usersDto.Select(u => _autoMapperInnerService.Map<UserDto, UserVm>(u));
+            var usersVm = usersDto.Select(u => _mapper.Map<UserVm>(u));
             return Ok(usersVm);
         }
 
@@ -46,7 +47,7 @@ namespace ReportPortal.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> CreateUser([FromBody] UserVm userModel)
         {
-            var userDto = _autoMapperInnerService.Map<UserVm, UserDto>(userModel);
+            var userDto = _mapper.Map<UserDto>(userModel);
 
             var userCreated = await _userService.CreateAsync(userDto);
 
