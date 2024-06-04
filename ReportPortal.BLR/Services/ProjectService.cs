@@ -13,12 +13,14 @@ namespace ReportPortal.BL.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly IRunService _runService;
         private readonly IMapper _mapper;
 
-        public ProjectService(IProjectRepository projectRepository, IMapper mapper)
+        public ProjectService(IProjectRepository projectRepository, IMapper mapper, IRunService runService)
         {
             _projectRepository = projectRepository;
             _mapper = mapper;
+            _runService = runService;
         }
 
         public async Task<ProjectCreatedDto> CreateAsync(ProjectDto projectForCreationDto, CancellationToken cancellationToken = default)
@@ -51,6 +53,13 @@ namespace ReportPortal.BL.Services
             }
 
             await _projectRepository.RemoveAsync(existingProject);
+
+            // delete all runs of the project
+            var projectRuns = await _runService.GetAllByAsync(pr => pr.ProjectId == id);
+            foreach ( var run in projectRuns) 
+            {
+                await _runService.DeleteByIdAsync(run.Id);
+            }
         }
 
         public async Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
