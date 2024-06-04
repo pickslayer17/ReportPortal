@@ -12,15 +12,18 @@ namespace ReportPortal.BL.Services
     public class RunService : IRunService
     {
         private readonly IFolderRepository _folderRepository;
+        private readonly ITestRepository _testRepository;
+        private readonly ITestResultRepository _testResultRepository;
         private readonly IRunRepository _runRepository;
         private readonly IProjectService _projectService;
 
-
-        public RunService(IRunRepository runRepository, IFolderRepository folderRepository, IProjectService projectService)
+        public RunService(IRunRepository runRepository, IFolderRepository folderRepository, IProjectService projectService, ITestRepository testRepository, ITestResultRepository testResultRepository)
         {
             _runRepository = runRepository;
             _folderRepository = folderRepository;
             _projectService = projectService;
+            _testRepository = testRepository;
+            _testResultRepository = testResultRepository;
         }
 
         public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
@@ -55,9 +58,26 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(int runId)
         {
-            throw new NotImplementedException();
+            var folders = await _folderRepository.GetAllByAsync(f => f.RunId == runId);
+
+            foreach (var folder in folders)
+            {
+                await _folderRepository.RemoveAsync(folder);
+            }
+
+            var tests = await _testRepository.GetAllByAsync(t => t.RunId == runId);
+            foreach (var test in tests)
+            {
+                await _testRepository.RemoveAsync(test);
+            }
+
+            var testResults = await _testResultRepository.GetAllByAsync(tr => tr.RunId == runId);
+            foreach (var tr in testResults)
+            {
+                await _testResultRepository.RemoveAsync(tr);
+            }
         }
 
         public Task<IEnumerable<RunDto>> GetAllAsync(CancellationToken cancellationToken = default)

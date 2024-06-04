@@ -41,11 +41,11 @@ namespace ReportPortal.Controllers
             return Ok(runCreatedDto);
         }
 
-        [HttpPost("DeleteRun")]
+        [HttpPost("DeleteRun/{runId:int}")]
         [Authorize]
-        public async Task<IActionResult> DeleteRun([FromBody] RunVm runVm)
+        public async Task<IActionResult> DeleteRun(int runId)
         {
-            
+            await _runService.DeleteByIdAsync(runId);
 
             return Ok();
         }
