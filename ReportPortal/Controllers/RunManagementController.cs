@@ -5,7 +5,6 @@ using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
-using ReportPortal.Services.Interfaces;
 using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
@@ -50,7 +49,7 @@ namespace ReportPortal.Controllers
             return Ok(_mapper.Map<RunVm>(run));
         }
 
-        [HttpGet("Project/{projectId:int}/Runs}")]
+        [HttpGet("Project/{projectId:int}/Runs")]
         [Authorize]
         public async Task<IActionResult> GetAllRuns(int projectId)
         {
@@ -63,7 +62,7 @@ namespace ReportPortal.Controllers
 
         [HttpPost("Project/{projectId:int}/Runs/{runId:int}/delete")]
         [Authorize]
-        public async Task<IActionResult> DeleteRun(int runId)
+        public async Task<IActionResult> DeleteRun(int projectId, int runId)
         {
             await _runService.DeleteByIdAsync(runId);
 
