@@ -17,6 +17,7 @@ namespace ReportPortal.BL.Maps
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<TestRunItem, TestCreatedDto>();
             CreateMap<Run, RunDto>().ReverseMap();
+            CreateMap<FolderDto, FolderRunItem>().ReverseMap();
         }
     }
 }

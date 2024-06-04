@@ -4,6 +4,7 @@ using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
+using ReportPortal.DAL.Repositories;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq;
 using System.Linq.Expressions;
@@ -53,6 +54,10 @@ namespace ReportPortal.BL.Services
                 RootFolderId = rootFolderId
             };
             var runId = await _runRepository.InsertAsync(run);
+
+            var rootFolder = await _folderRepository.GetByAsync(f => f.Id == rootFolderId);
+            rootFolder.RunId = runId;
+            await _folderRepository.UpdateItem(rootFolder);
 
             return new RunCreatedDto { Id = runId };
         }

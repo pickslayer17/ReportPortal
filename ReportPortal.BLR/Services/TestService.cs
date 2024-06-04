@@ -2,6 +2,7 @@
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
@@ -26,6 +27,17 @@ namespace ReportPortal.BL.Services
             // create or take existing folder
             var folderId = await _folderService.GetIdOrAddFolderInRun(testDto.RunId, testDto.Path);
             testDto.FolderId = folderId;
+
+            /// verify if test with such name already exists
+            var folder = await _folderService.GetByIdAsync(folderId);
+            if (folder.TestIds != null && folder.TestIds.Count > 0)
+            {
+                foreach (var testId in folder.TestIds)
+                {
+                    var test = await _testRepository.GetByAsync(t => t.Id == testId);
+                    if (test.Name == testDto.Name) throw new TestWithSuchNameAlreadyExists($"Test with name '{testDto.Name}' already exists in folder with id {folderId}");
+                }
+            }
 
             // insert test to databse
             var testRunItem = _mapper.Map<TestRunItem>(testDto);

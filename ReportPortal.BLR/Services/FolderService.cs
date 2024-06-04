@@ -1,9 +1,9 @@
-﻿using ReportPortal.BL.Models;
-using ReportPortal.BL.Models.Created;
+﻿using AutoMapper;
+using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
-using System.Linq;
+using System;
 using System.Linq.Expressions;
 
 namespace ReportPortal.BL.Services
@@ -12,11 +12,13 @@ namespace ReportPortal.BL.Services
     {
         private readonly IFolderRepository _folderRepository;
         private readonly IRunRepository _runRepository;
+        private readonly IMapper _mapper;
 
-        public FolderService(IRunRepository runRepository, IFolderRepository folderRepository)
+        public FolderService(IRunRepository runRepository, IFolderRepository folderRepository, IMapper mapper)
         {
             _runRepository = runRepository;
             _folderRepository = folderRepository;
+            _mapper = mapper;
         }
 
         public async Task<int> GetIdOrAddFolderInRun(int runId, string path)
@@ -49,7 +51,7 @@ namespace ReportPortal.BL.Services
                 var newFolderId = await CreateFolder(parentFolder.Id, folderNames[0], runId);
                 var newFolder = await _folderRepository.GetByAsync(f => f.Id == newFolderId);
 
-                if(folderNames.Length == 1)
+                if (folderNames.Length == 1)
                 {
                     return newFolder.Id;
                 }
@@ -84,7 +86,7 @@ namespace ReportPortal.BL.Services
 
             int folderId = await _folderRepository.InsertAsync(folderRunItem);
             var parentFolder = await _folderRepository.GetByAsync(f => f.Id == folderParentId);
-            if(parentFolder.ChildFolderIds == null)
+            if (parentFolder.ChildFolderIds == null)
             {
                 parentFolder.ChildFolderIds = new List<int> { folderId };
             }
@@ -92,7 +94,7 @@ namespace ReportPortal.BL.Services
             {
                 parentFolder.ChildFolderIds.Add(folderId);
             }
-           
+
             await _folderRepository.UpdateItem(parentFolder);
 
             return folderId;
@@ -104,9 +106,9 @@ namespace ReportPortal.BL.Services
             var folder = await _folderRepository.GetByAsync(f => f.Id == folderId);
             if (folder == null) throw new DirectoryNotFoundException($"There is no folder with such id {folderId}!");
 
-            if(folder.TestIds == null)
+            if (folder.TestIds == null)
             {
-                folder.TestIds = new List<int> { testId  };
+                folder.TestIds = new List<int> { testId };
             }
             else
             {
@@ -121,24 +123,10 @@ namespace ReportPortal.BL.Services
             return await _folderRepository.GetByAsync(predicate, cancellationToken);
         }
 
-        public Task<FolderCreatedDto> CreateAsync(FolderDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<FolderDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<FolderRunItem>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<FolderRunItem>> GetAllByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
+            var folderRunItem = await _folderRepository.GetByAsync(f => f.Id == id, cancellationToken);
+            return _mapper.Map<FolderDto>(folderRunItem);
         }
     }
 }
