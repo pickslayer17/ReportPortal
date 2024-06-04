@@ -13,8 +13,8 @@ namespace ReportPortal.BL.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
-        private readonly IRunService _runService;
         private readonly IMapper _mapper;
+        private readonly IRunService _runService;
 
         public ProjectService(IProjectRepository projectRepository, IMapper mapper, IRunService runService)
         {
@@ -56,7 +56,7 @@ namespace ReportPortal.BL.Services
 
             // delete all runs of the project
             var projectRuns = await _runService.GetAllByAsync(pr => pr.ProjectId == id);
-            foreach ( var run in projectRuns) 
+            foreach (var run in projectRuns)
             {
                 await _runService.DeleteByIdAsync(run.Id);
             }

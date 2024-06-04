@@ -29,10 +29,10 @@ namespace ReportPortal.BL.Services
 
             var rootFolder = await _folderRepository.GetByAsync(f => f.Id == run.RootFolderId);
 
-            return await GetIdOrAddFolder(rootFolder, folderNames);
+            return await GetIdOrAddFolder(rootFolder, folderNames, runId);
         }
 
-        private async Task<int> GetIdOrAddFolder(FolderRunItem parentFolder, string[] folderNames)
+        private async Task<int> GetIdOrAddFolder(FolderRunItem parentFolder, string[] folderNames, int runId)
         {
             var parentFolderChildNames = new List<string>();
             if (parentFolder.ChildFolderIds != null)
@@ -46,7 +46,7 @@ namespace ReportPortal.BL.Services
             /// if no -> crate folder,  
             if (!parentFolderChildNames.Contains(folderNames[0]))
             {
-                var newFolderId = await CreateFolder(parentFolder.Id, folderNames[0]);
+                var newFolderId = await CreateFolder(parentFolder.Id, folderNames[0], runId);
                 var newFolder = await _folderRepository.GetByAsync(f => f.Id == newFolderId);
 
                 if(folderNames.Length == 1)
@@ -55,7 +55,7 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    return await GetIdOrAddFolder(newFolder, folderNames.Skip(1).ToArray());
+                    return await GetIdOrAddFolder(newFolder, folderNames.Skip(1).ToArray(), runId);
                 }
             }
             /// if yes -> choose folder, call GetIdOrAddFolder() again
@@ -68,17 +68,18 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    return await GetIdOrAddFolder(foundFolder, folderNames.Skip(1).ToArray());
+                    return await GetIdOrAddFolder(foundFolder, folderNames.Skip(1).ToArray(), runId);
                 }
             }
         }
 
-        private async Task<int> CreateFolder(int? folderParentId, string folderName)
+        private async Task<int> CreateFolder(int? folderParentId, string folderName, int runId)
         {
             var folderRunItem = new FolderRunItem
             {
                 Name = folderName,
                 ParentId = folderParentId,
+                RunId = runId
             };
 
             int folderId = await _folderRepository.InsertAsync(folderRunItem);

@@ -15,20 +15,20 @@ namespace ReportPortal.BL.Services
         private readonly ITestRepository _testRepository;
         private readonly ITestResultRepository _testResultRepository;
         private readonly IRunRepository _runRepository;
-        private readonly IProjectService _projectService;
+        private readonly IProjectRepository _projectRepository;
 
-        public RunService(IRunRepository runRepository, IFolderRepository folderRepository, IProjectService projectService, ITestRepository testRepository, ITestResultRepository testResultRepository)
+        public RunService(IRunRepository runRepository, IFolderRepository folderRepository, ITestRepository testRepository, ITestResultRepository testResultRepository, IProjectRepository projectRepository)
         {
             _runRepository = runRepository;
             _folderRepository = folderRepository;
-            _projectService = projectService;
             _testRepository = testRepository;
             _testResultRepository = testResultRepository;
+            _projectRepository = projectRepository;
         }
 
         public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
         {
-            var project = await _projectService.GetByIdAsync(runForCreationDto.ProjectId);
+            var project = await _projectRepository.GetByAsync(pr => pr.Id == runForCreationDto.ProjectId);
             if (project == null)
             {
                 throw new ProjectNotFoundException($"No project to create a Run in with id {runForCreationDto.ProjectId}");
