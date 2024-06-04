@@ -41,7 +41,27 @@ namespace ReportPortal.Controllers
             return Ok(runCreatedDto);
         }
 
-        [HttpPost("DeleteRun/{runId:int}")]
+        [HttpGet("Project/{projectId:int}/Runs/{runId:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetRun(int projectId, int runId)
+        {
+            var run = await _runService.GetByIdAsync(runId);
+
+            return Ok(_mapper.Map<RunVm>(run));
+        }
+
+        [HttpGet("Project/{projectId:int}/Runs}")]
+        [Authorize]
+        public async Task<IActionResult> GetAllRuns(int projectId)
+        {
+            var allRunsDto = await _runService.GetAllByAsync(r => r.ProjectId == projectId);
+            var resultVms = allRunsDto.Select(rdto => _mapper.Map<RunVm>(rdto));
+
+            return Ok(resultVms);
+        }
+
+
+        [HttpPost("Project/{projectId:int}/Runs/{runId:int}/delete")]
         [Authorize]
         public async Task<IActionResult> DeleteRun(int runId)
         {
