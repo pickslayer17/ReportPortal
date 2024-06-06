@@ -11,9 +11,9 @@ namespace ReportPortal.DAL.Repositories
         {
         }
 
-        public Task<IEnumerable<Run>> GetAllByAsync(Expression<Func<Run, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Run>> GetAllByAsync(Expression<Func<Run, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Runs.Where(predicate).ToListAsync();
         }
 
         public async Task<Run> GetByAsync(Expression<Func<Run, bool>> predicate, CancellationToken cancellationToken = default)
@@ -29,9 +29,10 @@ namespace ReportPortal.DAL.Repositories
             return item.Id;
         }
 
-        public Task RemoveAsync(Run item)
+        public async Task RemoveAsync(Run item)
         {
-            throw new NotImplementedException();
+            _dbContext.Runs.Remove(item);
+            _dbContext.SaveChangesAsync();
         }
     }
 

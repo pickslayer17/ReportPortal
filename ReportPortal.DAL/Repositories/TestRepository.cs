@@ -11,9 +11,9 @@ namespace ReportPortal.DAL.Repositories
         {
         }
 
-        public Task<IEnumerable<TestRunItem>> GetAllByAsync(Expression<Func<TestRunItem, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TestRunItem>> GetAllByAsync(Expression<Func<TestRunItem, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Tests.Where(predicate).ToListAsync(cancellationToken);
         }
 
         public async Task<TestRunItem> GetByAsync(Expression<Func<TestRunItem, bool>> predicate, CancellationToken cancellationToken = default)
@@ -29,9 +29,10 @@ namespace ReportPortal.DAL.Repositories
             return testRunItem.Id;
         }
 
-        public Task RemoveAsync(TestRunItem user)
+        public async Task RemoveAsync(TestRunItem test)
         {
-            throw new NotImplementedException();
+            _dbContext.Tests.Remove(test);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

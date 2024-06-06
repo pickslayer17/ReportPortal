@@ -87,6 +87,9 @@ namespace ReportPortal.BL.Services
             {
                 await _testResultRepository.RemoveAsync(tr);
             }
+
+            var run = await _runRepository.GetByAsync(r => r.Id == runId);
+            await _runRepository.RemoveAsync(run);
         }
 
         public Task<IEnumerable<RunDto>> GetAllAsync(CancellationToken cancellationToken = default)

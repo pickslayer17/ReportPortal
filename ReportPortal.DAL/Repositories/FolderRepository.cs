@@ -29,9 +29,10 @@ namespace ReportPortal.DAL.Repositories
             return folder.Id;
         }
 
-        public Task RemoveAsync(FolderRunItem user)
+        public async Task RemoveAsync(FolderRunItem folder)
         {
-            throw new NotImplementedException();
+            _dbContext.Folders.Remove(folder);
+            _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateItem(FolderRunItem item)

@@ -1,4 +1,5 @@
-﻿using ReportPortal.DAL.Models.RunProjectManagement;
+﻿using Microsoft.EntityFrameworkCore;
+using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
 
@@ -10,14 +11,14 @@ namespace ReportPortal.DAL.Repositories
         {
         }
 
-        public Task<IEnumerable<TestResult>> GetAllByAsync(Expression<Func<TestResult, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TestResult>> GetAllByAsync(Expression<Func<TestResult, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.TestResults.Where(predicate).ToListAsync(cancellationToken);
         }
 
-        public Task<TestResult> GetByAsync(Expression<Func<TestResult, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<TestResult> GetByAsync(Expression<Func<TestResult, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.TestResults.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
         public async Task<int> InsertAsync(TestResult testResult)
@@ -28,9 +29,10 @@ namespace ReportPortal.DAL.Repositories
             return testResult.Id;
         }
 
-        public Task RemoveAsync(TestResult user)
+        public async Task RemoveAsync(TestResult testResult)
         {
-            throw new NotImplementedException();
+            _dbContext.TestResults.Remove(testResult);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

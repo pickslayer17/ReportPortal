@@ -64,9 +64,16 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteRun(int projectId, int runId)
         {
-            await _runService.DeleteByIdAsync(runId);
+            try
+            {
+                await _runService.DeleteByIdAsync(runId);
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"There were some troubles with run deleting (run.id = {runId})\n{ex.Message}");
+            }
         }
     }
 }
