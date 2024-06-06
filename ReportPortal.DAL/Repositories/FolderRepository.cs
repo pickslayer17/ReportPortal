@@ -32,7 +32,7 @@ namespace ReportPortal.DAL.Repositories
         public async Task RemoveAsync(FolderRunItem folder)
         {
             _dbContext.Folders.Remove(folder);
-            _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateItem(FolderRunItem item)
