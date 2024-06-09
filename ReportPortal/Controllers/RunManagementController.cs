@@ -40,9 +40,9 @@ namespace ReportPortal.Controllers
             return Ok(runCreatedDto);
         }
 
-        [HttpGet("Project/{projectId:int}/Runs/{runId:int}")]
+        [HttpGet("Runs/{runId:int}")]
         [Authorize]
-        public async Task<IActionResult> GetRun(int projectId, int runId)
+        public async Task<IActionResult> GetRun(int runId)
         {
             var run = await _runService.GetByIdAsync(runId);
 
@@ -60,9 +60,9 @@ namespace ReportPortal.Controllers
         }
 
 
-        [HttpPost("Project/{projectId:int}/Runs/{runId:int}/delete")]
+        [HttpPost("Runs/{runId:int}/delete")]
         [Authorize]
-        public async Task<IActionResult> DeleteRun(int projectId, int runId)
+        public async Task<IActionResult> DeleteRun(int runId)
         {
             try
             {
