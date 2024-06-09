@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ReportPortal.BL.Constatnts;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.RunProjectManagement;
@@ -118,15 +119,25 @@ namespace ReportPortal.BL.Services
             await _folderRepository.UpdateItem(folder);
         }
 
-        private async Task<FolderRunItem> GetByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            return await _folderRepository.GetByAsync(predicate, cancellationToken);
-        }
-
         public async Task<FolderDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var folderRunItem = await _folderRepository.GetByAsync(f => f.Id == id, cancellationToken);
             return _mapper.Map<FolderDto>(folderRunItem);
+        }
+
+        public async Task<IEnumerable<FolderDto>> GetAllRunChildAsync(int runId, CancellationToken cancellationToken = default)
+        {
+
+            var rootFolder = await _folderRepository.GetByAsync(f => f.Name == FolderNames.RootFolderName && f.Id == runId, cancellationToken);
+            var folders = new List<FolderRunItem>();
+            foreach (var childId in rootFolder.ChildFolderIds)
+            {
+                var childFolder = await _folderRepository.GetByAsync(f => f.Id == childId, cancellationToken);
+                if(childFolder == null) continue;
+                folders.Add(childFolder);
+            }
+
+            return folders.Select(f => _mapper.Map<FolderDto>(f));
         }
     }
 }

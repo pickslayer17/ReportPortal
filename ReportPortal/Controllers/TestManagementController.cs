@@ -16,7 +16,7 @@ namespace ReportPortal.Controllers
         private readonly IFolderService _folderService;
         private readonly IMapper _mapper;
 
-        public TestManagementController(ITestService testService, IProjectService projectService, IFolderService folderService, IMapper mapper)
+        public TestManagementController(ITestService testService, IFolderService folderService, IMapper mapper)
         {
             _testService = testService;
             _folderService = folderService;

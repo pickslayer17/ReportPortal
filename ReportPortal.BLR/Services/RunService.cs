@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ReportPortal.BL.Constatnts;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
@@ -41,7 +42,7 @@ namespace ReportPortal.BL.Services
 
             var folderRunItem = new FolderRunItem
             {
-                Name = "Root",
+                Name = FolderNames.RootFolderName,
                 ParentId = null,
             };
 
