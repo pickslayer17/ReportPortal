@@ -15,13 +15,15 @@ namespace ReportPortal.BL.Services
         private readonly ITestResultRepository _testResultRepository;
         private readonly IMapper _mapper;
         private readonly IFolderService _folderService;
+        private readonly IFolderRepository _folderRepository;
 
-        public TestService(ITestRepository testRepository, IMapper mapper, IFolderService folderService, ITestResultRepository testResultRepository)
+        public TestService(ITestRepository testRepository, IMapper mapper, IFolderService folderService, ITestResultRepository testResultRepository, IFolderRepository folderRepository)
         {
             _testRepository = testRepository;
             _mapper = mapper;
             _folderService = folderService;
             _testResultRepository = testResultRepository;
+            _folderRepository = folderRepository;
         }
 
         public async Task<TestCreatedDto> CreateAsync(TestDto testDto, CancellationToken cancellationToken = default)
@@ -65,13 +67,13 @@ namespace ReportPortal.BL.Services
                 }
             }
 
-            var folder = await _folderService.GetByIdAsync(test.FolderId);
-            if (folder != null && folder.TestIds != null)
+            var folder = await _folderRepository.GetByAsync(f => f.Id == test.FolderId);
+            if (folder.TestIds != null)
             {
                 var isRemoved = folder.TestIds.Remove(test.Id);
                 if (!isRemoved) throw new Exception("Would be nice to add logger here, but let it be exception for a while. Test wasnt present in folder test ids list");
+                await _folderRepository.UpdateItem(folder);
             }
-            ///_folderService.Update(folder);
 
             await _testRepository.RemoveByIdAsync(test.Id);
         }

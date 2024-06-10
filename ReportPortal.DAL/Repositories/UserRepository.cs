@@ -41,5 +41,10 @@ namespace ReportPortal.Services
 
             return user;
         }
+
+        public Task UpdateItem(User item)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

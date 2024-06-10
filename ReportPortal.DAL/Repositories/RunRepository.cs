@@ -35,6 +35,11 @@ namespace ReportPortal.DAL.Repositories
             _dbContext.Runs.Remove(run);
             await _dbContext.SaveChangesAsync();
         }
+
+        public Task UpdateItem(Run item)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

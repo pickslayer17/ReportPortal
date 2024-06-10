@@ -39,5 +39,10 @@ namespace ReportPortal.DAL.Repositories
             _dbContext.Projects.Remove(project);
             await _dbContext.SaveChangesAsync();
         }
+
+        public Task UpdateItem(Project item)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
