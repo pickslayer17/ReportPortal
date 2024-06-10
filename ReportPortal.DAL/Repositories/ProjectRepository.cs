@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
@@ -18,7 +19,10 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<Project> GetByAsync(Expression<Func<Project, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Projects.FirstOrDefaultAsync(predicate, cancellationToken);
+            var project = await _dbContext.Projects.FirstOrDefaultAsync(predicate, cancellationToken);
+            if(project == null) throw new ProjectNotFoundException($"There is no project with such predicate {predicate}");
+
+            return project;
         }
 
         public async Task<int> InsertAsync(Project project)
@@ -29,8 +33,9 @@ namespace ReportPortal.DAL.Repositories
             return project.Id;
         }
 
-        public async Task RemoveAsync(Project project)
+        public async Task RemoveByIdAsync(int projectId)
         {
+            var project = await GetByAsync(pr => pr.Id == projectId);
             _dbContext.Projects.Remove(project);
             await _dbContext.SaveChangesAsync();
         }

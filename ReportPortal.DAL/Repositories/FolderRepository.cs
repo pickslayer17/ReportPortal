@@ -29,8 +29,9 @@ namespace ReportPortal.DAL.Repositories
             return folder.Id;
         }
 
-        public async Task RemoveAsync(FolderRunItem folder)
+        public async Task RemoveByIdAsync(int folderId)
         {
+            var folder = await GetByAsync(f => f.Id == folderId);
             _dbContext.Folders.Remove(folder);
             await _dbContext.SaveChangesAsync();
         }

@@ -29,8 +29,9 @@ namespace ReportPortal.DAL.Repositories
             return testResult.Id;
         }
 
-        public async Task RemoveAsync(TestResult testResult)
+        public async Task RemoveByIdAsync(int testResultId)
         {
+            var testResult = await GetByAsync(tr => tr.Id == testResultId);
             _dbContext.TestResults.Remove(testResult);
             await _dbContext.SaveChangesAsync();
         }

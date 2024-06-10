@@ -47,15 +47,7 @@ namespace ReportPortal.Services
 
         public async Task DeleteByIdAsync(int id)
         {
-            var user = await _userRepository.GetByAsync(u => u.Id == id);
-            if (user != null)
-            {
-                await _userRepository.RemoveAsync(user);
-            }
-            else
-            {
-                throw new UserNotFoundException($"User with userId {id} isn't present.");
-            }
+            await _userRepository.RemoveByIdAsync(id);
         }
 
         public async Task<IEnumerable<UserDto>> GetAllAsync(CancellationToken cancellationToken = default)

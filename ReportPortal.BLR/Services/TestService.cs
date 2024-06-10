@@ -61,7 +61,7 @@ namespace ReportPortal.BL.Services
                 foreach (var testResultId in test.TestResultIds)
                 {
                     var testResult = await _testResultRepository.GetByAsync(tr => tr.Id == testResultId);
-                    await _testResultRepository.RemoveAsync(_mapper.Map<TestResult>(testResult));
+                    await _testResultRepository.RemoveByIdAsync(testResult.Id);
                 }
             }
 
@@ -73,7 +73,7 @@ namespace ReportPortal.BL.Services
             }
             ///_folderService.Update(folder);
 
-            await _testRepository.RemoveAsync(_mapper.Map<TestRunItem>(test));
+            await _testRepository.RemoveByIdAsync(test.Id);
         }
 
         public Task<IEnumerable<TestDto>> GetAllAsync(CancellationToken cancellationToken = default)

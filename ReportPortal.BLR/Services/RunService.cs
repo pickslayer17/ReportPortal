@@ -74,23 +74,23 @@ namespace ReportPortal.BL.Services
 
             foreach (var folder in folders)
             {
-                await _folderRepository.RemoveAsync(folder);
+                await _folderRepository.RemoveByIdAsync(folder.Id);
             }
 
             var tests = await _testRepository.GetAllByAsync(t => t.RunId == runId);
             foreach (var test in tests)
             {
-                await _testRepository.RemoveAsync(test);
+                await _testRepository.RemoveByIdAsync(test.Id);
             }
 
             var testResults = await _testResultRepository.GetAllByAsync(tr => tr.RunId == runId);
             foreach (var tr in testResults)
             {
-                await _testResultRepository.RemoveAsync(tr);
+                await _testResultRepository.RemoveByIdAsync(tr.Id);
             }
 
             var run = await _runRepository.GetByAsync(r => r.Id == runId);
-            await _runRepository.RemoveAsync(run);
+            await _runRepository.RemoveByIdAsync(run.Id);
         }
 
         public Task<IEnumerable<RunDto>> GetAllAsync(CancellationToken cancellationToken = default)

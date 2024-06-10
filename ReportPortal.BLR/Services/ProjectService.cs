@@ -46,13 +46,7 @@ namespace ReportPortal.BL.Services
 
         public async Task DeleteByIdAsync(int id)
         {
-            var existingProject = await _projectRepository.GetByAsync(pr => pr.Id == id);
-            if (existingProject != null)
-            {
-                throw new ProjectNotFoundException($"There is no project with such id {id}");
-            }
-
-            await _projectRepository.RemoveAsync(existingProject);
+            await _projectRepository.RemoveByIdAsync(id);
 
             // delete all runs of the project
             var projectRuns = await _runService.GetAllByAsync(pr => pr.ProjectId == id);

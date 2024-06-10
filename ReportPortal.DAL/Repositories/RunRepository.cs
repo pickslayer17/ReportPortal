@@ -29,9 +29,10 @@ namespace ReportPortal.DAL.Repositories
             return item.Id;
         }
 
-        public async Task RemoveAsync(Run item)
+        public async Task RemoveByIdAsync(int runId)
         {
-            _dbContext.Runs.Remove(item);
+            var run = await GetByAsync(r => r.Id == runId);
+            _dbContext.Runs.Remove(run);
             await _dbContext.SaveChangesAsync();
         }
     }

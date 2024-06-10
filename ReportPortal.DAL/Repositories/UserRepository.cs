@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReportPortal.DAL;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.UserManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Interfaces;
@@ -26,15 +27,19 @@ namespace ReportPortal.Services
             return user.Id.Value;
         }
 
-        public async Task RemoveAsync(User user)
+        public async Task RemoveByIdAsync(int uesrId)
         {
+            var user = await GetByAsync(u => u.Id == uesrId);
             _dbContext.Users.Remove(user);
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task<User> GetByAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(predicate);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(predicate);
+            if(user == null) throw new UserNotFoundException($"User with predicate {predicate} cannot be found.");
+
+            return user;
         }
     }
 }
