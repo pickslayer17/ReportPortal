@@ -23,9 +23,18 @@ namespace ReportPortal.Controllers
 
         [HttpGet("Runs/{runId:int}/folders")]
         [Authorize]
-        public async Task<IActionResult> GetAllRunFolders(int runId)
+        public async Task<IActionResult> GetRunChildFolders(int runId)
         {
-            var foldersDto = await _folderService.GetAllRunChildAsync(runId);
+            var foldersDto = await _folderService.GetRunChildrenAsync(runId);
+
+            return Ok(foldersDto.Select(f => _mapper.Map<FolderVm>(f)));
+        }
+
+        [HttpGet("Folder/{folderId:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetChildFolders(int folderId)
+        {
+            var foldersDto = await _folderService.GetChildrenAsync(folderId);
 
             return Ok(foldersDto.Select(f => _mapper.Map<FolderVm>(f)));
         }

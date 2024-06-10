@@ -2,10 +2,9 @@
 using ReportPortal.BL.Constatnts;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
-using System;
-using System.Linq.Expressions;
 
 namespace ReportPortal.BL.Services
 {
@@ -125,16 +124,27 @@ namespace ReportPortal.BL.Services
             return _mapper.Map<FolderDto>(folderRunItem);
         }
 
-        public async Task<IEnumerable<FolderDto>> GetAllRunChildAsync(int runId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<FolderDto>> GetRunChildrenAsync(int runId, CancellationToken cancellationToken = default)
         {
-
             var rootFolder = await _folderRepository.GetByAsync(f => f.Name == FolderNames.RootFolderName && f.Id == runId, cancellationToken);
+
+            return await GetChildrenAsync(rootFolder.Id, cancellationToken);
+        }
+
+        public async Task<IEnumerable<FolderDto>> GetChildrenAsync(int folderId, CancellationToken cancellationToken = default)
+        {
+            var parentFolder = await _folderRepository.GetByAsync(f => f.Id == folderId, cancellationToken);
+            if (parentFolder == null) throw new FolderNotFoundException($"folder with id {folderId} was not found");
+
             var folders = new List<FolderRunItem>();
-            foreach (var childId in rootFolder.ChildFolderIds)
+            if (parentFolder.ChildFolderIds != null)
             {
-                var childFolder = await _folderRepository.GetByAsync(f => f.Id == childId, cancellationToken);
-                if(childFolder == null) continue;
-                folders.Add(childFolder);
+                foreach (var childId in parentFolder.ChildFolderIds)
+                {
+                    var childFolder = await _folderRepository.GetByAsync(f => f.Id == childId, cancellationToken);
+                    if (childFolder == null) continue;
+                    folders.Add(childFolder);
+                }
             }
 
             return folders.Select(f => _mapper.Map<FolderDto>(f));
