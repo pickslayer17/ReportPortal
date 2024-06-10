@@ -66,14 +66,35 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
+        public async Task<IEnumerable<TestDto>> GetAllByFolderIdAsync(int folderId, CancellationToken cancellationToken = default)
+        {
+            var folder = await _folderService.GetByIdAsync(folderId);
+            var testIds = folder.TestIds;
+
+            var tests = new List<TestDto>();
+            if (testIds != null)
+            {
+                foreach (var testId in folder.TestIds)
+                {
+                    var test = await GetByIdAsync(testId);
+                    tests.Add(_mapper.Map<TestDto>(test));
+                }
+            }
+
+            return tests;
+        }
+
         public Task<TestDto> GetByAsync(Expression<Func<TestDto, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TestDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<TestDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var test = await _testRepository.GetByAsync(t => t.Id == id, cancellationToken);
+            if (test == null) throw new TestNotFoundExeption("");
+
+            return _mapper.Map<TestDto>(test);
         }
     }
 

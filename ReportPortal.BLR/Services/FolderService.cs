@@ -121,6 +121,8 @@ namespace ReportPortal.BL.Services
         public async Task<FolderDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var folderRunItem = await _folderRepository.GetByAsync(f => f.Id == id, cancellationToken);
+            if (folderRunItem == null) throw new FolderNotFoundException($"folder with id {id} was not found");
+
             return _mapper.Map<FolderDto>(folderRunItem);
         }
 
@@ -133,8 +135,7 @@ namespace ReportPortal.BL.Services
 
         public async Task<IEnumerable<FolderDto>> GetChildrenAsync(int folderId, CancellationToken cancellationToken = default)
         {
-            var parentFolder = await _folderRepository.GetByAsync(f => f.Id == folderId, cancellationToken);
-            if (parentFolder == null) throw new FolderNotFoundException($"folder with id {folderId} was not found");
+            var parentFolder = await GetByIdAsync(folderId, cancellationToken);
 
             var folders = new List<FolderRunItem>();
             if (parentFolder.ChildFolderIds != null)
