@@ -40,5 +40,20 @@ namespace ReportPortal.Controllers
             var tests = await _testService.GetAllByFolderIdAsync(folderId);
             return Ok(tests.Select(t => _mapper.Map<TestVm>(t)));
         }
+
+        [HttpPost("Test/{testId:int}/delete")]
+        [Authorize]
+        public async Task<IActionResult> DeleteTest(int testId)
+        {
+            try
+            {
+                await _testService.DeleteByIdAsync(testId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

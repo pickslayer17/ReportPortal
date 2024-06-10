@@ -12,14 +12,16 @@ namespace ReportPortal.BL.Services
     public class TestService : ITestService
     {
         private readonly ITestRepository _testRepository;
+        private readonly ITestResultRepository _testResultRepository;
         private readonly IMapper _mapper;
         private readonly IFolderService _folderService;
 
-        public TestService(ITestRepository testRepository, IMapper mapper, IFolderService folderService)
+        public TestService(ITestRepository testRepository, IMapper mapper, IFolderService folderService, ITestResultRepository testResultRepository)
         {
             _testRepository = testRepository;
             _mapper = mapper;
             _folderService = folderService;
+            _testResultRepository = testResultRepository;
         }
 
         public async Task<TestCreatedDto> CreateAsync(TestDto testDto, CancellationToken cancellationToken = default)
@@ -51,9 +53,27 @@ namespace ReportPortal.BL.Services
             return testCreated;
         }
 
-        public Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var test = await GetByIdAsync(id);
+            if (test.TestResultIds != null)
+            {
+                foreach (var testResultId in test.TestResultIds)
+                {
+                    var testResult = await _testResultRepository.GetByAsync(tr => tr.Id == testResultId);
+                    await _testResultRepository.RemoveAsync(_mapper.Map<TestResult>(testResult));
+                }
+            }
+
+            var folder = await _folderService.GetByIdAsync(test.FolderId);
+            if (folder != null && folder.TestIds != null)
+            {
+                var isRemoved = folder.TestIds.Remove(test.Id);
+                if (!isRemoved) throw new Exception("Would be nice to add logger here, but let it be exception for a while. Test wasnt present in folder test ids list");
+            }
+            ///_folderService.Update(folder);
+
+            await _testRepository.RemoveAsync(_mapper.Map<TestRunItem>(test));
         }
 
         public Task<IEnumerable<TestDto>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -92,7 +112,7 @@ namespace ReportPortal.BL.Services
         public async Task<TestDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var test = await _testRepository.GetByAsync(t => t.Id == id, cancellationToken);
-            if (test == null) throw new TestNotFoundExeption("");
+            if (test == null) throw new TestNotFoundExeption($"Test with id {id} was not found");
 
             return _mapper.Map<TestDto>(test);
         }
