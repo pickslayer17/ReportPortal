@@ -18,7 +18,7 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<TestRunItem> GetByAsync(Expression<Func<TestRunItem, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Tests.FirstOrDefaultAsync(predicate);
+            return await _dbContext.Tests.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
         public async Task<int> InsertAsync(TestRunItem testRunItem)
@@ -36,9 +36,11 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public Task UpdateItem(TestRunItem item)
+        public async Task UpdateItem(TestRunItem item)
         {
-            throw new NotImplementedException();
+            var oldItem = await GetByAsync(t => t.Id == item.Id);
+            _dbContext.Tests.Entry(oldItem).CurrentValues.SetValues(item);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

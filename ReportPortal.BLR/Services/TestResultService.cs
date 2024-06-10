@@ -1,15 +1,42 @@
-﻿using ReportPortal.BL.Models;
+﻿using AutoMapper;
+using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Models.RunProjectManagement;
+using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
 
 namespace ReportPortal.BL.Services
 {
     public class TestResultService : ITestResultService
     {
-        public TestResultService()
+        private readonly ITestRepository _testRepository;
+        private readonly ITestResultRepository _testResultRepository;
+        private readonly IMapper _mapper;
+
+        public TestResultService(ITestRepository testRepository, ITestResultRepository testResultRepository, IMapper mapper)
         {
+            _testRepository = testRepository;
+            _testResultRepository = testResultRepository;
+            _mapper = mapper;
         }
+
+        public async Task<int> AddTestResultToTest(int testId, TestResultDto testDto, CancellationToken cancellationToken = default)
+        {
+            var testResult = _mapper.Map<TestResult>(testDto);
+            var test = await _testRepository.GetByAsync(t => t.Id == testId, cancellationToken);
+
+            testResult.TestId = testId;
+            testResult.RunId = test.RunId;
+            var testResultId = await _testResultRepository.InsertAsync(testResult);
+
+            if (test.TestResultIds == null) test.TestResultIds = new List<int>();
+            test.TestResultIds.Add(testResultId);
+            await _testRepository.UpdateItem(test);
+
+            return testResultId;
+        }
+
         public async Task<TestResultCreatedDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

@@ -1,5 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using ReportPortal.DAL.Enums;
+﻿using ReportPortal.DAL.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace ReportPortal.DAL.Models.RunProjectManagement

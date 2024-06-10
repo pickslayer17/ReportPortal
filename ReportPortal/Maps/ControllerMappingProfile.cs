@@ -17,6 +17,7 @@ namespace ReportPortal.Maps
             CreateMap<UserVm, UserDto>().ReverseMap(); ;
             CreateMap<ProjectVm, ProjectDto>().ReverseMap();
             CreateMap<FolderVm, FolderDto>().ReverseMap();
+            CreateMap<TestResultVm, TestResultDto>().ReverseMap();
         }
     }
 }

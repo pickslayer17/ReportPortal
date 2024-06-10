@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
-using ReportPortal.Services.Interfaces;
 using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
