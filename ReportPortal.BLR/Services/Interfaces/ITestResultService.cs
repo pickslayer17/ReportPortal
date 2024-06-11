@@ -5,6 +5,7 @@ namespace ReportPortal.BL.Services.Interfaces
 {
     public interface ITestResultService : IServiceBase<TestResultDto, TestResultCreatedDto>
     {
-        public Task<int> AddTestResultToTest(int testId, TestResultDto testDto, CancellationToken cancellationToken = default);
+        public Task<int> AddTestResultToTestAsync(int testId, TestResultDto testDto, CancellationToken cancellationToken = default);
+        public Task<IEnumerable<int>> GetTestTestResultIdsAsync(int testId, CancellationToken cancellationToken = default);
     }
 }

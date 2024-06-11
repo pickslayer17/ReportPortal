@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
@@ -18,7 +19,10 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<TestRunItem> GetByAsync(Expression<Func<TestRunItem, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Tests.FirstOrDefaultAsync(predicate, cancellationToken);
+            var test =  await _dbContext.Tests.FirstOrDefaultAsync(predicate, cancellationToken);
+            if (test == null) throw new TestNotFoundException($"There is no test with such predicate {predicate}");
+
+            return test;
         }
 
         public async Task<int> InsertAsync(TestRunItem testRunItem)

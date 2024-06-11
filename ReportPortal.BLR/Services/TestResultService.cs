@@ -21,7 +21,7 @@ namespace ReportPortal.BL.Services
             _mapper = mapper;
         }
 
-        public async Task<int> AddTestResultToTest(int testId, TestResultDto testDto, CancellationToken cancellationToken = default)
+        public async Task<int> AddTestResultToTestAsync(int testId, TestResultDto testDto, CancellationToken cancellationToken = default)
         {
             var testResult = _mapper.Map<TestResult>(testDto);
             var test = await _testRepository.GetByAsync(t => t.Id == testId, cancellationToken);
@@ -37,7 +37,22 @@ namespace ReportPortal.BL.Services
             return testResultId;
         }
 
-        public async Task<TestResultCreatedDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<int>> GetTestTestResultIdsAsync(int testId, CancellationToken cancellationToken = default)
+        {
+            var test = await _testRepository.GetByAsync(t => t.Id == testId, cancellationToken);
+            var testResultIds = new List<int>();
+            if(test.TestResultIds == null) return testResultIds;
+
+            return test.TestResultIds;
+        }
+
+        public async Task<TestResultDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var testResult = await _testResultRepository.GetByAsync(tr => tr.Id == id, cancellationToken);
+            return _mapper.Map<TestResultDto>(testResult);
+        }
+
+        public Task<TestResultCreatedDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -57,13 +72,7 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-
         public Task<TestResultDto> GetByAsync(Expression<Func<TestResultDto, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<TestResultDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

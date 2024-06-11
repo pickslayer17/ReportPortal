@@ -114,7 +114,7 @@ namespace ReportPortal.BL.Services
         public async Task<TestDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var test = await _testRepository.GetByAsync(t => t.Id == id, cancellationToken);
-            if (test == null) throw new TestNotFoundExeption($"Test with id {id} was not found");
+            if (test == null) throw new TestNotFoundException($"Test with id {id} was not found");
 
             return _mapper.Map<TestDto>(test);
         }
