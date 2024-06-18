@@ -40,7 +40,7 @@ namespace ReportPortal.BL.Services
                 throw new ProjectNotFoundException($"No project to create a Run in with id {runForCreationDto.ProjectId}");
             }
 
-            var folderRunItem = new FolderRunItem
+            var folderRunItem = new Folder
             {
                 Name = FolderNames.RootFolderName,
                 ParentId = null,

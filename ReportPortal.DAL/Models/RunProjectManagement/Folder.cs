@@ -2,14 +2,12 @@
 
 namespace ReportPortal.DAL.Models.RunProjectManagement
 {
-    public class FolderRunItem
+    public class Folder
     {
         [Key]
         public int Id { get; set; }
-        public int RunId { get; set; }
         public string Name { get; set; }
         public Nullable<int> ParentId { get; set; }
-        public List<int>? ChildFolderIds { get; set; }
-        public List<int>? TestIds { get; set; }
+        public virtual Folder Parent { get; set; }
     }
 }

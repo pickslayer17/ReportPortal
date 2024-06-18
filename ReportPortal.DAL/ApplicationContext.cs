@@ -10,8 +10,8 @@ namespace ReportPortal.DAL
 
         public DbSet<Run> Runs { get; set; }
         public DbSet<Project> Projects { get; set; }
-        public DbSet<FolderRunItem> Folders { get; set; }
-        public DbSet<TestRunItem> Tests { get; set; }
+        public DbSet<Folder> Folders { get; set; }
+        public DbSet<Test> Tests { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {

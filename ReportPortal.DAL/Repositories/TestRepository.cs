@@ -12,12 +12,12 @@ namespace ReportPortal.DAL.Repositories
         {
         }
 
-        public async Task<IEnumerable<TestRunItem>> GetAllByAsync(Expression<Func<TestRunItem, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Test>> GetAllByAsync(Expression<Func<Test, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Tests.Where(predicate).ToListAsync(cancellationToken);
         }
 
-        public async Task<TestRunItem> GetByAsync(Expression<Func<TestRunItem, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<Test> GetByAsync(Expression<Func<Test, bool>> predicate, CancellationToken cancellationToken = default)
         {
             var test =  await _dbContext.Tests.FirstOrDefaultAsync(predicate, cancellationToken);
             if (test == null) throw new TestNotFoundException($"There is no test with such predicate {predicate}");
@@ -25,7 +25,7 @@ namespace ReportPortal.DAL.Repositories
             return test;
         }
 
-        public async Task<int> InsertAsync(TestRunItem testRunItem)
+        public async Task<int> InsertAsync(Test testRunItem)
         {
             _dbContext.Tests.Add(testRunItem);
             await _dbContext.SaveChangesAsync();
@@ -40,7 +40,7 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateItem(TestRunItem item)
+        public async Task UpdateItem(Test item)
         {
             var oldItem = await GetByAsync(t => t.Id == item.Id);
             _dbContext.Tests.Entry(oldItem).CurrentValues.SetValues(item);

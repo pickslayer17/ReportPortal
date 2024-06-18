@@ -11,13 +11,13 @@ namespace ReportPortal.BL.Maps
     {
         public ServiceMappingProfile()
         {
-            CreateMap<TestRunItem, TestDto>().ReverseMap();
+            CreateMap<Test, TestDto>().ReverseMap();
             CreateMap<Project, ProjectDto>().ReverseMap();
             CreateMap<UserDto, User>().ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
-            CreateMap<TestRunItem, TestCreatedDto>();
+            CreateMap<Test, TestCreatedDto>();
             CreateMap<Run, RunDto>().ReverseMap();
-            CreateMap<FolderDto, FolderRunItem>().ReverseMap();
+            CreateMap<FolderDto, Folder>().ReverseMap();
             CreateMap<TestResult, TestResultDto>().ReverseMap();
         }
     }

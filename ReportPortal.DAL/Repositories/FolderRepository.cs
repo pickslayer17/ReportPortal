@@ -11,17 +11,17 @@ namespace ReportPortal.DAL.Repositories
         {
         }
 
-        public async Task<IEnumerable<FolderRunItem>> GetAllByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Folder>> GetAllByAsync(Expression<Func<Folder, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Folders.Where(predicate).ToListAsync();
         }
 
-        public async Task<FolderRunItem> GetByAsync(Expression<Func<FolderRunItem, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<Folder> GetByAsync(Expression<Func<Folder, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Folders.FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<int> InsertAsync(FolderRunItem folder)
+        public async Task<int> InsertAsync(Folder folder)
         {
             _dbContext.Folders.Add(folder);
             await _dbContext.SaveChangesAsync();
@@ -36,7 +36,7 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateItem(FolderRunItem item)
+        public async Task UpdateItem(Folder item)
         {
             var oldItem = await _dbContext.Folders.FirstOrDefaultAsync(f => f.Id == item.Id);
             _dbContext.Folders.Entry(oldItem).CurrentValues.SetValues(item);

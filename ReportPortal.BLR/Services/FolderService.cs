@@ -34,7 +34,7 @@ namespace ReportPortal.BL.Services
             return await GetIdOrAddFolder(rootFolder, folderNames, runId);
         }
 
-        private async Task<int> GetIdOrAddFolder(FolderRunItem parentFolder, string[] folderNames, int runId)
+        private async Task<int> GetIdOrAddFolder(Folder parentFolder, string[] folderNames, int runId)
         {
             var parentFolderChildNames = new List<string>();
             if (parentFolder.ChildFolderIds != null)
@@ -77,7 +77,7 @@ namespace ReportPortal.BL.Services
 
         private async Task<int> CreateFolder(int? folderParentId, string folderName, int runId)
         {
-            var folderRunItem = new FolderRunItem
+            var folderRunItem = new Folder
             {
                 Name = folderName,
                 ParentId = folderParentId,
@@ -137,7 +137,7 @@ namespace ReportPortal.BL.Services
         {
             var parentFolder = await GetByIdAsync(folderId, cancellationToken);
 
-            var folders = new List<FolderRunItem>();
+            var folders = new List<Folder>();
             if (parentFolder.ChildFolderIds != null)
             {
                 foreach (var childId in parentFolder.ChildFolderIds)

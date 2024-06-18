@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // DaaBase
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString));
 
 // Add services to the container.
 builder.Services.AddControllers();

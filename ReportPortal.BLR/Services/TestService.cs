@@ -44,7 +44,7 @@ namespace ReportPortal.BL.Services
             }
 
             // insert test to databse
-            var testRunItem = _mapper.Map<TestRunItem>(testDto);
+            var testRunItem = _mapper.Map<Test>(testDto);
             var testCreatedId = await _testRepository.InsertAsync(testRunItem);
             var testCreated = _mapper.Map<TestCreatedDto>(testRunItem);
             testCreated.Id = testCreatedId;
