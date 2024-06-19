@@ -29,93 +29,25 @@ namespace ReportPortal.BL.Services
             var folderNames = path.Split('.');
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
-            var rootFolder = await _folderRepository.GetByAsync(f => f.Id == run.RootFolderId);
+            var rootFolder = await _folderRepository.GetByAsync(f => f.Name == FolderNames.RootFolderName && f.ParentId == run.Id);
 
             return await GetIdOrAddFolder(rootFolder, folderNames, runId);
         }
 
         private async Task<int> GetIdOrAddFolder(Folder parentFolder, string[] folderNames, int runId)
         {
-            var parentFolderChildNames = new List<string>();
-            if (parentFolder.ChildFolderIds != null)
-            {
-                var parentFolderChildIds = parentFolder.ChildFolderIds.ToArray();
-                /// verify if parentFolderChildNames contain folderNames[0]
-                var parentFolderChilds = await _folderRepository.GetAllByAsync(f => parentFolderChildIds.Contains(f.Id));
-                parentFolderChildNames = parentFolderChilds.Select(f => f.Name).ToList();
-            }
-
-            /// if no -> crate folder,  
-            if (!parentFolderChildNames.Contains(folderNames[0]))
-            {
-                var newFolderId = await CreateFolder(parentFolder.Id, folderNames[0], runId);
-                var newFolder = await _folderRepository.GetByAsync(f => f.Id == newFolderId);
-
-                if (folderNames.Length == 1)
-                {
-                    return newFolder.Id;
-                }
-                else
-                {
-                    return await GetIdOrAddFolder(newFolder, folderNames.Skip(1).ToArray(), runId);
-                }
-            }
-            /// if yes -> choose folder, call GetIdOrAddFolder() again
-            else
-            {
-                var foundFolder = await _folderRepository.GetByAsync(f => f.Name == folderNames[0] && parentFolder.ChildFolderIds.Contains(f.Id));
-                if (folderNames.Length == 1)
-                {
-                    return foundFolder.Id;
-                }
-                else
-                {
-                    return await GetIdOrAddFolder(foundFolder, folderNames.Skip(1).ToArray(), runId);
-                }
-            }
+           throw new NotImplementedException();
         }
 
-        private async Task<int> CreateFolder(int? folderParentId, string folderName, int runId)
+        private async Task<int> CreateFolder(int? folderParentId, string folderName)
         {
-            var folderRunItem = new Folder
-            {
-                Name = folderName,
-                ParentId = folderParentId,
-                RunId = runId
-            };
-
-            int folderId = await _folderRepository.InsertAsync(folderRunItem);
-            var parentFolder = await _folderRepository.GetByAsync(f => f.Id == folderParentId);
-            if (parentFolder.ChildFolderIds == null)
-            {
-                parentFolder.ChildFolderIds = new List<int> { folderId };
-            }
-            else
-            {
-                parentFolder.ChildFolderIds.Add(folderId);
-            }
-
-            await _folderRepository.UpdateItem(parentFolder);
-
-            return folderId;
+            throw new NotImplementedException();
         }
 
 
         public async Task AttachTestToFolder(int folderId, int testId)
         {
-            var folder = await _folderRepository.GetByAsync(f => f.Id == folderId);
-            if (folder == null) throw new DirectoryNotFoundException($"There is no folder with such id {folderId}!");
-
-            if (folder.TestIds == null)
-            {
-                folder.TestIds = new List<int> { testId };
-            }
-            else
-            {
-                folder.TestIds.Add(testId);
-            }
-
-            await _folderRepository.UpdateItem(folder);
+            throw new NotImplementedException();
         }
 
         public async Task<FolderDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)

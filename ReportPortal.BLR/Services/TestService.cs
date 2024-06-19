@@ -57,25 +57,7 @@ namespace ReportPortal.BL.Services
 
         public async Task DeleteByIdAsync(int id)
         {
-            var test = await GetByIdAsync(id);
-            if (test.TestResultIds != null)
-            {
-                foreach (var testResultId in test.TestResultIds)
-                {
-                    var testResult = await _testResultRepository.GetByAsync(tr => tr.Id == testResultId);
-                    await _testResultRepository.RemoveByIdAsync(testResult.Id);
-                }
-            }
-
-            var folder = await _folderRepository.GetByAsync(f => f.Id == test.FolderId);
-            if (folder.TestIds != null)
-            {
-                var isRemoved = folder.TestIds.Remove(test.Id);
-                if (!isRemoved) throw new Exception("Would be nice to add logger here, but let it be exception for a while. Test wasnt present in folder test ids list");
-                await _folderRepository.UpdateItem(folder);
-            }
-
-            await _testRepository.RemoveByIdAsync(test.Id);
+            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<TestDto>> GetAllAsync(CancellationToken cancellationToken = default)

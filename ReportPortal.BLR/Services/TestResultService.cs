@@ -23,27 +23,12 @@ namespace ReportPortal.BL.Services
 
         public async Task<int> AddTestResultToTestAsync(int testId, TestResultDto testDto, CancellationToken cancellationToken = default)
         {
-            var testResult = _mapper.Map<TestResult>(testDto);
-            var test = await _testRepository.GetByAsync(t => t.Id == testId, cancellationToken);
-
-            testResult.TestId = testId;
-            testResult.RunId = test.RunId;
-            var testResultId = await _testResultRepository.InsertAsync(testResult);
-
-            if (test.TestResultIds == null) test.TestResultIds = new List<int>();
-            test.TestResultIds.Add(testResultId);
-            await _testRepository.UpdateItem(test);
-
-            return testResultId;
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<int>> GetTestTestResultIdsAsync(int testId, CancellationToken cancellationToken = default)
         {
-            var test = await _testRepository.GetByAsync(t => t.Id == testId, cancellationToken);
-            var testResultIds = new List<int>();
-            if(test.TestResultIds == null) return testResultIds;
-
-            return test.TestResultIds;
+            throw new NotImplementedException();
         }
 
         public async Task<TestResultDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)

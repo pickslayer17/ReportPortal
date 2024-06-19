@@ -34,33 +34,7 @@ namespace ReportPortal.BL.Services
 
         public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
         {
-            var project = await _projectRepository.GetByAsync(pr => pr.Id == runForCreationDto.ProjectId);
-            if (project == null)
-            {
-                throw new ProjectNotFoundException($"No project to create a Run in with id {runForCreationDto.ProjectId}");
-            }
-
-            var folderRunItem = new Folder
-            {
-                Name = FolderNames.RootFolderName,
-                ParentId = null,
-            };
-
-            var rootFolderId = await _folderRepository.InsertAsync(folderRunItem);
-
-            var run = new Run
-            {
-                Name = runForCreationDto.Name,
-                ProjectId = runForCreationDto.ProjectId,
-                RootFolderId = rootFolderId
-            };
-            var runId = await _runRepository.InsertAsync(run);
-
-            var rootFolder = await _folderRepository.GetByAsync(f => f.Id == rootFolderId);
-            rootFolder.RunId = runId;
-            await _folderRepository.UpdateItem(rootFolder);
-
-            return new RunCreatedDto { Id = runId };
+            throw new NotImplementedException();
         }
 
         public Task<RunCreatedDto> CreateAsync(RunCreatedDto projectForCreationDto, CancellationToken cancellationToken = default)
@@ -70,27 +44,7 @@ namespace ReportPortal.BL.Services
 
         public async Task DeleteByIdAsync(int runId)
         {
-            var folders = await _folderRepository.GetAllByAsync(f => f.RunId == runId);
-
-            foreach (var folder in folders)
-            {
-                await _folderRepository.RemoveByIdAsync(folder.Id);
-            }
-
-            var tests = await _testRepository.GetAllByAsync(t => t.RunId == runId);
-            foreach (var test in tests)
-            {
-                await _testRepository.RemoveByIdAsync(test.Id);
-            }
-
-            var testResults = await _testResultRepository.GetAllByAsync(tr => tr.RunId == runId);
-            foreach (var tr in testResults)
-            {
-                await _testResultRepository.RemoveByIdAsync(tr.Id);
-            }
-
-            var run = await _runRepository.GetByAsync(r => r.Id == runId);
-            await _runRepository.RemoveByIdAsync(run.Id);
+            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<RunDto>> GetAllAsync(CancellationToken cancellationToken = default)
