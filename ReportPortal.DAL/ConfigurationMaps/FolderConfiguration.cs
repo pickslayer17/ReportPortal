@@ -11,9 +11,9 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.ToTable("Folders", "dbo");
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).HasColumnName("Id").HasColumnType("int").IsRequired().UseIdentityColumn();
-            builder.Property(e => e.Name).HasColumnName("Name").HasColumnType("nvarchar").IsRequired();
+            builder.Property(e => e.Name).HasColumnName("Name").HasColumnType("nvarchar(MAX)").IsRequired();
             builder.Property(e => e.ParentId).HasColumnName("ParentId").HasColumnType("int");
-            builder.HasMany(e => e.Folders).WithOne(e => e.Folder1).HasForeignKey(e => e.ParentId).OnDelete(deleteBehavior: DeleteBehavior.Cascade);
+            builder.HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
 
         }
         //public FolderConfiguration()
