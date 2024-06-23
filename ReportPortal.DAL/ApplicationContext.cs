@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReportPortal.DAL.ConfigurationMaps;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Models.UserManagement;
 
@@ -15,6 +16,11 @@ namespace ReportPortal.DAL
         public DbSet<TestResult> TestResults { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) 
+        {
+            modelBuilder.ApplyConfiguration(new FolderConfiguration());
         }
     }
 }

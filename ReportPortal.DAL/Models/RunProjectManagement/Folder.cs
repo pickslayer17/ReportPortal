@@ -9,5 +9,7 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
         public string Name { get; set; }
         public Nullable<int> ParentId { get; set; }
         public virtual Folder Parent { get; set; }
+        public virtual Folder Folder1 { get; set; }
+        public virtual ICollection<Folder> Folders { get; set; }
     }
 }
