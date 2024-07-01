@@ -16,21 +16,5 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
 
         }
-        //public FolderConfiguration()
-        //{
-
-        //Property(e => e.Name).HasColumnName("Name").HasColumnType("nvarchar").IsRequired().HasMaxLength(440);
-        //Property(e => e.Description).HasColumnName("Description").HasColumnType("nvarchar").IsOptional().HasMaxLength(2000);
-        //Property(e => e.ParentID).HasColumnName("ParentID").HasColumnType("int").IsOptional();
-        //Property(e => e.Created).HasColumnName("Created").HasColumnType("datetime").IsRequired().HasPrecision(3);
-        //Property(e => e.CreatedBy).HasColumnName("CreatedBy").HasColumnType("int").IsRequired();
-        //Property(e => e.Modified).HasColumnName("Modified").HasColumnType("datetime").IsRequired().HasPrecision(3);
-        //Property(e => e.ModifiedBy).HasColumnName("ModifiedBy").HasColumnType("int").IsRequired();
-        //Property(e => e.FolderTypeID).HasColumnName("FolderTypeID").HasColumnType("tinyint").IsRequired();
-
-        //HasMany(e => e.MarketingFiles).WithOptional(e => e.MarketingFolder).HasForeignKey(e => e.FolderID).WillCascadeOnDelete(false);
-        //HasMany(e => e.MarketingFolders1).WithOptional(e => e.MarketingFolder1).HasForeignKey(e => e.ParentID).WillCascadeOnDelete(false);
-        //HasRequired(e => e.Client).WithMany(e => e.MarketingFolders).HasForeignKey(e => e.ClientID).WillCascadeOnDelete(false);
-        //}
     }
 }
