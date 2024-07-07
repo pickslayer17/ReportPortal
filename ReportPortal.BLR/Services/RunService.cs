@@ -34,12 +34,27 @@ namespace ReportPortal.BL.Services
 
         public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
+            var project = await _projectRepository.GetByAsync(p => p.Id ==  runForCreationDto.ProjectId);
+            if (project == null) throw new ProjectNotFoundException($"no project with such id: {runForCreationDto.ProjectId}");
 
-        public Task<RunCreatedDto> CreateAsync(RunCreatedDto projectForCreationDto, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
+            var rootFolder = new Folder
+            {
+                Name = FolderNames.RootFolderName,
+                ParentId = null
+            };
+            var rootFolderId = await _folderRepository.InsertAsync(rootFolder);
+
+            var run = _mapper.Map<Run>(runForCreationDto);
+            run.RootFolderId = rootFolderId;
+            var runId = await _runRepository.InsertAsync(run);
+            
+
+            var runCreatedDto = new RunCreatedDto
+            {
+                Id = runId,
+            };
+
+            return runCreatedDto;
         }
 
         public async Task DeleteByIdAsync(int runId)
