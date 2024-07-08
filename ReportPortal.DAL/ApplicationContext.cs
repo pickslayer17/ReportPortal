@@ -20,8 +20,11 @@ namespace ReportPortal.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
-            modelBuilder.ApplyConfiguration(new FolderConfiguration());
+            modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new RunConfiguration());
+            modelBuilder.ApplyConfiguration(new FolderConfiguration());
+            modelBuilder.ApplyConfiguration(new TestConfiguration());
+            modelBuilder.ApplyConfiguration(new TestResultConfiguration());
         }
     }
 }
