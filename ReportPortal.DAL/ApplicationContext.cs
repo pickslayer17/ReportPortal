@@ -21,6 +21,7 @@ namespace ReportPortal.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
             modelBuilder.ApplyConfiguration(new FolderConfiguration());
+            modelBuilder.ApplyConfiguration(new RunConfiguration());
         }
     }
 }
