@@ -45,13 +45,8 @@ namespace ReportPortal.BL.Services
             var rootFolderId = await _folderRepository.InsertAsync(rootFolder);
 
             var run = _mapper.Map<Run>(runForCreationDto);
-            run.RootFolderId = rootFolderId;
+            run.RootFolder = rootFolder;
             var runId = await _runRepository.InsertAsync(run);
-
-            run = await _runRepository.GetByAsync(r => r.Id == runId);
-            rootFolder = run.RootFolder;
-            rootFolder.RunId = runId;
-            await _folderRepository.UpdateItem(rootFolder);
 
             var runCreatedDto = new RunCreatedDto
             {
