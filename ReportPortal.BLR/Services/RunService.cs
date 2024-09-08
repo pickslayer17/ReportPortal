@@ -20,7 +20,6 @@ namespace ReportPortal.BL.Services
         private readonly ITestResultRepository _testResultRepository;
         private readonly IRunRepository _runRepository;
         private readonly IProjectRepository _projectRepository;
-        private readonly IRootFolderRepository _rootFolderRepository;
         private readonly IMapper _mapper;
 
         public RunService(
@@ -29,7 +28,6 @@ namespace ReportPortal.BL.Services
             ITestRepository testRepository,
             ITestResultRepository testResultRepository,
             IProjectRepository projectRepository,
-            IRootFolderRepository rootFolderRepository,
             IMapper mapper)
         {
             _runRepository = runRepository;
@@ -37,7 +35,6 @@ namespace ReportPortal.BL.Services
             _testRepository = testRepository;
             _testResultRepository = testResultRepository;
             _projectRepository = projectRepository;
-            _rootFolderRepository = rootFolderRepository;
             _mapper = mapper;
         }
 
@@ -49,14 +46,6 @@ namespace ReportPortal.BL.Services
             var run = _mapper.Map<Run>(runForCreationDto);
             
             var runId = await _runRepository.InsertAsync(run);
-
-            var rootFolder = new RootFolder
-            {
-                Name = FolderNames.RootFolderName,
-                Run = run
-            };
-            var rootFolderId = await _rootFolderRepository.InsertAsync(rootFolder);
-            run.RootFolder = rootFolder;
 
             var runCreatedDto = new RunCreatedDto
             {

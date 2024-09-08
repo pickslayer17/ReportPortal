@@ -12,7 +12,6 @@ namespace ReportPortal.DAL
         public DbSet<Run> Runs { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Folder> Folders { get; set; }
-        public DbSet<RootFolder> RootFolders { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
@@ -24,7 +23,6 @@ namespace ReportPortal.DAL
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new RunConfiguration());
             modelBuilder.ApplyConfiguration(new FolderConfiguration());
-            modelBuilder.ApplyConfiguration(new RootFolderConfiguration());
             modelBuilder.ApplyConfiguration(new TestConfiguration());
             modelBuilder.ApplyConfiguration(new TestResultConfiguration());
         }

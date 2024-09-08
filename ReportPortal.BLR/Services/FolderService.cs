@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using ReportPortal.BL.Constatnts;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
-using System.Threading;
 
 namespace ReportPortal.BL.Services
 {
@@ -30,14 +28,13 @@ namespace ReportPortal.BL.Services
             var folderNames = path.Split('.');
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
-            var rootFolder = run.RootFolder;
-
-            return await GetIdOrAddFolder(rootFolder.ToFolder(), folderNames);
+            return await GetIdOrAddFolder(null, run, 0, folderNames);
         }
 
-        private async Task<int> GetIdOrAddFolder(Folder parentFolder, string[] folderNames)
+        private async Task<int> GetIdOrAddFolder(Folder parentFolder, Run run, int folderLevel, string[] folderNames)
         {
             var currentFolderName = folderNames[0];
+
             if (folderNames.Length == 1)
             {
                 if (parentFolder.Children != null && parentFolder.Children.Any(c => c.Name == currentFolderName))
@@ -46,7 +43,7 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    return await CreateFolder(parentFolder, currentFolderName);
+                    return await CreateFolder(parentFolder, run, currentFolderName, ++folderLevel);
                 }
             }
             else
@@ -58,22 +55,23 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    var newFolderId = await CreateFolder(parentFolder, currentFolderName);
+                    var newFolderId = await CreateFolder(parentFolder, run, currentFolderName, ++folderLevel);
                     childFolder = await _folderRepository.GetByAsync(f => f.Id == newFolderId);
                 }
 
                 folderNames = folderNames.Skip(1).ToArray();
 
-                return await GetIdOrAddFolder(childFolder, folderNames);
+                return await GetIdOrAddFolder(childFolder, run, ++folderLevel, folderNames);
             }
         }
 
-        private async Task<int> CreateFolder(Folder parentFolder, string folderName)
+        private async Task<int> CreateFolder(Folder parentFolder, Run run, string folderName, int folderLevel)
         {
             var folder = new Folder
             {
                 Name = folderName,
-                RunId = parentFolder.RunId,
+                RunId = run.Id,
+                FolderLevel = folderLevel,
                 Parent = parentFolder
             };
 

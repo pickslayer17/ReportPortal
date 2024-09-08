@@ -13,6 +13,7 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.Property(e => e.Id).HasColumnName("Id").HasColumnType("int").IsRequired().UseIdentityColumn();
             builder.Property(e => e.Name).HasColumnName("Name").HasColumnType("nvarchar(MAX)").IsRequired();
             builder.Property(e => e.ParentId).HasColumnName("ParentId").HasColumnType("int");
+            builder.Property(e => e.FolderLevel).HasColumnName("FolderLevel").HasColumnType("int");
             builder.HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
             builder.Property(e => e.RunId).HasColumnName("RunId").HasColumnType("int");
             builder.HasOne(e => e.Run).WithMany(e => e.Folders).HasForeignKey(e => e.Run).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
