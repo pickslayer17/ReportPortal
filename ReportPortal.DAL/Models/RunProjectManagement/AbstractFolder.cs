@@ -1,6 +1,6 @@
 ﻿namespace ReportPortal.DAL.Models.RunProjectManagement
 {
-    public class AbstractFolder
+    public abstract class AbstractFolder
     {
         public Nullable<int> ParentId { get; set; }
         public virtual AbstractFolder Parent { get; set; }
