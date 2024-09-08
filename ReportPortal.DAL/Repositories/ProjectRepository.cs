@@ -20,7 +20,6 @@ namespace ReportPortal.DAL.Repositories
         public async Task<Project> GetByAsync(Expression<Func<Project, bool>> predicate, CancellationToken cancellationToken = default)
         {
             var project = await _dbContext.Projects.FirstOrDefaultAsync(predicate, cancellationToken);
-            if(project == null) throw new ProjectNotFoundException($"There is no project with such predicate {predicate}");
 
             return project;
         }

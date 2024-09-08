@@ -5,6 +5,7 @@ using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
+using System.Threading;
 
 namespace ReportPortal.BL.Services
 {
@@ -29,21 +30,57 @@ namespace ReportPortal.BL.Services
             var folderNames = path.Split('.');
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
-            var rootFolder = await _folderRepository.GetByAsync(f => f.Name == FolderNames.RootFolderName && f.ParentId == run.Id);
+            var rootFolder = run.RootFolder;
 
-            return await GetIdOrAddFolder(rootFolder, folderNames, runId);
+            return await GetIdOrAddFolder(rootFolder, folderNames);
         }
 
-        private async Task<int> GetIdOrAddFolder(Folder parentFolder, string[] folderNames, int runId)
+        private async Task<int> GetIdOrAddFolder(AbstractFolder parentFolder, string[] folderNames)
         {
-           throw new NotImplementedException();
+            var currentFolderName = folderNames[0];
+            if (folderNames.Length == 1)
+            {
+                if (parentFolder.Children != null && parentFolder.Children.Any(c => c.Name == currentFolderName))
+                {
+                    return parentFolder.Children.First(c => c.Name == currentFolderName).Id;
+                }
+                else
+                {
+                    return await CreateFolder(parentFolder, currentFolderName);
+                }
+            }
+            else
+            {
+                Folder childFolder = null;
+                if (parentFolder.Children != null && parentFolder.Children.Any(c => c.Name == currentFolderName))
+                {
+                    childFolder = parentFolder.Children.First(c => c.Name == currentFolderName);
+                }
+                else
+                {
+                    var newFolderId = await CreateFolder(parentFolder, currentFolderName);
+                    childFolder = await _folderRepository.GetByAsync(f => f.Id == newFolderId);
+                }
+
+                folderNames = folderNames.Skip(1).ToArray();
+
+                return await GetIdOrAddFolder(childFolder, folderNames);
+            }
         }
 
-        private async Task<int> CreateFolder(int? folderParentId, string folderName)
+        private async Task<int> CreateFolder(AbstractFolder parentFolder, string folderName)
         {
-            throw new NotImplementedException();
-        }
+            var folder = new Folder
+            {
+                Name = folderName,
+                RunId = parentFolder.RunId,
+                Parent = parentFolder
+            };
 
+            var folderId = await _folderRepository.InsertAsync(folder);
+
+            return folderId;
+        }
 
         public async Task AttachTestToFolder(int folderId, int testId)
         {
@@ -56,31 +93,6 @@ namespace ReportPortal.BL.Services
             if (folderRunItem == null) throw new FolderNotFoundException($"folder with id {id} was not found");
 
             return _mapper.Map<FolderDto>(folderRunItem);
-        }
-
-        public async Task<IEnumerable<FolderDto>> GetRunChildrenAsync(int runId, CancellationToken cancellationToken = default)
-        {
-            var rootFolder = await _folderRepository.GetByAsync(f => f.Name == FolderNames.RootFolderName && f.Id == runId, cancellationToken);
-
-            return await GetChildrenAsync(rootFolder.Id, cancellationToken);
-        }
-
-        public async Task<IEnumerable<FolderDto>> GetChildrenAsync(int folderId, CancellationToken cancellationToken = default)
-        {
-            var parentFolder = await GetByIdAsync(folderId, cancellationToken);
-
-            var folders = new List<Folder>();
-            if (parentFolder.ChildFolderIds != null)
-            {
-                foreach (var childId in parentFolder.ChildFolderIds)
-                {
-                    var childFolder = await _folderRepository.GetByAsync(f => f.Id == childId, cancellationToken);
-                    if (childFolder == null) continue;
-                    folders.Add(childFolder);
-                }
-            }
-
-            return folders.Select(f => _mapper.Map<FolderDto>(f));
         }
     }
 }

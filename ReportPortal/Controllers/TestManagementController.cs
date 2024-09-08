@@ -27,7 +27,8 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> AddTest([FromBody] TestVm testVm)
         {
             var testDto = _mapper.Map<TestDto>(testVm);
-            var testCreated = await _testService.CreateAsync(testDto);
+            var folderId = await _folderService.GetIdOrAddFolderInRun(testVm.RunId, testVm.Path);
+            var testCreated = await _testService.CreateAsync(testDto, folderId);
 
             return Ok(testCreated);
         }

@@ -26,12 +26,8 @@ namespace ReportPortal.BL.Services
             _folderRepository = folderRepository;
         }
 
-        public async Task<TestCreatedDto> CreateAsync(TestDto testDto, CancellationToken cancellationToken = default)
+        public async Task<TestCreatedDto> CreateAsync(TestDto testDto, int folderId, CancellationToken cancellationToken = default)
         {
-            // create or take existing folder
-            var folderId = await _folderService.GetIdOrAddFolderInRun(testDto.RunId, testDto.Path);
-            testDto.FolderId = folderId;
-
             /// verify if test with such name already exists
             var folder = await _folderService.GetByIdAsync(folderId);
             if (folder.TestIds != null && folder.TestIds.Count > 0)
@@ -45,14 +41,17 @@ namespace ReportPortal.BL.Services
 
             // insert test to databse
             var testRunItem = _mapper.Map<Test>(testDto);
+            testRunItem.FolderId = folderId;
             var testCreatedId = await _testRepository.InsertAsync(testRunItem);
             var testCreated = _mapper.Map<TestCreatedDto>(testRunItem);
             testCreated.Id = testCreatedId;
 
-            // Set test to folder
-            await _folderService.AttachTestToFolder(folderId, testCreated.Id);
-
             return testCreated;
+        }
+
+        public Task<TestCreatedDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task DeleteByIdAsync(int id)
@@ -101,5 +100,4 @@ namespace ReportPortal.BL.Services
             return _mapper.Map<TestDto>(test);
         }
     }
-
 }

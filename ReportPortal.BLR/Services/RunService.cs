@@ -20,15 +20,24 @@ namespace ReportPortal.BL.Services
         private readonly ITestResultRepository _testResultRepository;
         private readonly IRunRepository _runRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IRootFolderRepository _rootFolderRepository;
         private readonly IMapper _mapper;
 
-        public RunService(IRunRepository runRepository, IFolderRepository folderRepository, ITestRepository testRepository, ITestResultRepository testResultRepository, IProjectRepository projectRepository, IMapper mapper)
+        public RunService(
+            IRunRepository runRepository,
+            IFolderRepository folderRepository,
+            ITestRepository testRepository,
+            ITestResultRepository testResultRepository,
+            IProjectRepository projectRepository,
+            IRootFolderRepository rootFolderRepository,
+            IMapper mapper)
         {
             _runRepository = runRepository;
             _folderRepository = folderRepository;
             _testRepository = testRepository;
             _testResultRepository = testResultRepository;
             _projectRepository = projectRepository;
+            _rootFolderRepository = rootFolderRepository;
             _mapper = mapper;
         }
 
@@ -37,16 +46,17 @@ namespace ReportPortal.BL.Services
             var project = await _projectRepository.GetByAsync(p => p.Id ==  runForCreationDto.ProjectId);
             if (project == null) throw new ProjectNotFoundException($"no project with such id: {runForCreationDto.ProjectId}");
 
-            var rootFolder = new Folder
+            var run = _mapper.Map<Run>(runForCreationDto);
+            
+            var runId = await _runRepository.InsertAsync(run);
+
+            var rootFolder = new RootFolder
             {
                 Name = FolderNames.RootFolderName,
-                ParentId = null
+                Run = run
             };
-            var rootFolderId = await _folderRepository.InsertAsync(rootFolder);
-
-            var run = _mapper.Map<Run>(runForCreationDto);
+            var rootFolderId = await _rootFolderRepository.InsertAsync(rootFolder);
             run.RootFolder = rootFolder;
-            var runId = await _runRepository.InsertAsync(run);
 
             var runCreatedDto = new RunCreatedDto
             {
