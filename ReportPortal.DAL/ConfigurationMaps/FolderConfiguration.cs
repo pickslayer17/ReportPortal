@@ -16,7 +16,7 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.Property(e => e.FolderLevel).HasColumnName("FolderLevel").HasColumnType("int");
             builder.HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
             builder.Property(e => e.RunId).HasColumnName("RunId").HasColumnType("int");
-            builder.HasOne(e => e.Run).WithMany(e => e.Folders).HasForeignKey(e => e.Run).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
+            builder.HasOne(e => e.Run).WithMany(e => e.Folders).HasForeignKey(e => e.RunId).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
         }
     }
 }
