@@ -2,7 +2,7 @@
 
 namespace ReportPortal.DAL.Models.RunProjectManagement
 {
-    public class Folder : AbstractFolder
+    public class Folder : RootFolder
     {
         public virtual ICollection<Test> Tests { get; set; }
     }

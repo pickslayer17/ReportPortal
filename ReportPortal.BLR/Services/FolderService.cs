@@ -35,7 +35,7 @@ namespace ReportPortal.BL.Services
             return await GetIdOrAddFolder(rootFolder, folderNames);
         }
 
-        private async Task<int> GetIdOrAddFolder(AbstractFolder parentFolder, string[] folderNames)
+        private async Task<int> GetIdOrAddFolder(RootFolder parentFolder, string[] folderNames)
         {
             var currentFolderName = folderNames[0];
             if (folderNames.Length == 1)
@@ -68,7 +68,7 @@ namespace ReportPortal.BL.Services
             }
         }
 
-        private async Task<int> CreateFolder(AbstractFolder parentFolder, string folderName)
+        private async Task<int> CreateFolder(RootFolder parentFolder, string folderName)
         {
             var folder = new Folder
             {
