@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ReportPortal.BL.Constatnts;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
@@ -28,7 +29,14 @@ namespace ReportPortal.BL.Services
             var folderNames = path.Split('.');
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
-            return await GetIdOrAddFolder(null, run, 0, folderNames);
+            Folder rootFolder;
+            rootFolder = run.Folders.First(f => f.FolderLevel == 0);
+            if (rootFolder == null)
+            {
+                rootFolder = await CreateFolder(null, run, FolderNames.RootFolderName, 0);
+            }
+
+            return await GetIdOrAddFolder(rootFolder, run, 1, folderNames);
         }
 
         private async Task<int> GetIdOrAddFolder(Folder parentFolder, Run run, int folderLevel, string[] folderNames)
@@ -43,7 +51,9 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    return await CreateFolder(parentFolder, run, currentFolderName, ++folderLevel);
+                    var newFolder = await CreateFolder(parentFolder, run, currentFolderName, folderLevel);
+
+                    return newFolder.Id;
                 }
             }
             else
@@ -55,8 +65,7 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    var newFolderId = await CreateFolder(parentFolder, run, currentFolderName, ++folderLevel);
-                    childFolder = await _folderRepository.GetByAsync(f => f.Id == newFolderId);
+                    childFolder = await CreateFolder(parentFolder, run, currentFolderName, folderLevel);
                 }
 
                 folderNames = folderNames.Skip(1).ToArray();
@@ -65,7 +74,7 @@ namespace ReportPortal.BL.Services
             }
         }
 
-        private async Task<int> CreateFolder(Folder parentFolder, Run run, string folderName, int folderLevel)
+        private async Task<Folder> CreateFolder(Folder parentFolder, Run run, string folderName, int folderLevel)
         {
             var folder = new Folder
             {
@@ -75,9 +84,9 @@ namespace ReportPortal.BL.Services
                 Parent = parentFolder
             };
 
-            var folderId = await _folderRepository.InsertAsync(folder);
+            await _folderRepository.InsertAsync(folder);
 
-            return folderId;
+            return folder;
         }
 
         public async Task AttachTestToFolder(int folderId, int testId)

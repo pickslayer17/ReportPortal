@@ -30,11 +30,10 @@ namespace ReportPortal.BL.Services
         {
             /// verify if test with such name already exists
             var folder = await _folderService.GetByIdAsync(folderId);
-            if (folder.TestIds != null && folder.TestIds.Count > 0)
+            if (folder.Tests != null && folder.Tests.Count > 0)
             {
-                foreach (var testId in folder.TestIds)
+                foreach (var test in folder.Tests)
                 {
-                    var test = await _testRepository.GetByAsync(t => t.Id == testId);
                     if (test.Name == testDto.Name) throw new TestWithSuchNameAlreadyExists($"Test with name '{testDto.Name}' already exists in folder with id {folderId}");
                 }
             }
@@ -71,20 +70,7 @@ namespace ReportPortal.BL.Services
 
         public async Task<IEnumerable<TestDto>> GetAllByFolderIdAsync(int folderId, CancellationToken cancellationToken = default)
         {
-            var folder = await _folderService.GetByIdAsync(folderId);
-            var testIds = folder.TestIds;
-
-            var tests = new List<TestDto>();
-            if (testIds != null)
-            {
-                foreach (var testId in folder.TestIds)
-                {
-                    var test = await GetByIdAsync(testId);
-                    tests.Add(_mapper.Map<TestDto>(test));
-                }
-            }
-
-            return tests;
+            throw new NotImplementedException();
         }
 
         public Task<TestDto> GetByAsync(Expression<Func<TestDto, bool>> predicate, CancellationToken cancellationToken = default)
