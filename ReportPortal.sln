@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.DAL", "ReportP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.BL", "ReportPortal.BLR\ReportPortal.BL.csproj", "{ECE47167-41DB-47DF-B65E-B3192090AA2A}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "reactfe.client", "ReactFE\reactfe.client\reactfe.client.esproj", "{92F19E12-A51B-4789-9549-85E1560E8B4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,12 @@ Global
 		{ECE47167-41DB-47DF-B65E-B3192090AA2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECE47167-41DB-47DF-B65E-B3192090AA2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECE47167-41DB-47DF-B65E-B3192090AA2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F19E12-A51B-4789-9549-85E1560E8B4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F19E12-A51B-4789-9549-85E1560E8B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F19E12-A51B-4789-9549-85E1560E8B4C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{92F19E12-A51B-4789-9549-85E1560E8B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F19E12-A51B-4789-9549-85E1560E8B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F19E12-A51B-4789-9549-85E1560E8B4C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
