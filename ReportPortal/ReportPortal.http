@@ -1,6 +1,6 @@
 @ReportPortal_HostAddress = http://localhost:5095
 
-GET {{ReportPortal_HostAddress}}/weatherforecast/
+GET {{ReportPortal_HostAddress}}/ReportPortal
 Accept: application/json
 
 ###
