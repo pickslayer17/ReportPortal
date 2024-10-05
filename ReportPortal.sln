@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal", "ReportPortal\ReportPortal.csproj", "{BBE04222-4222-4101-AAAC-0D7A3E94B812}"
+	ProjectSection(ProjectDependencies) = postProject
+		{92F19E12-A51B-4789-9549-85E1560E8B4C} = {92F19E12-A51B-4789-9549-85E1560E8B4C}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.DAL", "ReportPortal.DAL\ReportPortal.DAL.csproj", "{84E5A7BA-80D8-43FC-9755-42B3C20419C6}"
 EndProject
