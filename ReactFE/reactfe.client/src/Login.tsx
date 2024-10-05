@@ -1,7 +1,7 @@
 import './Cool.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie'; // Import the js-cookie library
+import Cookies from 'js-cookie';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -12,15 +12,35 @@ function Login() {
     const [showError, setShowError] = useState(false); // State for controlling error visibility
     const navigate = useNavigate();
 
-    // Check for token in cookies on component mount
-    useEffect(() => {
-        const token = Cookies.get('token'); // Check if token exists in cookies
-        if (token) {
-            // Optionally, you can add logic to check if the token is valid
-            // For now, we'll assume the token is valid and redirect the user
-            navigate('/main'); // Redirect to the main page
+    // Function to validate token
+    const validateToken = async () => {
+        const token = Cookies.get('token');
+        if (!token) return;
+
+        try {
+            const response = await fetch(`${apiUrl}/api/UserManagement/ValidateToken`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                // Token is valid, redirect to the main page
+                navigate('/main');
+            } else {
+                // Invalid token, remain on the login page
+                console.log('Token is invalid');
+            }
+        } catch (error) {
+            console.error('Error validating token:', error);
         }
-    }, [navigate]);
+    };
+
+    // Call validateToken on component mount
+    useEffect(() => {
+        validateToken();
+    }, []);
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault(); // Prevent form submission
@@ -48,7 +68,7 @@ function Login() {
                 const data = await response.json();
                 console.log('Login successful', data);
 
-                // Store the token in cookies instead of localStorage
+                // Store the token in cookies
                 Cookies.set('token', data.token, { secure: true, sameSite: 'Strict', expires: 7 }); // Expires in 7 days
 
                 // Redirect to the main page using React Router

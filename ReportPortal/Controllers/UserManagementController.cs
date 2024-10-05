@@ -85,5 +85,12 @@ namespace ReportPortal.Controllers
 
             return response;
         }
+
+        [HttpGet("ValidateToken")]
+        [Authorize]
+        public async Task<IActionResult> ValidateToken()
+        {
+            return Ok();
+        }
     }
 }
