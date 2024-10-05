@@ -24,6 +24,10 @@
     position: relative; /* Position for dropdown */
 }
 
+.logout {
+    margin-left: auto; /* Push logout button to the right */
+}
+
 .dropdown {
     position: absolute; /* Absolute position for dropdown */
     background-color: #444; /* Dark background for dropdown */
