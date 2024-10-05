@@ -2,14 +2,22 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './Login';
 import MainPage from './MainPage'; // Ensure this is the correct path to MainPage
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/main" element={<MainPage />} />
-                {/* You can also add other routes as needed */}
+                <Route
+                    path="/main"
+                    element={
+                        <ProtectedRoute>
+                            <MainPage />
+                        </ProtectedRoute>
+                    }
+                />
+                {/* Add more protected routes here */}
             </Routes>
         </Router>
     );
