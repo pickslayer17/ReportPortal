@@ -94,13 +94,14 @@ button {
     font-weight: bold; /* Bold text for errors */
     text-align: center; /* Center the error message */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-    transition: opacity 0.5s; /* Smooth transition for appearing/disappearing */
+    transition: opacity 0.5s ease; /* Smooth transition for opacity change */
     opacity: 1; /* Start as fully visible */
 }
 
-    /* Fade out the error message */
+    /* Error message hiding class */
     .error-message.hide {
         opacity: 0; /* Fully transparent */
+        transition: opacity 1.5s ease; /* Smooth fading out transition */
     }
 
 /* Add a custom font */

@@ -1,5 +1,5 @@
 import './Cool.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -8,11 +8,12 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [showError, setShowError] = useState(false); // State for controlling error visibility
+    const [showError, setShowError] = useState(false);
+    const [opacity, setOpacity] = useState(1); // State for controlling the opacity of the error message
     const navigate = useNavigate();
 
     const handleLogin = async (event: React.FormEvent) => {
-        event.preventDefault(); // Prevent form submission
+        event.preventDefault();
         console.log("API URL:", apiUrl);
         try {
             const response = await fetch(`${apiUrl}/api/UserManagement/Login`, {
@@ -24,32 +25,48 @@ function Login() {
             });
 
             if (!response.ok) {
-                // Handle error response
                 const data = await response.json();
                 setErrorMessage(data.message || 'Login failed');
-                setShowError(true); // Show the error message
+                setShowError(true);
+                setOpacity(1); // Set opacity back to fully visible when the error appears
 
                 // Hide the error message after 5 seconds
                 setTimeout(() => {
-                    setShowError(false);
-                }, 5000);
+                    let fadeEffect = setInterval(() => {
+                        setOpacity((prev) => {
+                            if (prev > 0) {
+                                return prev - 0.1; // Reduce opacity gradually
+                            } else {
+                                clearInterval(fadeEffect); // Stop the interval when opacity reaches 0
+                                setShowError(false); // Hide the error after fading
+                                return 0;
+                            }
+                        });
+                    }, 100); // Speed of the fading effect
+                }, 5000); // Wait 5 seconds before fading out
             } else {
                 const data = await response.json();
                 console.log('Login successful', data);
-
-                // Store the token in local storage
                 localStorage.setItem('token', data.token);
-
-                // Redirect to the main page using React Router
-                navigate('/main'); // Change this to your main page route
+                navigate('/main');
             }
         } catch (error) {
             setErrorMessage('An error occurred. Please try again.');
-            setShowError(true); // Show the error message
+            setShowError(true);
+            setOpacity(1); // Set opacity back to fully visible when the error appears
 
-            // Hide the error message after 5 seconds
             setTimeout(() => {
-                setShowError(false);
+                let fadeEffect = setInterval(() => {
+                    setOpacity((prev) => {
+                        if (prev > 0) {
+                            return prev - 0.1; // Reduce opacity gradually
+                        } else {
+                            clearInterval(fadeEffect);
+                            setShowError(false);
+                            return 0;
+                        }
+                    });
+                }, 100);
             }, 5000);
         }
     };
@@ -80,7 +97,11 @@ function Login() {
                 </div>
                 <button type="submit">Login</button>
                 {/* Error message displayed conditionally */}
-                {showError && <p className={`error-message ${showError ? '' : 'hide'}`}>{errorMessage}</p>}
+                {showError && (
+                    <p className="error-message" style={{ opacity: opacity }}>
+                        {errorMessage}
+                    </p>
+                )}
             </form>
         </div>
     );
