@@ -42,7 +42,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     }
 
     if (!isTokenValid) {
-        return <Navigate to="/" replace />; // Redirect to login if token is invalid
+        return <Navigate to="/login" replace />; // Redirect to login if token is invalid
     }
 
     return <>{children}</>; // Render protected content if token is valid

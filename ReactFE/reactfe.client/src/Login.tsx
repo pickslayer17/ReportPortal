@@ -14,7 +14,7 @@ function Login() {
 
     // Function to validate token
     const validateToken = async () => {
-        Cookies.remove('token');
+        //Cookies.remove('token');
         const token = Cookies.get('token');
         if (!token) return;
 
@@ -74,7 +74,7 @@ function Login() {
                 Cookies.set('token', data.token, { secure: true, sameSite: 'Strict', expires: 7 }); // Expires in 7 days
 
                 // Redirect to the main page using React Router
-                navigate('/main'); // Change this to your main page route
+                navigate('/'); // Change this to your main page route
             }
         } catch (error) {
             setErrorMessage('An error occurred. Please try again.');
