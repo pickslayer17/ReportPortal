@@ -1,4 +1,4 @@
-import './Cool.css';
+import './App.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
@@ -14,7 +14,7 @@ function Login() {
 
     // Function to validate token
     const validateToken = async () => {
-        //Cookies.remove('token');
+        Cookies.remove('token');
         const token = Cookies.get('token');
         if (!token) return;
 
@@ -70,8 +70,8 @@ function Login() {
                 console.log('Login successful', data);
 
                 // Store the token in cookies
-                Cookies.set('token', data.token);// one session
-                //Cookies.set('token', data.token, { secure: true, sameSite: 'Strict', expires: 7 }); // Expires in 7 days
+                //Cookies.set('token', data.token);// one session
+                Cookies.set('token', data.token, { secure: true, sameSite: 'Strict', expires: 7 }); // Expires in 7 days
 
                 // Redirect to the main page using React Router
                 navigate('/main'); // Change this to your main page route
