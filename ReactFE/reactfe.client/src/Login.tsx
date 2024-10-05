@@ -1,6 +1,5 @@
-// Login.tsx
+import './Cool.css';
 import { useState } from 'react';
-import './App.css';
 import { useNavigate } from 'react-router-dom';
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -9,6 +8,7 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [showError, setShowError] = useState(false); // State for controlling error visibility
     const navigate = useNavigate();
 
     const handleLogin = async (event: React.FormEvent) => {
@@ -27,6 +27,12 @@ function Login() {
                 // Handle error response
                 const data = await response.json();
                 setErrorMessage(data.message || 'Login failed');
+                setShowError(true); // Show the error message
+
+                // Hide the error message after 5 seconds
+                setTimeout(() => {
+                    setShowError(false);
+                }, 5000);
             } else {
                 const data = await response.json();
                 console.log('Login successful', data);
@@ -39,6 +45,12 @@ function Login() {
             }
         } catch (error) {
             setErrorMessage('An error occurred. Please try again.');
+            setShowError(true); // Show the error message
+
+            // Hide the error message after 5 seconds
+            setTimeout(() => {
+                setShowError(false);
+            }, 5000);
         }
     };
 
@@ -67,7 +79,8 @@ function Login() {
                     />
                 </div>
                 <button type="submit">Login</button>
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
+                {/* Error message displayed conditionally */}
+                {showError && <p className={`error-message ${showError ? '' : 'hide'}`}>{errorMessage}</p>}
             </form>
         </div>
     );
