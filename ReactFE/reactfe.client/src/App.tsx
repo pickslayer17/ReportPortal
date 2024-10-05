@@ -5,7 +5,7 @@ import './App.css';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function Login() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -18,7 +18,7 @@ function Login() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ email, password }),
             });
 
             if (!response.ok) {
@@ -46,8 +46,8 @@ function Login() {
                     <input
                         type="text"
                         id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                 </div>
