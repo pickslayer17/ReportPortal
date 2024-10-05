@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import './App.css';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -9,9 +11,9 @@ function Login() {
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault(); // Prevent form submission
-
+        console.log("API URL:", apiUrl);
         try {
-            const response = await fetch('/UserManagement/Login', {
+            const response = await fetch(`${apiUrl}/api/UserManagement/Login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
