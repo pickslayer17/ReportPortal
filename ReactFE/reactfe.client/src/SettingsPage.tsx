@@ -3,7 +3,7 @@ import './App.css';
 function SettingsPage() {
 
     return (
-        <div className="project-page">
+        <div className="settings-page">
             <h1>Settings</h1>
             {/* Display project details here */}
         </div>

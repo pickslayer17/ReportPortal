@@ -1,9 +1,8 @@
 // Navbar.tsx
+import './Navbar.css'; // Import your Navbar CSS
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported
-import './Navbar.css'; // Import your Navbar CSS
-
-const apiUrl = import.meta.env.VITE_API_URL;
+import { fetchWithToken } from './helpers/api';
 
 interface Project {
     id: number;
@@ -18,20 +17,7 @@ const Navbar: React.FC = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1]; // Get the token from cookies
-                const response = await fetch(`${apiUrl}/api/ProjectManagement/GetAllProject`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`, // Include token in the Authorization header
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch projects'); // Handle error response
-                }
-
-                const data: Project[] = await response.json(); // Explicitly declare type for the response data
+                const data = await fetchWithToken(`api/ProjectManagement/GetAllProject`);
                 setProjects(data); // Save the project list
             } catch (error) {
                 console.error('Failed to fetch projects:', error);

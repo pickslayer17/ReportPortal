@@ -1,0 +1,31 @@
+.run-page {
+    padding: 20px;
+}
+
+.folders-list {
+    margin-top: 20px;
+}
+
+.folder {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.folder-name {
+    font-weight: bold;
+    cursor: pointer; /* Indicate that the folder is clickable */
+}
+
+.subfolders {
+    margin-left: 20px; /* Indent for subfolders */
+}
+
+.tests {
+    margin-left: 20px;
+    color: gray; /* Optional: different color for tests */
+}
+
+    .tests ul {
+        list-style-type: none; /* Remove default list style */
+        padding-left: 0; /* Remove default padding */
+    }

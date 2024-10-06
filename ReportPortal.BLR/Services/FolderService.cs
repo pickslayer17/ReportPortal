@@ -5,6 +5,7 @@ using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
+using System.Linq.Expressions;
 
 namespace ReportPortal.BL.Services
 {
@@ -19,6 +20,14 @@ namespace ReportPortal.BL.Services
             _runRepository = runRepository;
             _folderRepository = folderRepository;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<FolderDto>> GetAllFolders(int runId, CancellationToken cancellationToken = default)
+        {
+            var folders = await _folderRepository.GetAllByAsync(f => f.RunId == runId, cancellationToken);
+            var folderDto = folders.Select(f => _mapper.Map<FolderDto>(f));
+
+            return folderDto;
         }
 
         public async Task<int> GetIdOrAddFolderInRun(int runId, string path)

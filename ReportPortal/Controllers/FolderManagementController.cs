@@ -23,16 +23,11 @@ namespace ReportPortal.Controllers
 
         [HttpGet("Runs/{runId:int}/folders")]
         [Authorize]
-        public async Task<IActionResult> GetRunChildFolders(int runId)
+        public async Task<IActionResult> GetAllFolders(int runId)
         {
-            throw new NotImplementedException();
-        }
-
-        [HttpGet("Folder/{folderId:int}")]
-        [Authorize]
-        public async Task<IActionResult> GetChildFolders(int folderId)
-        {
-            throw new NotImplementedException();
+            var allFoldersDto = await _folderService.GetAllFolders(runId);
+            var allProjectsVm = allFoldersDto.Select(f => _mapper.Map<FolderVm>(f));
+            return Ok(allProjectsVm);
         }
     }
 }

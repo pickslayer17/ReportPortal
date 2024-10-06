@@ -2,6 +2,7 @@ import './App.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { fetchWithToken } from './helpers/api';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -19,12 +20,7 @@ function Login() {
         if (!token) return;
 
         try {
-            const response = await fetch(`${apiUrl}/api/UserManagement/ValidateToken`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
+            const response = await fetchWithToken(`api/UserManagement/ValidateToken`);
 
             if (response.ok) {
                 // Token is valid, redirect to the main page
@@ -115,7 +111,7 @@ function Login() {
                 {/* Error message displayed conditionally */}
                 {showError && <p className={`error-message ${showError ? '' : 'hide'}`}>{errorMessage}</p>}
             </form>
-        </div>
+            </div>
     );
 }
 

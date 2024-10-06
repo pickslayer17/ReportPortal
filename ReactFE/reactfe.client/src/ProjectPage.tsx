@@ -2,8 +2,7 @@ import './App.css';
 import './ProjectPage.css'; // Assume we have styles for ProjectPage
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const apiUrl = import.meta.env.VITE_API_URL;
+import { fetchWithToken } from './helpers/api';
 
 interface Run {
     id: number;
@@ -19,20 +18,7 @@ function ProjectPage() {
     useEffect(() => {
         const fetchRuns = async () => {
             try {
-                const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-                const response = await fetch(`${apiUrl}/api/RunManagement/Project/${projectId}/Runs`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch runs');
-                }
-
-                const data: Run[] = await response.json();
+                const data = await fetchWithToken(`api/RunManagement/Project/${projectId}/Runs`);
                 setRuns(data);
             } catch (error) {
                 console.error('Failed to fetch runs:', error);
