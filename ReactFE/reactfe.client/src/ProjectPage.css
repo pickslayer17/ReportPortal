@@ -1,0 +1,37 @@
+.project-page {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: flex-start; /* Align items to the left */
+    justify-content: flex-start; /* Align items to the top */
+    height: 100vh; /* Full viewport height */
+    margin: 0; /* Remove any margin */
+}
+
+.project-header {
+    text-align: center; /* Center the heading */
+    margin-bottom: 20px; /* Optional: Add some space below the heading */
+}
+
+.runs-list {
+    margin-top: 10px; /* Space between title and runs list */
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column; /* Stack runs vertically */
+    align-items: flex-start; /* Align runs to the start (left) */
+    width: 100%; /* Full width for the runs list */
+}
+
+.run-item {
+    cursor: pointer; /* Change cursor on hover */
+    color: blue; /* Set the text color to blue */
+    margin-bottom: 10px; /* Space between runs */
+    padding: 10px; /* Padding for each run */
+    border: 1px solid #ccc; /* Optional: add border around each run */
+    border-radius: 4px; /* Optional: add rounded corners */
+    width: 100%; /* Full width for each run item */
+    background-color: #f9f9f9; /* Optional: background color */
+}
+
+.run-item:hover {
+    background-color: #e0e0e0; /* Optional: highlight on hover */
+}

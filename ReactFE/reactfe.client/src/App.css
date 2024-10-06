@@ -1,4 +1,11 @@
-﻿/* General Body Style */
+﻿#root {
+    width: 100%;
+    height: 100%; /* Optional: if you want it to fill the height too */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
+/* General Body Style */
 body {
     font-family: 'Metal Mania', cursive; /* Custom font for a heavy metal feel */
     background-color: #1a1a1a; /* Dark background */
@@ -108,16 +115,16 @@ button {
     margin: 0;
 }
 
-    .nav-list li {
-        margin-right: 2rem;
-        color: #fff;
-        cursor: pointer;
-        font-size: 1.2rem;
-    }
+.nav-list li {
+    margin-right: 2rem;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
 
-        .nav-list li:hover {
-            text-decoration: underline;
-        }
+.nav-list li:hover {
+    text-decoration: underline;
+}
 
 /* Content Area */
 .content {

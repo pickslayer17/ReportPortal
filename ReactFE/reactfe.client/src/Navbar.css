@@ -1,3 +1,7 @@
+:root {
+    --navbar-height: 50px; /* Adjust this value as needed */
+}
+
 .navbar {
     background-color: #333; /* Dark background for navbar */
     display: flex; /* Use flexbox for layout */
@@ -9,6 +13,7 @@
     left: 0; /* Align to the left */
     right: 0; /* Align to the right */
     z-index: 1000; /* Ensure it stays on top */
+    height: var(--navbar-height);
 }
 
 .navbar-container {
@@ -24,8 +29,8 @@
     position: relative; /* Position for dropdown */
 }
 
-.logout {
-    margin-left: auto; /* Push logout button to the right */
+.logout-button {
+    margin-left: auto; /* Push Logout button to the right */
 }
 
 .dropdown {
@@ -36,12 +41,20 @@
     z-index: 1000; /* Ensure dropdown stays on top */
 }
 
-    .dropdown li {
-        padding: 10px; /* Padding for dropdown items */
-        color: #fff; /* White text */
-        cursor: pointer; /* Pointer cursor */
-    }
+.dropdown li {
+    padding: 10px; /* Padding for dropdown items */
+    color: #fff; /* White text */
+    cursor: pointer; /* Pointer cursor */
+}
 
-        .dropdown li:hover {
-            background-color: #555; /* Highlight effect on hover */
-        }
+.dropdown li:hover {
+    background-color: #555; /* Highlight effect on hover */
+}
+
+.project-page {
+    padding-top: calc(var(--navbar-height) + 10px);  Add some extra space if needed 
+}
+
+.settings-page {
+    padding-top: calc(var(--navbar-height) + 10px); /* Add some extra space if needed */
+}

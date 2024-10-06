@@ -71,7 +71,7 @@ const Navbar: React.FC = () => {
                     <div className="navbar-item" onClick={() => navigate('/settings')}>
                         Settings
                     </div>
-                    <div className="navbar-item" onClick={() => handleLogout()}>
+                    <div className="navbar-item logout-button" onClick={() => handleLogout()}>
                         Logout
                     </div>
                 </div>

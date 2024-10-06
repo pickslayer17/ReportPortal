@@ -6,6 +6,7 @@ import ProtectedRoute from './ProtectedRoute';
 import Navbar from './Navbar'; // Import your new Layout component
 import SettingsPage from './SettingsPage'; // Import SettingsPage if it exists
 import ProjectPage from './ProjectPage'; // Import ProjectPage if it exists
+import RunPage from './RunPage';
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
                     <Route index element={<ProtectedRoute><MainPage /></ProtectedRoute>} /> {/* Default route */}
                     <Route path="settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} /> {/* Settings route */}
                     <Route path="ProjectPage/:projectId" element={<ProtectedRoute><ProjectPage /></ProtectedRoute>} /> {/* ProjectPage route */}
+                    <Route path="RunPage/:runId" element={<ProtectedRoute><RunPage /></ProtectedRoute>} /> {/* ProjectPage route */}
                 </Route>
             </Routes>
         </Router>
