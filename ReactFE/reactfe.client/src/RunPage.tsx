@@ -1,4 +1,5 @@
 import './App.css';
+import './RunPage.css';
 import { useEffect, useState } from 'react';
 import { useParams, } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api'; // Adjust the path as necessary
