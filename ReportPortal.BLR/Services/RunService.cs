@@ -78,9 +78,10 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task<RunDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<RunDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var run = await _runRepository.GetByAsync(r => r.Id == id);
+            return _mapper.Map<RunDto>(run);
         }
     }
 

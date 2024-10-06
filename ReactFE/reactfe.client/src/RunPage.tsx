@@ -22,6 +22,12 @@ interface TestVm {
     testResultIds: number[] | null;
 }
 
+interface Run {
+    id: number;
+    name: string;
+    projectId: number;
+}
+
 const RunPage: React.FC = () => {
     const { runId } = useParams<{ runId: string }>();
     const [folders, setFolders] = useState<FolderVm[]>([]);
@@ -29,6 +35,7 @@ const RunPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
     const [parentFolderId, setParentFolderId] = useState<number | null>(null);
+    const [runName, setRunName] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -38,6 +45,9 @@ const RunPage: React.FC = () => {
 
                 const testData: TestVm[] = await fetchWithToken(`api/TestManagement/Runs/${runId}/tests`);
                 setTests(testData);
+
+                const run: Run = await fetchWithToken(`api/RunManagement/Runs/${runId}`);
+                setRunName(run.name);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -103,7 +113,7 @@ const RunPage: React.FC = () => {
 
     return (
         <div className="run-page">
-            <h1>Run Details</h1>
+            <h1>{runName}</h1>
             {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
         </div>
     );
