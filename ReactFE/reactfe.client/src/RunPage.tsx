@@ -29,7 +29,6 @@ const RunPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
     const [parentFolderId, setParentFolderId] = useState<number | null>(null);
-    const [initialParentId, setInitialParentId] = useState<number | null>(null); // To hold the initial parent ID
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -39,12 +38,6 @@ const RunPage: React.FC = () => {
 
                 const testData: TestVm[] = await fetchWithToken(`api/TestManagement/Runs/${runId}/tests`);
                 setTests(testData);
-
-                // Find the initial parent ID based on the $$Root$$ folder name
-                const rootFolder = folderData.find(folder => folder.name === '$$Root$$');
-                if (rootFolder) {
-                    setInitialParentId(rootFolder.id);
-                }
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -55,8 +48,9 @@ const RunPage: React.FC = () => {
         fetchFoldersAndTests();
     }, [runId]);
 
+    // Render folders and tests
     const renderFoldersAndTests = (parentId: number | null) => {
-        const childFolders = folders.filter(folder => folder.parentId === parentId && folder.name !== '$$Root$$'); // Exclude $$Root$$
+        const childFolders = folders.filter(folder => folder.parentId === parentId);
         const folderTests = tests.filter(test => test.folderId === parentId);
 
         return (
@@ -73,8 +67,10 @@ const RunPage: React.FC = () => {
                         </div>
                     ))}
                     {folderTests.map(test => (
-                        <div key={test.id} className="test-name" style={{ color: 'blue' }}>
-                            {test.name}
+                        <div key={test.id} className="test-container" style={{ border: '1px solid black', backgroundColor: 'white' }}>
+                            <div className="test-name" style={{ color: 'blue' }}>
+                                {test.name}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -83,24 +79,32 @@ const RunPage: React.FC = () => {
     };
 
     const openFolder = (folderId: number) => {
-        setParentFolderId(currentFolderId);
-        setCurrentFolderId(folderId);
+        // Set the current folder and parent folder ID
+        const currentFolder = folders.find(folder => folder.id === folderId);
+        if (currentFolder) {
+            setParentFolderId(currentFolder.parentId); // Set parent folder ID based on the opened folder
+            setCurrentFolderId(folderId); // Open the new folder
+        }
     };
 
     const goBack = () => {
+        // Navigate back to the parent folder
         setCurrentFolderId(parentFolderId);
-        setParentFolderId(folders.find(folder => folder.id === parentFolderId)?.parentId || null);
+        const parentFolder = folders.find(folder => folder.id === parentFolderId);
+        setParentFolderId(parentFolder?.parentId || null); // Update the parent folder ID for the back button
     };
 
     if (loading) {
         return <p>Loading...</p>;
     }
 
-    // Use initialParentId to start rendering child folders of $$Root$$
+    // Find initial parent id by folder name $$Root$$
+    const initialParentId = folders.find(folder => folder.name === '$$Root$$')?.id || null;
+
     return (
         <div className="run-page">
             <h1>Run Details</h1>
-            {currentFolderId !== null ? renderFoldersAndTests(currentFolderId) : renderFoldersAndTests(initialParentId)}
+            {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
         </div>
     );
 };

@@ -1,35 +1,35 @@
-.folder-container {
-    margin-top: 10px;
+* {
+    margin: 0; /* Remove default margins */
+    padding: 0; /* Remove default paddings */
+    box-sizing: border-box; /* Include padding and border in width */
 }
 
-.folder {
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin-bottom: 5px;
-    cursor: pointer;
+.run-page {
+    margin: 20px;
+}
+
+.folder-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the left */
+    margin: 20px auto; /* Center container horizontally */
+    max-width: 800px; /* Maximum width */
+    width: 100%; /* Full width */
+}
+
+.folder, .test-container, .back-button {
+    padding: 10px; /* Inner spacing */
+    border: 1px solid black; /* Border style for visibility */
+    width: 100%; /* Ensure full width */
+    text-align: center; /* Center text */
+    margin: 10px 0; /* Space between each item */
 }
 
 .test-container {
-    padding: 10px;
-    border: 1px solid #eee;
-    background-color: #f9f9f9;
-    margin-bottom: 10px;
-}
-
-.test-name {
-    padding: 5px;
+    background-color: white; /* White background for test containers */
 }
 
 .back-button {
-    margin-bottom: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    background-color: lightgray; /* Optional background color for the button */
+    cursor: pointer; /* Change cursor on hover */
 }
-
-    .back-button:hover {
-        background-color: #0056b3;
-    }
