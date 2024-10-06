@@ -48,6 +48,14 @@ namespace ReportPortal.BL.Services
             return testCreated;
         }
 
+        public async Task<IEnumerable<TestDto>> GetAllByRunIdAsync(int runId, CancellationToken cancellationToken = default)
+        {
+            var tests = await _testRepository.GetAllByAsync(t => t.RunId == runId, cancellationToken);
+            var testsDto = tests.Select(t => _mapper.Map<TestDto>(t));
+
+            return testsDto;
+        }
+
         public Task<TestCreatedDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

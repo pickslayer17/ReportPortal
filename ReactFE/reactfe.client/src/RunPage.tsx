@@ -1,75 +1,88 @@
-import './App.css';
 import './RunPage.css';
-import { useEffect, useState } from 'react';
-import { useParams, } from 'react-router-dom';
-import { fetchWithToken } from './helpers/api'; // Adjust the path as necessary
+import './App.css';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchWithToken } from './helpers/api'; // Import your helper function
 
 interface FolderVm {
     id: number;
     runId: number;
     name: string;
-    parentId?: number;
-    childFolderIds?: number[];
-    testIds?: number[];
+    parentId: number | null;
+    childFolderIds: number[] | null;
+    testIds: number[] | null;
 }
 
-function RunPage() {
+interface TestVm {
+    id: number;
+    folderId: number;
+    path: string;
+    runId: number;
+    name: string;
+    testResultIds: number[] | null;
+}
+
+const RunPage: React.FC = () => {
     const { runId } = useParams<{ runId: string }>();
     const [folders, setFolders] = useState<FolderVm[]>([]);
-    const[rootFolderId, setRootFolderId] = useState<number | null>(null);
+    const [tests, setTests] = useState<TestVm[]>([]);
+    const [loading, setLoading] = useState(true); // Set loading state
 
     useEffect(() => {
-        const fetchFolders = async () => {
+        const fetchFoldersAndTests = async () => {
             try {
-                const data: FolderVm[] = await fetchWithToken(`api/FolderManagement/Runs/${runId}/folders`);
-                setFolders(data);
+                // Fetch folders using fetchWithToken
+                const folderData: FolderVm[] = await fetchWithToken(`api/FolderManagement/Runs/${runId}/folders`);
+                setFolders(folderData);
 
-                const rootFolder = data.find(folder => folder.name === '$$Root$$');
-                if (rootFolder) {
-                    setRootFolderId(rootFolder.id);
-                } else {
-                    console.error('Root folder not found');
-                }
+                // Fetch tests using fetchWithToken
+                const testData: TestVm[] = await fetchWithToken(`api/TestManagement/Runs/${runId}/tests`);
+                setTests(testData);
+
             } catch (error) {
-                console.error('Failed to fetch folders:', error);
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false); // End loading after fetch
             }
         };
 
-        fetchFolders();
+        fetchFoldersAndTests();
     }, [runId]);
 
-    const renderFolders = (parentId: number | null) => {
-        return folders
-            .filter(folder => folder.parentId === parentId)
-            .map(folder => (
-                <div key={folder.id} className="folder">
-                    <div className="folder-name">{folder.name}</div>
-                    {/* Render subfolders */}
-                    <div className="subfolders">
-                        {renderFolders(folder.id)}
-                    </div>
-                    {/* Render tests if available */}
-                    {folder.testIds && folder.testIds.length > 0 && (
-                        <div className="tests">
-                            <h4>Tests:</h4>
-                            <ul>
-                                {folder.testIds.map(testId => (
-                                    <li key={testId}>Test ID: {testId}</li>
-                                ))}
-                            </ul>
+    // Helper function to display folders and tests recursively
+    const renderFolder = (folder: FolderVm) => {
+        const childFolders = folders.filter(f => f.parentId === folder.id);
+        const folderTests = tests.filter(t => t.folderId === folder.id);
+
+        return (
+            <div key={folder.id} className="folder">
+                <div className="folder-name">{folder.name}</div>
+                <div className="folder-content">
+                    {childFolders.map(childFolder => renderFolder(childFolder))}
+                    {folderTests.map(test => (
+                        <div key={test.id} className="test-name">
+                            {test.name}
                         </div>
-                    )}
+                    ))}
                 </div>
-            ));
+            </div>
+        );
     };
+
+    const rootFolder = folders.find(f => f.name === '$$Root$$');
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
+    if (!rootFolder) {
+        return <p>No folders found for this run.</p>;
+    }
 
     return (
         <div className="run-page">
             <h1>Run Details</h1>
-            <p>Details for Run ID: {runId}</p>
-            <div className="folders-list">
-                {rootFolderId !== null && renderFolders(rootFolderId)} {/* Start rendering from the root folder */}
-            </div>
+            {renderFolder(rootFolder)}
         </div>
     );
 };
