@@ -37,7 +37,7 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllRunTests(int runId)
         {
-            var tests = await _testService.GetAllByFolderIdAsync(runId);
+            var tests = await _testService.GetAllByRunIdAsync(runId);
             return Ok(tests.Select(t => _mapper.Map<TestVm>(t)));
         }
 

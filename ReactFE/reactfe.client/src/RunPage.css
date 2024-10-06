@@ -1,31 +1,18 @@
-.run-page {
-    padding: 20px;
-}
-
-.folders-list {
-    margin-top: 20px;
-}
-
-.folder {
-    margin-left: 20px;
-    margin-bottom: 10px;
-}
-
-.folder-name {
+.folder-header {
+    cursor: pointer;
+    padding: 5px;
     font-weight: bold;
-    cursor: pointer; /* Indicate that the folder is clickable */
+    display: flex;
+    align-items: center;
 }
 
-.subfolders {
-    margin-left: 20px; /* Indent for subfolders */
-}
-
-.tests {
+.folder-content {
     margin-left: 20px;
-    color: gray; /* Optional: different color for tests */
 }
 
-    .tests ul {
-        list-style-type: none; /* Remove default list style */
-        padding-left: 0; /* Remove default padding */
-    }
+.test-name {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    font-style: italic;
+}
