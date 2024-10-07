@@ -39,7 +39,7 @@ namespace ReportPortal.BL.Services
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
             Folder rootFolder;
-            rootFolder = run.Folders.First(f => f.FolderLevel == 0);
+            rootFolder = run.Folders.FirstOrDefault(f => f.FolderLevel == 0);
             if (rootFolder == null)
             {
                 rootFolder = await CreateFolder(null, run, FolderNames.RootFolderName, 0);
