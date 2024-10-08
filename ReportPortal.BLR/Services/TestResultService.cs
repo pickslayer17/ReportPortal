@@ -37,9 +37,10 @@ namespace ReportPortal.BL.Services
             }
         }
 
-        public async Task<IEnumerable<int>> GetTestTestResultIdsAsync(int testId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TestResultDto>> GetTestTestResultsAsync(int testId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var testResults = await _testResultRepository.GetAllByAsync(tr => tr.TestId == testId, cancellationToken);
+            return testResults.Select(tr => _mapper.Map<TestResultDto>(tr));
         }
 
         public async Task<TestResultDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)

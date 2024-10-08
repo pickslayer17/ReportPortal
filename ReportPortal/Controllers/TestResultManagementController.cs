@@ -30,13 +30,13 @@ namespace ReportPortal.Controllers
             return Ok(testResultCreated);
         }
 
-        [HttpGet("test/{testId:int}/GetTestResultIds")]
+        [HttpGet("test/{testId:int}/TestResults")]
         [Authorize]
         public async Task<IActionResult> GetTestResultIds(int testId)
         {
-            var testResultIds = await _testResultService.GetTestTestResultIdsAsync(testId);
+            var testResult = await _testResultService.GetTestTestResultsAsync(testId);
 
-            return Ok(testResultIds);
+            return Ok(testResult.Select(tr => _mapper.Map<TestResultVm>(tr)));
         }
 
 

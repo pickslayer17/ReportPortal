@@ -1,4 +1,6 @@
-﻿namespace ReportPortal.ViewModels.TestRun
+﻿using ReportPortal.DAL.Models.RunProjectManagement;
+
+namespace ReportPortal.ViewModels.TestRun
 {
     public class TestVm
     {
@@ -7,6 +9,5 @@
         public string Path { get; set; }
         public int RunId { get; set; }
         public string Name { get; set; }
-        public List<int>? TestResultIds { get; set; }
     }
 }

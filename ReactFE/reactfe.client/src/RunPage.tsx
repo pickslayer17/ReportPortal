@@ -1,7 +1,7 @@
 import './RunPage.css';
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api';
 
 interface FolderVm {
@@ -19,7 +19,6 @@ interface TestVm {
     path: string;
     runId: number;
     name: string;
-    testResultIds: number[] | null;
 }
 
 interface Run {
@@ -36,6 +35,7 @@ const RunPage: React.FC = () => {
     const [currentFolderId, setCurrentFolderId] = useState < number | null> (null);
     const [parentFolderId, setParentFolderId] = useState<number | null>(null);
     const [runName, setRunName] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -59,6 +59,10 @@ const RunPage: React.FC = () => {
 
         fetchFoldersAndTests();
     }, [runId]);
+
+    const handleTestClick = (testId: number) => {
+        navigate(`/TestPage/${testId}`);
+    };
 
     // Render folders and tests using a table
     const renderFoldersAndTests = (parentId: number | null) => {
@@ -93,7 +97,7 @@ const RunPage: React.FC = () => {
                         {folderTests.map(test => (
                             <tr key={test.id} className="test-row">
                                 <td className="test-container" style={{ border: '1px solid black', backgroundColor: 'white' }}>
-                                    <span className="test-name" style={{ color: 'blue' }}>
+                                    <span className="test-name" style={{ color: 'blue' }} onClick={() => handleTestClick(test.id)}>
                                         {test.name}
                                     </span>
                                 </td>

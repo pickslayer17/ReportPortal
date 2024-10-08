@@ -1,4 +1,6 @@
-﻿namespace ReportPortal.BL.Models
+﻿using ReportPortal.DAL.Models.RunProjectManagement;
+
+namespace ReportPortal.BL.Models
 {
     public class TestDto
     {
@@ -7,7 +9,6 @@
         public int RunId { get; set; }
         public string Name { get; set; }
         public int FolderId { get; set; }
-        public List<int>? TestResultIds { get; set; }
+        public List<TestResult> TestResults { get; set; }
     }
-
 }

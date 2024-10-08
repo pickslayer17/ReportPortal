@@ -33,6 +33,14 @@ namespace ReportPortal.Controllers
             return Ok(testCreated);
         }
 
+        [HttpGet("tests/{testId:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetTestById( int testId)
+        {
+            var test = await _testService.GetByIdAsync(testId);
+            return Ok(_mapper.Map<TestVm>(test));
+        }
+
         [HttpGet("Runs/{runId:int}/tests")]
         [Authorize]
         public async Task<IActionResult> GetAllRunTests(int runId)
