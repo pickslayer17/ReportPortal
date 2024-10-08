@@ -33,7 +33,7 @@ const RunPage: React.FC = () => {
     const [folders, setFolders] = useState<FolderVm[]>([]);
     const [tests, setTests] = useState<TestVm[]>([]);
     const [loading, setLoading] = useState(true);
-    const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
+    const [currentFolderId, setCurrentFolderId] = useState < number | null> (null);
     const [parentFolderId, setParentFolderId] = useState<number | null>(null);
     const [runName, setRunName] = useState<string | null>(null);
 
@@ -48,6 +48,8 @@ const RunPage: React.FC = () => {
 
                 const run: Run = await fetchWithToken(`api/RunManagement/Runs/${runId}`);
                 setRunName(run.name);
+
+                setCurrentFolderId(folderData.find(folder => folder.name === '$$Root$$')?.id || 0);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -58,34 +60,56 @@ const RunPage: React.FC = () => {
         fetchFoldersAndTests();
     }, [runId]);
 
-    // Render folders and tests
+    // Render folders and tests using a table
     const renderFoldersAndTests = (parentId: number | null) => {
         const childFolders = folders.filter(folder => folder.parentId === parentId);
         const folderTests = tests.filter(test => test.folderId === parentId);
 
         return (
             <div className="folder-container">
-                {parentFolderId !== null && (
-                    <button onClick={goBack} className="back-button">
-                        {folders.find(folder => folder.id === parentFolderId)?.name}
-                    </button>
-                )}
-                <div className="folder-list">
-                    {childFolders.map(folder => (
-                        <div key={folder.id} className="folder" onClick={() => openFolder(folder.id)}>
-                            {folder.name}
-                        </div>
-                    ))}
-                    {folderTests.map(test => (
-                        <div key={test.id} className="test-container" style={{ border: '1px solid black', backgroundColor: 'white' }}>
-                            <div className="test-name" style={{ color: 'blue' }}>
-                                {test.name}
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <table className="folder-table" >
+                    <thead>
+                        <tr>
+                            <th onClick={goBack}>{getBackButtonName()}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {childFolders.map(folder => (
+                            <tr key={folder.id} className="folder-row">
+                                <td className="folder" onClick={() => openFolder(folder.id)}>
+                                    {folder.name}
+                                </td>
+                            </tr>
+                        ))}
+                        {folderTests.map(test => (
+                            <tr key={test.id} className="test-row">
+                                <td className="test-container" style={{ border: '1px solid black', backgroundColor: 'white' }}>
+                                    <span className="test-name" style={{ color: 'blue' }}>
+                                        {test.name}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         );
+    };
+
+    const getBackButtonName = (): string => {
+        let currentFolder = folders.find(folder => folder.id === currentFolderId);
+        let path = "/";
+
+        while (currentFolder?.name != '$$Root$$') {
+            if (currentFolder) {
+                if (currentFolder?.name != '$$Root$$')
+                    path = ' / ' + currentFolder.name +  path;
+
+            }
+            currentFolder = folders.find(folder => folder.id === currentFolder?.parentId);
+        }
+
+        return path; // If no path is found, default to "Root"
     };
 
     const openFolder = (folderId: number) => {
@@ -98,6 +122,8 @@ const RunPage: React.FC = () => {
     };
 
     const goBack = () => {
+        if (folders.find(f => f.id === currentFolderId)?.name == '$$Root$$')
+            return;
         // Navigate back to the parent folder
         setCurrentFolderId(parentFolderId);
         const parentFolder = folders.find(folder => folder.id === parentFolderId);
