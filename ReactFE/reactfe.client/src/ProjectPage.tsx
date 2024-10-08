@@ -37,13 +37,22 @@ function ProjectPage() {
             <div className="project-header">
                 <h1>Project Runs</h1>
             </div>
-            <div className="runs-list">
-                {runs.map((run) => (
-                    <div key={run.id} className="run-item" onClick={() => handleRunClick(run.id)}>
-                        {run.name}
-                    </div>
-                ))}
-            </div>
+            <table className="folder-table" >
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {runs.map((run) => (
+                        <tr key={run.id} className="test-row">
+                            <td className="run-item" onClick={() => handleRunClick(run.id)}>
+                                    {run.name}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }

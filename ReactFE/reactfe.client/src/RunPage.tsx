@@ -62,6 +62,15 @@ const RunPage: React.FC = () => {
 
     // Render folders and tests using a table
     const renderFoldersAndTests = (parentId: number | null) => {
+        if (folders.length == 0)
+            return (
+                <div className="run-page">
+                    <div className="run-header">
+                        <h1>No available tests in the run.</h1>
+                    </div>
+                </div>
+            )
+
         const childFolders = folders.filter(folder => folder.parentId === parentId);
         const folderTests = tests.filter(test => test.folderId === parentId);
 
