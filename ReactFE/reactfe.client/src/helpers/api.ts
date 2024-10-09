@@ -10,7 +10,6 @@ export const fetchWithToken = async (endpoint: string, options: RequestInit = {}
     };
 
     const response = await fetch(`${apiUrl}/${endpoint}`, {
-        ...options,
         headers,
     });
 
