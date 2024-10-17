@@ -65,6 +65,22 @@ const RunPage: React.FC = () => {
     };
 
     // Render folders and tests using a table
+    const getTotalTestCountForFolder = (folderId: number): number => {
+        // Get direct tests in this folder
+        const directTestCount = tests.filter(test => test.folderId === folderId).length;
+
+        // Find all child folders of the current folder
+        const childFolders = folders.filter(folder => folder.parentId === folderId);
+
+        // Recursively sum up the test counts for child folders
+        const childTestCount = childFolders.reduce((total, folder) => {
+            return total + getTotalTestCountForFolder(folder.id);
+        }, 0);
+
+        // Return the total test count (direct + child folders)
+        return directTestCount + childTestCount;
+    };
+
     const renderFoldersAndTests = (parentId: number | null) => {
         if (folders.length == 0)
             return (
@@ -73,14 +89,15 @@ const RunPage: React.FC = () => {
                         <h1>No available tests in the run.</h1>
                     </div>
                 </div>
-            )
+            );
 
+        // Filter child folders and tests for the current folder
         const childFolders = folders.filter(folder => folder.parentId === parentId);
         const folderTests = tests.filter(test => test.folderId === parentId);
 
         return (
             <div className="folder-container">
-                <table className="folder-table" >
+                <table className="folder-table">
                     <thead>
                         <tr>
                             <th onClick={goBack}>{getBackButtonName()}</th>
@@ -90,7 +107,10 @@ const RunPage: React.FC = () => {
                         {childFolders.map(folder => (
                             <tr key={folder.id} className="folder-row">
                                 <td className="folder" onClick={() => openFolder(folder.id)}>
-                                    {folder.name}
+                                    {folder.name} 
+                                </td>
+                                <td>
+                                    ({getTotalTestCountForFolder(folder.id)} tests)
                                 </td>
                             </tr>
                         ))}
