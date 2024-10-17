@@ -1,6 +1,6 @@
 import './TestPage.css';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api';
 
 interface TestVm {
@@ -23,6 +23,10 @@ interface TestResultVm {
 
 const TestPage: React.FC = () => {
     const { testId } = useParams<{ testId: string }>();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const folderId = location.state?.folderId; // Get folderId from navigation state
+
     const [test, setTest] = useState<TestVm | null>(null);
     const [testResults, setTestResults] = useState<TestResultVm[]>([]);
     const [activeTab, setActiveTab] = useState<number | null>(null);
@@ -37,7 +41,7 @@ const TestPage: React.FC = () => {
                 const testResultData: TestResultVm[] = await fetchWithToken(`api/TestResultManagement/test/${testId}/testResults`);
                 setTestResults(testResultData);
 
-                setActiveTab(0); 
+                setActiveTab(0);
             } catch (error) {
                 console.error('Error fetching test and test results:', error);
             } finally {
@@ -47,6 +51,11 @@ const TestPage: React.FC = () => {
 
         fetchTest();
     }, [testId]);
+
+    const goBack = () => {
+        // Navigate back to the RunPage with the correct folderId
+        navigate(`/RunPage/${test?.runId}`, { state: { folderId } });
+    };
 
     if (loading) {
         return <p>Loading...</p>;
@@ -58,7 +67,10 @@ const TestPage: React.FC = () => {
 
     return (
         <div className="test-page">
-            <h1>{test.name}</h1>
+            
+            <h1>{test.name}
+                <button onClick={goBack} className="back-button">Back to Folder</button> {/* Add Back button */}
+            </h1>
             <div className="test-results-tabs">
                 <ul className="tabs-list">
                     {testResults.map((result, index) => (
