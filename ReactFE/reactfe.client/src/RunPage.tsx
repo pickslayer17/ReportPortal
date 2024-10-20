@@ -90,10 +90,17 @@ const RunPage: React.FC = () => {
 
                     connection.on("UpdateFolders", (updatedFolders: FolderVm[]) => {
                         setFolders(updatedFolders);
+                        console.log("Received updated data:", updatedFolders);
                     });
 
                     connection.on("UpdateTests", (updatedTests: TestVm[]) => {
                         setTests(updatedTests);
+                        console.log("Received updated data:", updatedTests);
+                    });
+
+                    connection.on("ReceiveUpdate", (updatedData) => {
+                        // Handle the updated data here, e.g., refresh the folders/tests
+                        console.log("Received updated data:", updatedData);
                     });
                 })
                 .catch(error => console.error("Error establishing SignalR connection: ", error));

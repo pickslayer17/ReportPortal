@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Models.RunProjectManagement;
+using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
@@ -14,12 +17,14 @@ namespace ReportPortal.Controllers
         private readonly ITestService _testService;
         private readonly IFolderService _folderService;
         private readonly IMapper _mapper;
+        private readonly IHubContext<RunUpdatesHub> _hubContext;
 
-        public TestManagementController(ITestService testService, IFolderService folderService, IMapper mapper)
+        public TestManagementController(ITestService testService, IFolderService folderService, IMapper mapper, IHubContext<RunUpdatesHub> hubContext)
         {
             _testService = testService;
             _folderService = folderService;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         [HttpPost("AddTest")]
@@ -29,6 +34,7 @@ namespace ReportPortal.Controllers
             var testDto = _mapper.Map<TestDto>(testVm);
             var folderId = await _folderService.GetIdOrAddFolderInRun(testVm.RunId, testVm.Path);
             var testCreated = await _testService.CreateAsync(testDto, folderId);
+            await _hubContext.Clients.All.SendAsync("ReceiveUpdate", testCreated);
 
             return Ok(testCreated);
         }
