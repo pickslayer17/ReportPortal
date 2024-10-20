@@ -60,7 +60,7 @@
 }
 
 .run-page {
-    padding-top: calc(var(--navbar-height) + 30px); /* Add some extra space if needed */
+    padding-top: calc(var(--navbar-height) + 10px); /* Add some extra space if needed */
 }
 
 .test-page {

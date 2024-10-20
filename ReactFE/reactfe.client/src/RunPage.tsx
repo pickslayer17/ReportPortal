@@ -125,8 +125,8 @@ const RunPage: React.FC = () => {
                         ))}
                         {folderTests.map(test => (
                             <tr key={test.id} className="test-row">
-                                <td className="test-container" style={{ border: '1px solid black', backgroundColor: 'white' }}>
-                                    <span className="test-name" style={{ color: 'blue' }} onClick={() => handleTestClick(test.id, test.folderId)}>
+                                <td className="test-container" >
+                                    <span className="test-name"  onClick={() => handleTestClick(test.id, test.folderId)}>
                                         {test.name}
                                     </span>
                                 </td>
