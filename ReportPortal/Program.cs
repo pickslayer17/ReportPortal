@@ -8,6 +8,7 @@ using ReportPortal.DAL;
 using ReportPortal.DAL.ConfigurationMaps;
 using ReportPortal.DAL.Repositories;
 using ReportPortal.DAL.Repositories.Interfaces;
+using ReportPortal.Hubs;
 using ReportPortal.Interfaces;
 using ReportPortal.Maps;
 using ReportPortal.Services;
@@ -31,6 +32,11 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// hub settings
+builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -68,6 +74,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder
+            .WithOrigins("https://localhost:5173") // Your frontend URL
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()); // <-- Add this line to allow credentials
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -79,6 +96,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+
+app.MapControllers();
+
+app.MapRazorPages();
+app.MapHub<RunUpdatesHub>("/hubs/runUpdates");
 
 // Use CORS
 app.UseCors("AllowSpecificOrigin");
