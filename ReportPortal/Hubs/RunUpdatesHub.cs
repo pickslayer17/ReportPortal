@@ -23,9 +23,6 @@ namespace ReportPortal.Hubs
 
         public async Task SendTestUpdate(TestVm[] tests)
         {
-            var testFromDB = await _testService.GetAllByRunIdAsync(3);
-            tests = testFromDB.Select(t => _mapper.Map<TestVm>(t)).ToArray();
-
             await Clients.All.SendAsync("UpdateTests", tests);
         }
     }
