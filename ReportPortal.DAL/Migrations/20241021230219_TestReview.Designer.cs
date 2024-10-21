@@ -12,8 +12,8 @@ using ReportPortal.DAL;
 namespace ReportPortal.DAL.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20241021223247_trAllowNull")]
-    partial class trAllowNull
+    [Migration("20241021230219_TestReview")]
+    partial class TestReview
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

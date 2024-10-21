@@ -19,7 +19,7 @@ namespace ReportPortal.DAL.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TestId = table.Column<int>(type: "int", nullable: false),
                     ReviewerId = table.Column<int>(type: "int", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
+                    Comments = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
                     TestReviewOutcome = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
