@@ -10,7 +10,7 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
         public virtual Test Test { get; set; }
         public int ReviewerId { get; set; }
         public virtual User Reviewer { get; set; }
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
         public TestReviewOutcome TestReviewOutcome { get; set; }
     }
 }
