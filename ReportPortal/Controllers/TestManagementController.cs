@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
-using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 

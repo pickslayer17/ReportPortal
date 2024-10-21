@@ -16,14 +16,22 @@ namespace ReportPortal.BL.Services
         private readonly IMapper _mapper;
         private readonly IFolderService _folderService;
         private readonly IFolderRepository _folderRepository;
+        private readonly ITestReviewRepository _testReviewRepository;
 
-        public TestService(ITestRepository testRepository, IMapper mapper, IFolderService folderService, ITestResultRepository testResultRepository, IFolderRepository folderRepository)
+        public TestService(
+            ITestRepository testRepository,
+            IMapper mapper,
+            IFolderService folderService,
+            ITestResultRepository testResultRepository,
+            IFolderRepository folderRepository,
+            ITestReviewRepository testReviewRepository)
         {
             _testRepository = testRepository;
             _mapper = mapper;
             _folderService = folderService;
             _testResultRepository = testResultRepository;
             _folderRepository = folderRepository;
+            _testReviewRepository = testReviewRepository;
         }
 
         public async Task<TestCreatedDto> CreateAsync(TestDto testDto, int folderId, CancellationToken cancellationToken = default)
@@ -44,6 +52,9 @@ namespace ReportPortal.BL.Services
             var testCreatedId = await _testRepository.InsertAsync(testRunItem);
             var testCreated = _mapper.Map<TestCreatedDto>(testRunItem);
             testCreated.Id = testCreatedId;
+            var testReview = new TestReview();
+            testReview.Test = testRunItem;
+            await _testReviewRepository.InsertAsync(_mapper.Map<TestReview>(testReview));
 
             return testCreated;
         }

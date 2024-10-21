@@ -1,5 +1,4 @@
-﻿using ReportPortal.BL.Services;
-using ReportPortal.DAL.Models.RunProjectManagement;
+﻿using ReportPortal.DAL.Models.RunProjectManagement;
 
 namespace ReportPortal.BL.Models
 {

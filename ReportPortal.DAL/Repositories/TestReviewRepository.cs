@@ -7,11 +7,9 @@ namespace ReportPortal.DAL.Repositories
 {
     public class TestReviewRepository : AbstractApplicationRepository, ITestReviewRepository
     {
-        private readonly ITestRepository _testRepository;
 
-        public TestReviewRepository(ApplicationContext dbContext, ITestRepository testRepository) : base(dbContext)
+        public TestReviewRepository(ApplicationContext dbContext) : base(dbContext)
         {
-            _testRepository = testRepository;
         }
 
         public Task<IEnumerable<TestReview>> GetAllByAsync(Expression<Func<TestReview, bool>> predicate, CancellationToken cancellationToken = default)
@@ -19,15 +17,15 @@ namespace ReportPortal.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<TestReview> GetByAsync(Expression<Func<TestReview, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<TestReview> GetByAsync(Expression<Func<TestReview, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var testReview = await _dbContext.TestReviews.FirstOrDefaultAsync(predicate, cancellationToken);
+
+            return testReview;
         }
 
         public async Task<int> InsertAsync(TestReview testReview)
         {
-            var test = await _testRepository.GetByAsync(t => t.Id == testReview.Id);
-            testReview.Test = test;
             _dbContext.TestReviews.Add(testReview);
             await _dbContext.SaveChangesAsync();
 
