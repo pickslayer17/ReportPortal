@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ReportPortal.DAL.Enums;
+using ReportPortal.DAL.Models.RunProjectManagement;
 
 namespace ReportPortal.DAL.Models.UserManagement
 {

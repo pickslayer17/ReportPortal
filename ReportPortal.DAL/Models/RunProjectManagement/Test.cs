@@ -8,5 +8,6 @@
         public int FolderId { get; set; }
         public virtual Folder Folder { get; set; }
         public virtual ICollection<TestResult> TestResults { get; set; }
+        public virtual TestReview TestReview { get; set; }
     }
 }

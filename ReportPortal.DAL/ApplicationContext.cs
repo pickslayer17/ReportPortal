@@ -14,6 +14,8 @@ namespace ReportPortal.DAL
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
+        public DbSet<TestReview> TestReviews { get; set; }
+
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
         }
@@ -25,6 +27,7 @@ namespace ReportPortal.DAL
             modelBuilder.ApplyConfiguration(new FolderConfiguration());
             modelBuilder.ApplyConfiguration(new TestConfiguration());
             modelBuilder.ApplyConfiguration(new TestResultConfiguration());
+            modelBuilder.ApplyConfiguration(new TestReviewConfiguration());
         }
     }
 }
