@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ReportPortal.DAL/Migrations/20241022074803_TestReview.cs
+/ReportPortal.DAL/Migrations/20241022074803_TestReview.Designer.cs
