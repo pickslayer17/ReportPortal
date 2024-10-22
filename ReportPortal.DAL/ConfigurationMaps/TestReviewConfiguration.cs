@@ -16,6 +16,7 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.Property(e => e.Comments).HasColumnName("Comments").HasColumnType("nvarchar(MAX)");
             builder.Property(e => e.TestReviewOutcome).HasColumnName("TestReviewOutcome").HasColumnType("int");
             builder.HasOne(e => e.Test).WithOne(e => e.TestReview).HasForeignKey<TestReview>(e => e.TestId).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
+            builder.HasOne(e => e.Reviewer).WithMany().HasForeignKey(e => e.ReviewerId).OnDelete(deleteBehavior: DeleteBehavior.ClientSetNull);
         }
     }
 }

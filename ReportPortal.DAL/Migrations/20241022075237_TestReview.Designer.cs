@@ -12,7 +12,7 @@ using ReportPortal.DAL;
 namespace ReportPortal.DAL.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20241021230219_TestReview")]
+    [Migration("20241022075237_TestReview")]
     partial class TestReview
     {
         /// <inheritdoc />
@@ -192,7 +192,7 @@ namespace ReportPortal.DAL.Migrations
                         .HasColumnType("nvarchar(MAX)")
                         .HasColumnName("Comments");
 
-                    b.Property<int>("ReviewerId")
+                    b.Property<int?>("ReviewerId")
                         .HasColumnType("int")
                         .HasColumnName("ReviewerId");
 
@@ -290,9 +290,7 @@ namespace ReportPortal.DAL.Migrations
                 {
                     b.HasOne("ReportPortal.DAL.Models.UserManagement.User", "Reviewer")
                         .WithMany()
-                        .HasForeignKey("ReviewerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReviewerId");
 
                     b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Test", "Test")
                         .WithOne("TestReview")

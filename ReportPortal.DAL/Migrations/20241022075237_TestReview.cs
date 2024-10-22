@@ -18,7 +18,7 @@ namespace ReportPortal.DAL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TestId = table.Column<int>(type: "int", nullable: false),
-                    ReviewerId = table.Column<int>(type: "int", nullable: false),
+                    ReviewerId = table.Column<int>(type: "int", nullable: true),
                     Comments = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
                     TestReviewOutcome = table.Column<int>(type: "int", nullable: false)
                 },
@@ -35,8 +35,7 @@ namespace ReportPortal.DAL.Migrations
                         name: "FK_TestReviews_Users_ReviewerId",
                         column: x => x.ReviewerId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
