@@ -40,7 +40,7 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public Task UpdateItem(TestResult item)
+        public Task<TestResult> UpdateItem(TestResult item)
         {
             throw new NotImplementedException();
         }

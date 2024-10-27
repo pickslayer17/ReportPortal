@@ -39,7 +39,7 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public Task UpdateItem(Project item)
+        public Task<Project> UpdateItem(Project item)
         {
             throw new NotImplementedException();
         }

@@ -25,8 +25,13 @@ namespace ReportPortal.Services
 
         public async Task<UserCreatedDto> CreateAsync(UserDto userForCreationDto, CancellationToken cancellationToken = default)
         {
-            var userByEmailResult = await _userRepository.GetByAsync(u => u.Email == userForCreationDto.Email);
-
+            // verify if user already exists
+            User userByEmailResult = null;
+            try
+            {
+                userByEmailResult = await _userRepository.GetByAsync(u => u.Email == userForCreationDto.Email);
+            }
+            catch (UserNotFoundException) { }
             if (userByEmailResult != null) throw new Exception("User already exists!");
 
             var userDbModel = new User();

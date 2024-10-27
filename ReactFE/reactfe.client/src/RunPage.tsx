@@ -1,8 +1,9 @@
 import './RunPage.css';
 import './App.css';
+import Modal from './Modal';
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { fetchWithToken } from './helpers/api';
+import { fetchWithToken, putWithToken } from './helpers/api';
 import * as signalR from '@microsoft/signalr'; // Import SignalR
 
 interface FolderVm {
@@ -59,12 +60,16 @@ const RunPage: React.FC = () => {
     const navigate = useNavigate();
     const [folders, setFolders] = useState<FolderVm[]>([]);
     const [tests, setTests] = useState<TestVm[]>([]);
+    const [users, setUsers] = useState<TestVm[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
     const [parentFolderId, setParentFolderId] = useState<number | null>(null);
     const [runName, setRunName] = useState<string | null>(null);
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null); // SignalR connection
     const [reviewerEmails, setReviewerEmails] = useState<{ [key: number]: string }>({});
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTestReview, setSelectedTestReview] = useState<TestReviewVm | null>(null);
+    const [selectedOutcome, setSelectedOutcome] = useState<TestReviewOutcome | null>(null); // New state for outcome
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -77,6 +82,9 @@ const RunPage: React.FC = () => {
 
                 const run: Run = await fetchWithToken(`api/RunManagement/Runs/${runId}`);
                 setRunName(run.name);
+
+                const userData: TestVm[] = await fetchWithToken(`api/UserManagement/GetUsers`);
+                setUsers(userData);
 
                 const initialFolderId = state?.folderId || folderData.find(folder => folder.name === '$$Root$$')?.id || 0;
                 setCurrentFolderId(initialFolderId);
@@ -159,6 +167,11 @@ const RunPage: React.FC = () => {
         });
     }, [tests]);
 
+    const openModal = (testReview: TestReviewVm) => {
+        setSelectedTestReview(testReview);
+        setIsModalOpen(true);
+    };
+
     const renderFoldersAndTests = (parentId: number | null) => {
         if (folders.length === 0) {
             return (
@@ -197,7 +210,7 @@ const RunPage: React.FC = () => {
                                         {test.name}
                                     </span>
                                 </td>
-                                <td className="test-review-outcome-container">
+                                <td className="test-review-outcome-container" onClick={() => openModal(test.testReview)}>
                                     {test.testReview.testReviewOutcome === TestReviewOutcome.ToInvestigate && (
                                         <span className="to-investigate">?</span>
                                     )}
@@ -212,7 +225,7 @@ const RunPage: React.FC = () => {
                                     )}
                                 </td>
                                 <td className="test-reviewer-container">
-                                    {reviewerEmails[test.testReview.reviewerId] || 'Loading...'}
+                                    {reviewerEmails[test.testReview.reviewerId] || 'No reviewer'}
                                 </td>
                                 <td className="test-comment-container">
                                     {test.testReview.comments}
@@ -260,10 +273,65 @@ const RunPage: React.FC = () => {
 
     const initialParentId = folders.find(folder => folder.name === '$$Root$$')?.id || null;
 
+    const getEnumValues = (): string[] => {
+        return Object.keys(TestReviewOutcome)
+            .filter(key => isNaN(Number(key))) // Filter out numeric keys
+            .map(key => key); // Return the keys as strings
+    };
+
+    const handleUpdate = async () => {
+        if (selectedTestReview) {
+            // Create a new TestReviewVm object with the updated values
+            const updatedTestReview = {
+                ...selectedTestReview,
+                testReviewOutcome: selectedOutcome !== null ? selectedOutcome : selectedTestReview.testReviewOutcome,
+            };
+
+            try {
+                const response = await putWithToken(`api/TestReviewManagement/UpdateTestReview`, updatedTestReview);
+
+                const result = await response.json();
+                // Handle the response from the server as needed
+                console.log('Update successful:', result);
+
+                // Optionally, update local state or refetch data here
+            } catch (error) {
+                console.error('Error updating test review:', error);
+            } finally {
+                setIsModalOpen(false); // Close the modal after updating
+            }
+        }
+    };
+
     return (
         <div className="run-page">
             <h1>{runName}</h1>
             {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                {selectedTestReview && (
+                    <div>
+                        <h2>Edit Test Review</h2>
+                        <div>
+                            <label htmlFor="outcome">Outcome:</label>
+                            <select
+                                id="outcome"
+                                value={selectedOutcome !== null ? selectedOutcome : selectedTestReview.testReviewOutcome}
+                                onChange={(e) => setSelectedOutcome(Number(e.target.value) as TestReviewOutcome)}
+                            >
+                                {getEnumValues().map((outcome) => (
+                                    <option key={outcome} value={TestReviewOutcome[outcome as keyof typeof TestReviewOutcome]}>
+                                        {outcome}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <p>Reviewer ID: {reviewerEmails[selectedTestReview.reviewerId]}</p>
+                        <p>Comments: {selectedTestReview.comments}</p>
+                        <button onClick={handleUpdate}>Update</button> {/* Update Button */}
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 };

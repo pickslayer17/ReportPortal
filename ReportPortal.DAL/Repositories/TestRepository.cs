@@ -40,11 +40,13 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateItem(Test item)
+        public async Task<Test> UpdateItem(Test item)
         {
             var oldItem = await GetByAsync(t => t.Id == item.Id);
             _dbContext.Tests.Entry(oldItem).CurrentValues.SetValues(item);
             await _dbContext.SaveChangesAsync();
+
+            return item;
         }
     }
 }

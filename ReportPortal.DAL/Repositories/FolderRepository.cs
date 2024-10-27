@@ -36,11 +36,13 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateItem(Folder item)
+        public async Task<Folder> UpdateItem(Folder item)
         {
             var oldItem = await _dbContext.Folders.FirstOrDefaultAsync(f => f.Id == item.Id);
             _dbContext.Folders.Entry(oldItem).CurrentValues.SetValues(item);
             await _dbContext.SaveChangesAsync();
+
+            return item;
         }
     }
 }

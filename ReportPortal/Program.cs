@@ -5,7 +5,6 @@ using ReportPortal.BL.Maps;
 using ReportPortal.BL.Services;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL;
-using ReportPortal.DAL.ConfigurationMaps;
 using ReportPortal.DAL.Repositories;
 using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Hubs;

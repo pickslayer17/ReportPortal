@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
-using ReportPortal.BL.Services;
 using ReportPortal.BL.Services.Interfaces;
-using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
@@ -31,14 +29,14 @@ namespace ReportPortal.Controllers
             return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
         }
 
-        [HttpPut("test/{testId:int}/TestReview")]
+        [HttpPut("UpdateTestReview")]
         [Authorize]
-        public async Task<IActionResult> GetTestReview(int testId, [FromBody]TestReviewVm testReview)
+        public async Task<IActionResult> UpdateTestReview([FromBody] TestReviewVm testReview)
         {
             var testReviewDto = _mapper.Map<TestReviewDto>(testReview);
-            await _testReviewService.UpdateTestReviewAsync(testReviewDto);
+            var testReviewDtoUpdated = await _testReviewService.UpdateTestReviewAsync(testReviewDto);
 
-            return Ok();
+            return Ok(_mapper.Map<TestReviewVm>(testReviewDtoUpdated));
         }
     }
 }
