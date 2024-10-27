@@ -8,5 +8,6 @@ namespace ReportPortal.BL.Services.Interfaces
         public Task AttachTestToFolder(int folderId, int testId);
         public Task<FolderDto> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         public Task<IEnumerable<FolderDto>> GetAllFolders(int runId, CancellationToken cancellationToken = default);
+        public Task DeleteFolder(int folderId);
     }
 }

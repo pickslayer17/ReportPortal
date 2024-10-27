@@ -110,5 +110,10 @@ namespace ReportPortal.BL.Services
 
             return _mapper.Map<FolderDto>(folderRunItem);
         }
+
+        public async Task DeleteFolder(int folderId)
+        {
+            await _folderRepository.RemoveByIdAsync(folderId);
+        }
     }
 }

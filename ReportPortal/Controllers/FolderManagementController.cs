@@ -29,5 +29,13 @@ namespace ReportPortal.Controllers
             var allProjectsVm = allFoldersDto.Select(f => _mapper.Map<FolderVm>(f));
             return Ok(allProjectsVm);
         }
+
+        [HttpDelete("folder/{folderId:int}/delete")]
+        [Authorize]
+        public async Task<IActionResult> DeleteFolder(int folderId)
+        {
+            await _folderService.DeleteFolder(folderId);
+            return Ok();
+        }
     }
 }

@@ -70,3 +70,38 @@
 .folder-list {
     margin-top: 15px;
 }
+
+.test-review-outcome-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.to-investigate {
+    color: blue;
+    font-size: 1.2rem;
+}
+
+.not-repro {
+    background-color: purple;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+}
+
+.product-bug {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+    position: relative;
+}
+
+    .product-bug .bug-id {
+        font-size: 0.8rem;
+        margin-top: 2px;
+        display: block;
+        color: white;
+        text-align: center;
+    }

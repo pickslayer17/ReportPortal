@@ -47,6 +47,10 @@ interface TestPageState {
     folderId: number;
 }
 
+interface UserVm {
+    email: string;
+}
+
 const RunPage: React.FC = () => {
     const apiUrl = import.meta.env.VITE_API_URL;
     const { runId } = useParams<{ runId: string }>();
@@ -60,6 +64,7 @@ const RunPage: React.FC = () => {
     const [parentFolderId, setParentFolderId] = useState<number | null>(null);
     const [runName, setRunName] = useState<string | null>(null);
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null); // SignalR connection
+    const [reviewerEmails, setReviewerEmails] = useState<{ [key: number]: string }>({});
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -137,6 +142,23 @@ const RunPage: React.FC = () => {
         return directTestCount + childTestCount;
     };
 
+    const fetchReviewerEmail = async (reviewerId: number) => {
+        if (reviewerEmails[reviewerId]) return; // Skip if already fetched
+        try {
+            const response: UserVm = await fetchWithToken(`api/UserManagement/GetUser/${reviewerId}`);
+            setReviewerEmails(prevEmails => ({ ...prevEmails, [reviewerId]: response.email }));
+        } catch (error) {
+            console.error(`Error fetching email for reviewer ${reviewerId}:`, error);
+        }
+    };
+
+    useEffect(() => {
+        // Fetch emails only for distinct reviewer IDs in tests
+        tests.forEach(test => {
+            if (test.testReview.reviewerId) fetchReviewerEmail(test.testReview.reviewerId);
+        });
+    }, [tests]);
+
     const renderFoldersAndTests = (parentId: number | null) => {
         if (folders.length === 0) {
             return (
@@ -174,6 +196,26 @@ const RunPage: React.FC = () => {
                                     <span className="test-name" onClick={() => handleTestClick(test.id, test.folderId)}>
                                         {test.name}
                                     </span>
+                                </td>
+                                <td className="test-review-outcome-container">
+                                    {test.testReview.testReviewOutcome === TestReviewOutcome.ToInvestigate && (
+                                        <span className="to-investigate">?</span>
+                                    )}
+                                    {test.testReview.testReviewOutcome === TestReviewOutcome.NotRepro && (
+                                        <span className="not-repro">NR</span>
+                                    )}
+                                    {test.testReview.testReviewOutcome === TestReviewOutcome.ProductBug && (
+                                        <div className="product-bug">
+                                            BUG
+                                            <span className="bug-id">ID: 0</span> 
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="test-reviewer-container">
+                                    {reviewerEmails[test.testReview.reviewerId] || 'Loading...'}
+                                </td>
+                                <td className="test-comment-container">
+                                    {test.testReview.comments}
                                 </td>
                             </tr>
                         ))}
