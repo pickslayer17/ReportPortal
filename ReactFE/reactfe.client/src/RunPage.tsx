@@ -20,6 +20,21 @@ interface TestVm {
     path: string;
     runId: number;
     name: string;
+    testReview: TestReviewVm
+}
+
+interface TestReviewVm {
+    id: number;
+    testId: number;
+    reviewerId: number;
+    comments: string;
+    testReviewOutcome: TestReviewOutcome;
+}
+
+enum TestReviewOutcome {
+    ToInvestigate = 0,
+    NotRepro = 1,
+    ProductBug = 2,
 }
 
 interface Run {

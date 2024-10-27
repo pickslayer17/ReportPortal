@@ -9,5 +9,6 @@ namespace ReportPortal.ViewModels.TestRun
         public string Path { get; set; }
         public int RunId { get; set; }
         public string Name { get; set; }
+        public virtual TestReviewVm TestReview { get; set; }
     }
 }
