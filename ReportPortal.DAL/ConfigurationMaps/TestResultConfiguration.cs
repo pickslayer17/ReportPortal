@@ -16,7 +16,7 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.Property(e => e.ErrorMessage).HasColumnName("ErrorMessage").HasColumnType("nvarchar(MAX)");
             builder.Property(e => e.StackTrace).HasColumnName("StackTrace").HasColumnType("nvarchar(MAX)");
             builder.Property(e => e.ScreenShot).HasColumnName("ScreenShot").HasColumnType("varbinary(max)");
-            builder.HasOne(e => e.Test).WithMany(e => e.TestResults).HasForeignKey(e => e.TestId).OnDelete(deleteBehavior: DeleteBehavior.ClientCascade);
+            builder.HasOne(e => e.Test).WithMany(e => e.TestResults).HasForeignKey(e => e.TestId).OnDelete(deleteBehavior: DeleteBehavior.Cascade);
         }
     }
 }
