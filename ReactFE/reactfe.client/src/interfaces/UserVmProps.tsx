@@ -1,0 +1,1 @@
+export interface UserVm { email: string; id: number; } 
