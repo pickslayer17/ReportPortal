@@ -40,6 +40,7 @@ namespace ReportPortal.Controllers
         {
             var usersDto = await _userService.GetAllAsync();
             var usersVm = usersDto.Select(u => _mapper.Map<UserVm>(u));
+
             return Ok(usersVm);
         }
 

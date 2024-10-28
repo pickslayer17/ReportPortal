@@ -62,6 +62,9 @@ const RunPage: React.FC = () => {
                 const userData: UserVm[] = await fetchWithToken(`api/UserManagement/GetUsers`);
                 setUsers(userData);
 
+                const dict = Object.fromEntries(userData.map(userVm => [userVm.id, userVm.email]));
+                setReviewerEmails(dict);
+
                 const initialFolderId = state?.folderId || folderData.find(folder => folder.name === '$$Root$$')?.id || 0;
                 setCurrentFolderId(initialFolderId);
                 setParentFolderId(folderData.find(folder => folder.id === initialFolderId)?.parentId || null);
