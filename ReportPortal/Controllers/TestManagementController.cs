@@ -33,7 +33,9 @@ namespace ReportPortal.Controllers
             var testDto = _mapper.Map<TestDto>(testVm);
             var folderId = await _folderService.GetIdOrAddFolderInRun(testVm.RunId, testVm.Path);
             var testCreated = await _testService.CreateAsync(testDto, folderId);
-            await _hubContext.Clients.All.SendAsync("ReceiveUpdate", testCreated);
+
+            var testDtoForHub = await _testService.GetByIdAsync(testCreated.Id);
+            await _hubContext.Clients.Group(testVm.RunId.ToString()).SendAsync("AddTest", _mapper.Map<TestVm>(testDtoForHub));
 
             return Ok(testCreated);
         }

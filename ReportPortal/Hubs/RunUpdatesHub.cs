@@ -16,6 +16,11 @@ namespace ReportPortal.Hubs
             _mapper = mapper;
         }
 
+        public async Task JoinRunGroup(string runId)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, runId);
+        }
+
         public async Task SendFolderUpdate(FolderVm[] folders)
         {
             await Clients.All.SendAsync("UpdateFolders", folders);

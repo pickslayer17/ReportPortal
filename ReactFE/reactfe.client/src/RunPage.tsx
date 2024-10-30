@@ -88,17 +88,17 @@ const RunPage: React.FC = () => {
     useEffect(() => {
         if (connection) {
             connection.start()
-                .then(() => {
+                .then(async () => {
                     console.log('Connected to SignalR hub');
 
-                    connection.on("UpdateFolders", (updatedFolders: FolderVm[]) => {
-                        setFolders(updatedFolders);
-                        console.log("Received updated data:", updatedFolders);
-                    });
+                    await connection.invoke("JoinRunGroup", runId);
 
-                    connection.on("UpdateTests", (updatedTests: TestVm[]) => {
-                        setTests(updatedTests);
-                        console.log("Received updated data:", updatedTests);
+                    connection.off("AddTest");
+                    connection.on("AddTest", async (test: TestVm) => {
+                        const folderData: FolderVm[] = await fetchWithToken(`api/FolderManagement/Runs/${runId}/folders`);
+                        setFolders(folderData);
+                        setTests(prevTests => [...prevTests, test]);
+                        console.log("Received updated data:", test);
                     });
                 })
                 .catch(error => console.error("Error establishing SignalR connection: ", error));
