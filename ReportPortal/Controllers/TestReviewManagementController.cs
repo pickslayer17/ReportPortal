@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
@@ -12,12 +14,16 @@ namespace ReportPortal.Controllers
     public class TestReviewManagementController : ControllerBase
     {
         private readonly ITestReviewService _testReviewService;
+        private readonly ITestService _testService;
         private readonly IMapper _mapper;
+        private readonly IHubContext<RunUpdatesHub> _hubContext;
 
-        public TestReviewManagementController(ITestReviewService testReviewService, IMapper mapper)
+        public TestReviewManagementController(ITestReviewService testReviewService, IMapper mapper, ITestService testService, IHubContext<RunUpdatesHub> hubContext)
         {
             _testReviewService = testReviewService;
             _mapper = mapper;
+            _testService = testService;
+            _hubContext = hubContext;
         }
 
         [HttpGet("test/{testId:int}/TestReview")]
@@ -35,6 +41,9 @@ namespace ReportPortal.Controllers
         {
             var testReviewDto = _mapper.Map<TestReviewDto>(testReview);
             var testReviewDtoUpdated = await _testReviewService.UpdateTestReviewAsync(testReviewDto);
+
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDtoUpdated));
         }

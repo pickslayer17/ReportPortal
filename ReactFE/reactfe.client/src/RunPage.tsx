@@ -94,11 +94,27 @@ const RunPage: React.FC = () => {
                     await connection.invoke("JoinRunGroup", runId);
 
                     connection.off("AddTest");
+                    connection.off("UpdateTest");
                     connection.on("AddTest", async (test: TestVm) => {
                         const folderData: FolderVm[] = await fetchWithToken(`api/FolderManagement/Runs/${runId}/folders`);
                         setFolders(folderData);
                         setTests(prevTests => [...prevTests, test]);
                         console.log("Received updated data:", test);
+                    });
+
+                    connection.on("UpdateTest", async (test: TestVm) => {
+                        try {
+                            setTests((prevTests) => {
+                                const updatedTests = prevTests.map((t) => (t.id === test.id ? test : t));
+                                console.log("Tests after update:", updatedTests); // Optional logging
+                                return updatedTests;
+                            });
+
+                            console.log("Received updated data:", test);
+                            // Optionally notify the user of the update (e.g., using a toast)
+                        } catch (error) {
+                            console.error("Error updating tests:", error);
+                        }
                     });
                 })
                 .catch(error => console.error("Error establishing SignalR connection: ", error));
