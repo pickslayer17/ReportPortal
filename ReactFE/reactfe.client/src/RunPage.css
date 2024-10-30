@@ -1,107 +1,124 @@
-/* Styling for folder and test table */
+/* Base Styles */
+.run-page {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: #ddd;
+    background-color: #333;
+}
+
+.run-header h1 {
+    font-size: 24px;
+    color: #eee;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Folder and Test Table */
+.folder-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
 .folder-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    background-color: #444;
+    color: #ddd;
+    margin-top: 10px;
 }
 
-    .folder-table th {
-        background-color: #333;
-        color: white;
+    .folder-table th, .folder-table td {
         padding: 10px;
+        border: 1px solid #555;
         text-align: left;
-        font-size: 1.2rem;
     }
 
-    .folder-table td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        vertical-align: middle;
-        text-align: left;
-        font-size: 1rem;
-        background-color: #f9f9f9;
-    }
-
-/* Folder row styling */
-.folder-row td {
+/* Folder Row Styling */
+.folder-row .folder {
     cursor: pointer;
-    background-color: white;
+    color: #4caf50;
     font-weight: bold;
-    color: black;
 }
 
-.folder-row:hover td {
-    background-color: #d0d0d0;
-}
-
-/* Test row styling */
-.test-row td {
-    background-color: white;
-    border: 1px solid black;
-}
-
-.test-row .test-name {
-    color: blue;
-}
-
-/* Back button styling */
-.back-button {
-    display: inline-block;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    background-color: #333;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    border-radius: 5px;
-}
-
-    .back-button:hover {
-        background-color: #555;
+    .folder-row .folder:hover {
+        text-decoration: underline;
     }
 
-/* General container styling */
-.folder-container {
-    padding: 20px;
-    background-color: #f0f0f0;
+/* Test Row Styling */
+.test-row {
+    background-color: #222;
 }
 
-.folder-list {
-    margin-top: 15px;
-}
-
-.test-review-outcome-container {
+.test-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-weight: bold;
 }
 
+    .test-container input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+.test-name {
+    cursor: pointer;
+    color: #ffeb3b;
+}
+
+    .test-name:hover {
+        text-decoration: underline;
+    }
+
+/* Test Review Outcomes */
+.test-review-outcome-container span, .test-review-outcome-container div {
+    display: inline-block;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+/* Specific Outcomes */
 .to-investigate {
-    color: blue;
-    font-size: 1.2rem;
+    color: #ff9800;
+    border: 1px solid #ff9800;
 }
 
 .not-repro {
-    background-color: purple;
-    color: white;
-    border-radius: 50%;
-    padding: 4px;
+    color: purple;
+    background-color: #fff;
+    padding: 0 5px;
 }
 
 .product-bug {
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 4px;
-    position: relative;
+    color: #f44336;
+    border: 1px solid #f44336;
+    padding: 5px;
 }
 
-    .product-bug .bug-id {
-        font-size: 0.8rem;
-        margin-top: 2px;
-        display: block;
-        color: white;
-        text-align: center;
+.bug-id {
+    font-size: 12px;
+    color: #ddd;
+    display: block;
+    margin-top: 3px;
+}
+
+/* Reviewer & Comment */
+.test-reviewer-container, .test-comment-container {
+    padding: 5px;
+}
+
+/* Button Styling */
+button {
+    padding: 8px 16px;
+    background-color: #4caf50;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    button:hover {
+        background-color: #43a047;
     }

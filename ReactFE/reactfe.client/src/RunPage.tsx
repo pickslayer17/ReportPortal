@@ -251,9 +251,10 @@ const RunPage: React.FC = () => {
 
     return (
         <div className="run-page">
-            <h1>{runName}</h1>
+            <div className="run-header">
+                <h1>{runName}</h1>
+            </div>
             {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
-           
             <EditTestReviewModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
