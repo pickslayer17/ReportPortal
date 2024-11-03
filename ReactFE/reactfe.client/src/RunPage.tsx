@@ -40,7 +40,6 @@ const RunPage: React.FC = () => {
     const [testReviews, setTestReviews] = useState<TestReviewVm[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
-    const [parentFolderId, setParentFolderId] = useState<number | null>(null);
     const [runName, setRunName] = useState<string | null>(null);
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
     const [reviewerEmails, setReviewerEmails] = useState<{ [key: number]: string }>({});
@@ -67,7 +66,6 @@ const RunPage: React.FC = () => {
 
                 const initialFolderId = state?.folderId || folderData.find(folder => folder.name === '$$Root$$')?.id || 0;
                 setCurrentFolderId(initialFolderId);
-                setParentFolderId(folderData.find(folder => folder.id === initialFolderId)?.parentId || null);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -226,34 +224,57 @@ const RunPage: React.FC = () => {
         );
     };
 
-    const getBackButtonName = (): string => {
+    const getBreadcrumbPath = (): { name: string; id: number | null }[] => {
+        let path: { name: string; id: number | null }[] = [];
         let currentFolder = folders.find(folder => folder.id === currentFolderId);
-        let path = " ";
-        while (currentFolder?.name !== '$$Root$$') {
-            if (currentFolder) {
-                if (currentFolder?.name !== '$$Root$$')
-                    path = ' / ' + currentFolder.name + path;
+
+        // Traverse back up to the root folder
+        while (currentFolder && currentFolder.name !== '$$Root$$') {
+            path.unshift({ name: currentFolder.name, id: currentFolder.id });
+
+            // Move to the parent folder if the parentId exists
+            if (currentFolder.parentId !== undefined && currentFolder.parentId !== null) {
+                currentFolder = folders.find(folder => folder.id === currentFolder?.parentId);
+            } else {
+                // Break out if there is no valid parentId
+                break;
             }
-            currentFolder = folders.find(folder => folder.id === currentFolder?.parentId);
         }
+
+        // Add "Home" at the beginning of the path
+        path.unshift({ name: 'Home', id: initialParentId });
+
         return path;
     };
 
-    const openFolder = (folderId: number) => {
-        const currentFolder = folders.find(folder => folder.id === folderId);
-        if (currentFolder) {
-            setParentFolderId(currentFolder.parentId);
+    const openFolder = (folderId: number | null) => {
+        if (folderId === null) return;
+        const folder = folders.find(folder => folder.id === folderId);
+        if (folder) {
             setCurrentFolderId(folderId);
         }
     };
 
-    const goBack = () => {
-        if (parentFolderId !== null) {
-            setCurrentFolderId(parentFolderId);
-            const parentFolder = folders.find(folder => folder.id === parentFolderId);
-            setParentFolderId(parentFolder?.parentId || null);
-        }
+    const renderBreadcrumb = () => {
+        const breadcrumbPath = getBreadcrumbPath();
+
+        return (
+            <div className="back-navigation-container">
+                {breadcrumbPath.map((folder, index) => (
+                    <React.Fragment key={folder.id ?? 'home'}>
+                        <span
+                            onClick={() => openFolder(folder.id)}
+                            className="breadcrumb-link"
+                        >
+                            {folder.name}
+                        </span>
+                        {index < breadcrumbPath.length - 1 && <span> / </span>}
+                    </React.Fragment>
+                ))}
+            </div>
+        );
     };
+
 
     if (loading) {
         return <p>Loading...</p>;
@@ -266,12 +287,7 @@ const RunPage: React.FC = () => {
             <div className="run-header">
                 <h1>{runName}</h1>
             </div>
-            <div className="back-navigation-container">
-                <span>{getBackButtonName()}</span>
-                <button onClick={goBack} className="go-back-button">
-                    Go Back
-                </button>
-            </div>
+            {renderBreadcrumb()}
             <div className="button-container">
                 <button onClick={openModal} className="update-tests-button">
                     Update Selected Tests

@@ -157,3 +157,17 @@ button {
 .test-container, .folder-row {
     cursor: pointer;
 }
+.back-navigation-container {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.breadcrumb-link {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+    .breadcrumb-link:hover {
+        text-decoration: underline;
+    }
