@@ -59,20 +59,12 @@ namespace ReportPortal.BL.Services
             return testCreated;
         }
 
-        public async Task<IEnumerable<TestDto>> GetAllByRunIdAsync(int runId, CancellationToken cancellationToken = default)
-        {
-            var tests = await _testRepository.GetAllByAsync(t => t.RunId == runId, cancellationToken);
-            var testsDto = tests.Select(t => _mapper.Map<TestDto>(t));
-
-            return testsDto;
-        }
-
         public Task<TestCreatedDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public Task DeleteByIdAsync(int id)
         {
             throw new NotImplementedException();
         }
@@ -87,9 +79,17 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<TestDto>> GetAllByFolderIdAsync(int folderId, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<TestDto>> GetAllByFolderIdAsync(int folderId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<TestDto>> GetAllByRunIdAsync(int runId, CancellationToken cancellationToken = default)
+        {
+            var tests = await _testRepository.GetAllByAsync(t => t.RunId == runId, cancellationToken);
+            var testsDto = tests.Select(t => _mapper.Map<TestDto>(t));
+
+            return testsDto;
         }
 
         public Task<TestDto> GetByAsync(Expression<Func<TestDto, bool>> predicate, CancellationToken cancellationToken = default)

@@ -47,13 +47,6 @@ namespace ReportPortal.BL.Services
         public async Task DeleteByIdAsync(int id)
         {
             await _projectRepository.RemoveByIdAsync(id);
-
-            // delete all runs of the project
-            var projectRuns = await _runService.GetAllByAsync(pr => pr.ProjectId == id);
-            foreach (var run in projectRuns)
-            {
-                await _runService.DeleteByIdAsync(run.Id);
-            }
         }
 
         public async Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
