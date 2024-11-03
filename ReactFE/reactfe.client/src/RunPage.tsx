@@ -141,24 +141,13 @@ const RunPage: React.FC = () => {
             alert('Choose at least 1 test for edit');
             return;
         }
-
         const selectedReviews = tests.filter(test => selectedTests.includes(test.id)).map(test => test.testReview);
         setTestReviews(selectedReviews);
         setIsModalOpen(true);
-        setSelectedTests([]); // Clear selections after opening modal
+        setSelectedTests([]);
     };
 
     const renderFoldersAndTests = (parentId: number | null) => {
-        if (folders.length === 0) {
-            return (
-                <div className="run-page">
-                    <div className="run-header">
-                        <h1>No available tests in the run.</h1>
-                    </div>
-                </div>
-            );
-        }
-
         const childFolders = folders.filter(folder => folder.parentId === parentId);
         const folderTests = tests.filter(test => test.folderId === parentId);
 
@@ -167,12 +156,19 @@ const RunPage: React.FC = () => {
                 <table className="folder-table">
                     <thead>
                         <tr>
-                            <th onClick={goBack}>{getBackButtonName()}</th>
-                            <th>
-                                <button onClick={openModal}>
-                                    Update selected tests
-                                </button>
-                            </th>
+                            {childFolders.length > 0 ? (
+                                <>
+                                    <th>Name</th>
+                                    <th>Tests Count</th>
+                                </>
+                            ) : (
+                                <>
+                                    <th>Name</th>
+                                    <th>Outcome</th>
+                                    <th>Reviewer</th>
+                                    <th>Comments</th>
+                                </>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
@@ -232,7 +228,7 @@ const RunPage: React.FC = () => {
 
     const getBackButtonName = (): string => {
         let currentFolder = folders.find(folder => folder.id === currentFolderId);
-        let path = "/";
+        let path = " ";
         while (currentFolder?.name !== '$$Root$$') {
             if (currentFolder) {
                 if (currentFolder?.name !== '$$Root$$')
@@ -269,6 +265,17 @@ const RunPage: React.FC = () => {
         <div className="run-page">
             <div className="run-header">
                 <h1>{runName}</h1>
+            </div>
+            <div className="back-navigation-container">
+                <span>{getBackButtonName()}</span>
+                <button onClick={goBack} className="go-back-button">
+                    Go Back
+                </button>
+            </div>
+            <div className="button-container">
+                <button onClick={openModal} className="update-tests-button">
+                    Update Selected Tests
+                </button>
             </div>
             {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
             <EditTestReviewModal

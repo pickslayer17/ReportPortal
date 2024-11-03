@@ -122,3 +122,38 @@ button {
     button:hover {
         background-color: #43a047;
     }
+
+.run-page {
+    padding: 20px;
+}
+
+.folder-container {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.folder-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .folder-table th, .folder-table td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        text-align: left;
+    }
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.go-back-button, .update-tests-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+.test-container, .folder-row {
+    cursor: pointer;
+}
