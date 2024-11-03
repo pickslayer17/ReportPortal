@@ -1,28 +1,130 @@
-/* Modal.css */
+/* Modal Overlay */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.8); /* Darker overlay */
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+/* Modal Content */
 .modal-content {
-    background: white;
-    padding: 20px;
+    background-color: rgba(30, 30, 30, 0.95); /* Dark background with slight transparency */
+    padding: 1rem;
     border-radius: 8px;
-    width: 400px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box; /* Ensures padding is included in width calculation */
+    border: 2px solid #f0f0f0; /* Light border to match app style */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+    color: #f0f0f0; /* Light text color */
+    font-family: 'Metal Mania', cursive; /* Heavy metal font */
+    text-align: center;
+    position: relative;
 }
 
+    /* Header */
+    .modal-content h2 {
+        color: #ffcc00; /* Vibrant heading color */
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+
+    /* Labels */
+    .modal-content label {
+        color: #ffcc00; /* Accent color for labels */
+        font-weight: bold;
+    }
+
+    /* Form Controls (Select and Textarea) */
+    .modal-content select,
+    .modal-content textarea {
+        width: calc(100% - 1rem); /* Ensures consistent padding on both sides */
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #444;
+        border-radius: 4px;
+        background-color: #333;
+        color: #f0f0f0;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .modal-content textarea {
+        resize: none; /* Prevent resizing */
+    }
+
+        /* Focus State for Form Controls */
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            border-color: #ffcc00; /* Match focus color with app style */
+            outline: none;
+        }
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    transition: opacity 0.3s;
+}
+
+    /* Primary button style (for Update) */
+    button:not(.button-secondary) {
+        background-color: #ffcc00;
+        color: black;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+/* Secondary button style (for Cancel) */
+.button-secondary {
+    background-color: #666;
+    color: #f0f0f0;
+}
+
+/* Close Button (X icon) */
 .close-button {
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 16px;
-    float: right;
+    font-size: 1.2rem;
+    color: #ffcc00;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+    .close-button:hover {
+        color: #d4a600;
+    }
+
+/* Textarea Adjustment */
+.modal-content textarea {
+    width: 100%; /* Set to full width of parent container */
+    max-width: 100%; /* Prevent overflow beyond container */
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #333;
+    color: #f0f0f0;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+    resize: none; /* Prevent resizing */
+    box-sizing: border-box; /* Ensure padding is included within width */
 }

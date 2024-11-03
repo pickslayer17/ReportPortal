@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import { EditTestReviewModalProps } from './interfaces/EditTestReviewModalProps';
 import { TestReviewOutcome } from './interfaces/TestVmProps';
-import { putWithToken } from './helpers/api'; // Make sure this path is correct
+import { putWithToken } from './helpers/api';
 
 const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
     isOpen,
@@ -12,26 +12,25 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
 }) => {
     const [selectedOutcome, setSelectedOutcome] = useState<TestReviewOutcome | null>(null);
     const [selectedReviewerId, setSelectedReviewerId] = useState<number | null>(null);
+    const [comment, setComment] = useState<string>('');
 
     const handleUpdate = async () => {
         const updatedTestReviews = testReviews.map(testReview => ({
             ...testReview,
             testReviewOutcome: selectedOutcome !== null ? selectedOutcome : testReview.testReviewOutcome,
             reviewerId: selectedReviewerId !== null ? selectedReviewerId : testReview.reviewerId,
+            comments: comment || testReview.comments,
         }));
 
         try {
-            for (var i = 0; i < updatedTestReviews.length; i++) {
-
-                var review = updatedTestReviews[i];
+            for (const review of updatedTestReviews) {
                 const result = await putWithToken(`api/TestReviewManagement/UpdateTestReview`, review);
                 console.log('Update successful:', result);
-
             }
         } catch (error) {
             console.error('Error updating test reviews:', error);
         } finally {
-        onClose();
+            onClose();
         }
     };
 
@@ -45,6 +44,7 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                         id="outcome"
                         value={selectedOutcome !== null ? selectedOutcome : ''}
                         onChange={(e) => setSelectedOutcome(Number(e.target.value) as TestReviewOutcome)}
+                        style={{ width: '100%' }}
                     >
                         <option value="">Select Outcome</option>
                         {Object.keys(TestReviewOutcome)
@@ -62,6 +62,7 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                         id="reviewer"
                         value={selectedReviewerId !== null ? String(selectedReviewerId) : ''}
                         onChange={(e) => setSelectedReviewerId(e.target.value ? Number(e.target.value) : null)}
+                        style={{ width: '100%' }}
                     >
                         <option value="">Select Reviewer</option>
                         {users.map(user => (
@@ -71,7 +72,19 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                         ))}
                     </select>
                 </div>
+                <div>
+                    <label htmlFor="comment">Comments:</label>
+                    <textarea
+                        id="comment"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder="Enter your comments here"
+                        rows={4}
+                        style={{ width: '100%' }}
+                    />
+                </div>
                 <button onClick={handleUpdate}>Update</button>
+                <button className="button-secondary" onClick={onClose}>Cancel</button>
             </div>
         </Modal>
     );

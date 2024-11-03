@@ -1,6 +1,5 @@
-// Modal.tsx
 import React from 'react';
-import './Modal.css'; // Create this CSS file for styling
+import './Modal.css';
 
 interface ModalProps {
     isOpen: boolean;
@@ -15,7 +14,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 {children}
-                <button className="close-button" onClick={onClose}>Cancel</button>
             </div>
         </div>
     );
