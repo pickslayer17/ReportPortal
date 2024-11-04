@@ -225,7 +225,7 @@ const RunPage: React.FC = () => {
     };
 
     const getBreadcrumbPath = (): { name: string; id: number | null }[] => {
-        let path: { name: string; id: number | null }[] = [];
+        const path: { name: string; id: number | null }[] = [];
         let currentFolder = folders.find(folder => folder.id === currentFolderId);
 
         // Traverse back up to the root folder
