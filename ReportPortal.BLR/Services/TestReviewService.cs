@@ -30,5 +30,25 @@ namespace ReportPortal.BL.Services
 
             return _mapper.Map<TestReviewDto>(testReviewUpdated);
         }
+
+        public async Task<TestReviewDto> UpdateTestReviewAsync(TestReviewUpdateDto testReviewUpdateDto)
+        {
+            var testReview = await _testReviewRepository.GetByAsync(testReview => testReview.Id == testReviewUpdateDto.Id);
+            if (testReview == null) throw new Exception($"TestReview  with ID {testReviewUpdateDto.Id} not found");
+
+            // Apply updates from the DTO
+            if (testReviewUpdateDto.ReviewerId.HasValue)
+                testReview.ReviewerId = testReviewUpdateDto.ReviewerId.Value;
+
+            if (testReviewUpdateDto.Comments.HasValue)
+                testReview.Comments = testReviewUpdateDto.Comments.Value;
+
+            if (testReviewUpdateDto.TestReviewOutcome.HasValue)
+                testReview.TestReviewOutcome = testReviewUpdateDto.TestReviewOutcome.Value;
+
+            // Save the updated domain model
+            var testReviewUpdated = await _testReviewRepository.UpdateItem(testReview);
+            return _mapper.Map<TestReviewDto>(testReviewUpdated);
+        }
     }
 }

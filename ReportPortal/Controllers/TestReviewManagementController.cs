@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Enums;
 using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 
@@ -46,6 +47,52 @@ namespace ReportPortal.Controllers
             await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDtoUpdated));
+        }
+
+        [HttpPut("TestReview/{id:int}/UpdateReviewer/{reviewerId:int}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateReviewer(int id, int? reviwerId)
+        {
+            var testReviewUpdateDto = new TestReviewUpdateDto();
+            testReviewUpdateDto.Id = id;
+            testReviewUpdateDto.ReviewerId = new Optional<int?>(reviwerId);
+            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
+
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
+
+            return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
+        }
+
+
+        [HttpPut("TestReview/{id:int}/UpdateOutcome/{outcome:int}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateOutcome(int id, TestReviewOutcome outcome)
+        {
+            var testReviewUpdateDto = new TestReviewUpdateDto();
+            testReviewUpdateDto.Id = id;
+            testReviewUpdateDto.TestReviewOutcome = new Optional<TestReviewOutcome>(outcome);
+            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
+
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
+
+            return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
+        }
+
+        [HttpPut("TestReview/{id:int}/UpdateComments")]
+        [Authorize]
+        public async Task<IActionResult> UpdateComments(int id, [FromBody] string comments)
+        {
+            var testReviewUpdateDto = new TestReviewUpdateDto();
+            testReviewUpdateDto.Id = id;
+            testReviewUpdateDto.Comments = new Optional<string?>(comments);
+            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
+
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
+
+            return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
         }
     }
 }

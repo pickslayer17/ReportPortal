@@ -40,9 +40,6 @@ namespace ReportPortal.DAL.Repositories
         public async Task<TestReview> UpdateItem(TestReview testReview)
         {
             var existingTestReview = await _dbContext.TestReviews.FirstOrDefaultAsync(tr => tr.Id == testReview.Id);
-            //existingTestReview.TestReviewOutcome = testReview.TestReviewOutcome;
-            //existingTestReview.Comments = testReview.Comments;
-            //existingTestReview.ReviewerId = testReview.ReviewerId;
             _dbContext.TestReviews.Entry(existingTestReview).CurrentValues.SetValues(testReview);
             await _dbContext.SaveChangesAsync();
 
