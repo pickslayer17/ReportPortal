@@ -1,0 +1,17 @@
+.dropdown {
+    position: absolute; /* Absolute position for dropdown */
+    background-color: #444; /* Dark background for dropdown */
+    min-width: 150px; /* Minimum width for dropdown */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
+    z-index: 1000; /* Ensure dropdown stays on top */
+}
+
+    .dropdown li {
+        padding: 10px; /* Padding for dropdown items */
+        color: #fff; /* White text */
+        cursor: pointer; /* Pointer cursor */
+    }
+
+        .dropdown li:hover {
+            background-color: #555; /* Highlight effect on hover */
+        }

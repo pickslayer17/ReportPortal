@@ -1,5 +1,6 @@
 import './RunPage.css';
 import './App.css';
+import './dropdown.css';
 
 import EditTestReviewModal from './EditTestReviewModal';
 import { TestVm, TestReviewOutcome, TestReviewVm } from './interfaces/TestVmProps';
@@ -45,6 +46,7 @@ const RunPage: React.FC = () => {
     const [reviewerEmails, setReviewerEmails] = useState<{ [key: number]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTests, setSelectedTests] = useState<number[]>([]); // Track selected test IDs
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -255,17 +257,31 @@ const RunPage: React.FC = () => {
         }
     };
 
+    const handleActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedAction(event.target.value);
+        openModal();
+        setSelectedAction(null);
+    };
+
+    const renderActions = () => (
+        <div className="header-actions">
+            <select onChange={handleActionChange} value={selectedAction || ""} className="action-select">
+                <option value="" disabled>Select Action</option>
+                <option value="Set Outcome">Set Outcome</option>
+                <option value="Select Reviewer">Select Reviewer</option>
+                <option value="Add Comments">Add Comments</option>
+            </select>
+            <button onClick={openModal} className="update-tests-button">Update Selected Tests</button>
+        </div>
+    );
+
     const renderBreadcrumb = () => {
         const breadcrumbPath = getBreadcrumbPath();
-
         return (
             <div className="back-navigation-container">
                 {breadcrumbPath.map((folder, index) => (
                     <React.Fragment key={folder.id ?? 'home'}>
-                        <span
-                            onClick={() => openFolder(folder.id)}
-                            className="breadcrumb-link"
-                        >
+                        <span onClick={() => openFolder(folder.id)} className="breadcrumb-link">
                             {folder.name}
                         </span>
                         {index < breadcrumbPath.length - 1 && <span> / </span>}
@@ -274,7 +290,6 @@ const RunPage: React.FC = () => {
             </div>
         );
     };
-
 
     if (loading) {
         return <p>Loading...</p>;
@@ -287,11 +302,9 @@ const RunPage: React.FC = () => {
             <div className="run-header">
                 <h1>{runName}</h1>
             </div>
-            {renderBreadcrumb()}
-            <div className="button-container">
-                <button onClick={openModal} className="update-tests-button">
-                    Update Selected Tests
-                </button>
+            <div className="header-controls">
+                {renderBreadcrumb()}
+                {renderActions()}
             </div>
             {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
             <EditTestReviewModal

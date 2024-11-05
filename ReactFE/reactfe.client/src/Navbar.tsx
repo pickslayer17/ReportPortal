@@ -1,5 +1,6 @@
 // Navbar.tsx
 import './Navbar.css'; // Import your Navbar CSS
+import './dropdown.css';
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported
 import { fetchWithToken } from './helpers/api';

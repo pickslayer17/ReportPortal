@@ -171,3 +171,34 @@ button {
     .breadcrumb-link:hover {
         text-decoration: underline;
     }
+
+.header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* Style for the action dropdown */
+.action-select {
+    margin-right: 1rem;
+    padding: 0.5rem;
+}
+
+/* Fixed-width button style */
+.update-tests-button {
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+    text-align: center;
+    cursor: pointer;
+}
+
+.action-select {
+    /* Ensure dropdown inherits from the common dropdown styles */
+    border: none;
+    background-color: #333;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
