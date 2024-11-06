@@ -3,6 +3,7 @@ import './App.css';
 import './dropdown.css';
 
 import EditTestReviewModal from './EditTestReviewModal';
+import { EditTestReviewMode } from './enums/EditTestReviewMode'
 import { TestVm, TestReviewOutcome, TestReviewVm } from './interfaces/TestVmProps';
 import { UserVm } from './interfaces/UserVmProps';
 import React, { useEffect, useState } from 'react';
@@ -47,6 +48,7 @@ const RunPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTests, setSelectedTests] = useState<number[]>([]); // Track selected test IDs
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
+    const [editMode, setEditMode] = useState<EditTestReviewMode>(EditTestReviewMode.all);
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -136,7 +138,7 @@ const RunPage: React.FC = () => {
         return directTestCount + childTestCount;
     };
 
-    const openModal = () => {
+    const openModal = (mode: EditTestReviewMode) => {
         if (selectedTests.length === 0) {
             alert('Choose at least 1 test for edit');
             return;
@@ -144,6 +146,7 @@ const RunPage: React.FC = () => {
         const selectedReviews = tests.filter(test => selectedTests.includes(test.id)).map(test => test.testReview);
         setTestReviews(selectedReviews);
         setIsModalOpen(true);
+        setEditMode(mode);
         setSelectedTests([]);
     };
 
@@ -259,7 +262,7 @@ const RunPage: React.FC = () => {
 
     const handleActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedAction(event.target.value);
-        openModal();
+        openModal(EditTestReviewMode.all);
         setSelectedAction(null);
     };
 
@@ -271,7 +274,10 @@ const RunPage: React.FC = () => {
                 <option value="Select Reviewer">Select Reviewer</option>
                 <option value="Add Comments">Add Comments</option>
             </select>
-            <button onClick={openModal} className="update-tests-button">Update Selected Tests</button>
+            <button onClick={() => openModal(EditTestReviewMode.reviewer)} className="update-reviewer-button">Update Reviewer</button>
+            <button onClick={() => openModal(EditTestReviewMode.outcome)} className="update-outcome-button">Update Outcome</button>
+            <button onClick={() => openModal(EditTestReviewMode.comments)} className="update-comments-button">Update Comments</button>
+            <button onClick={() => openModal(EditTestReviewMode.all)} className="update-tests-button">Update Selected Tests</button>
         </div>
     );
 
@@ -312,6 +318,7 @@ const RunPage: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 users={users}
                 testReviews={testReviews}
+                editMode={editMode}
             />
         </div>
     );
