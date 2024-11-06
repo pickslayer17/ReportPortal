@@ -53,9 +53,11 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateReviewer(int id, int? reviwerId)
         {
-            var testReviewUpdateDto = new TestReviewUpdateDto();
-            testReviewUpdateDto.Id = id;
-            testReviewUpdateDto.ReviewerId = new Optional<int?>(reviwerId);
+            var testReviewUpdateDto = new TestReviewUpdateDto
+            {
+                Id = id,
+                ReviewerId = new Optional<int?>(reviwerId)
+            };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
 
             var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
@@ -69,9 +71,11 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateOutcome(int id, TestReviewOutcome outcome)
         {
-            var testReviewUpdateDto = new TestReviewUpdateDto();
-            testReviewUpdateDto.Id = id;
-            testReviewUpdateDto.TestReviewOutcome = new Optional<TestReviewOutcome>(outcome);
+            var testReviewUpdateDto = new TestReviewUpdateDto
+            {
+                Id = id,
+                TestReviewOutcome = new Optional<TestReviewOutcome>(outcome)
+            };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
 
             var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
@@ -84,9 +88,11 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateComments(int id, [FromBody] string comments)
         {
-            var testReviewUpdateDto = new TestReviewUpdateDto();
-            testReviewUpdateDto.Id = id;
-            testReviewUpdateDto.Comments = new Optional<string?>(comments);
+            var testReviewUpdateDto = new TestReviewUpdateDto
+            {
+                Id = id,
+                Comments = new Optional<string?>(comments)
+            };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
 
             var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
