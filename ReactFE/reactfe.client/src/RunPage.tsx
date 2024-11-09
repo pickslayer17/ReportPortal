@@ -139,6 +139,13 @@ const RunPage: React.FC = () => {
         return directTestCount + childTestCount;
     };
 
+    const openModalForCell = (mode: EditTestReviewMode, test: TestVm) => {
+        setTestReviews([test.testReview]); // Only open for the selected test
+        setEditMode(mode); // Set the mode based on the clicked cell
+        setIsModalOpen(true); // Open the modal
+        setSelectedTests([]);
+    };
+
     const openModal = (mode: EditTestReviewMode) => {
         if (selectedTests.length === 0) {
             alert('Choose at least 1 test for edit');
@@ -190,11 +197,20 @@ const RunPage: React.FC = () => {
                         ))}
                         {folderTests.map(test => (
                             <tr key={test.id} className="test-row">
-                                <td>
+                                <td
+                                    onClick={(e) => {
+                                        // Only toggle if the click is outside the checkbox itself
+                                        if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") {
+                                            return; // If clicked on the checkbox, do nothing here
+                                        }
+                                        handleCheckboxChange(test.id); // Otherwise, toggle as usual
+                                    }}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     <input
                                         type="checkbox"
                                         checked={selectedTests.includes(test.id)}
-                                        onChange={() => handleCheckboxChange(test.id)}
+                                        onChange={() => handleCheckboxChange(test.id)} // Handles direct checkbox clicks
                                     />
                                 </td>
                                 <td className="test-container">
@@ -202,15 +218,9 @@ const RunPage: React.FC = () => {
                                         {test.name}
                                     </span>
                                 </td>
-                                <td className="test-review-outcome-container">
-                                    {renderTestOutcome(test.testReview.testReviewOutcome)}
-                                </td>
-                                <td className="test-reviewer-container">
-                                    {reviewerEmails[test.testReview.reviewerId] || 'No reviewer'}
-                                </td>
-                                <td className="test-comment-container">
-                                    {test.testReview.comments}
-                                </td>
+                                {renderTestOutcome(test.testReview.testReviewOutcome, test)}
+                                {renderTestReviewer(test)}
+                                {renderTestComments(test)}
                             </tr>
                         ))}
                     </tbody>
@@ -219,22 +229,43 @@ const RunPage: React.FC = () => {
         );
     };
 
-    const renderTestOutcome = (outcome: TestReviewOutcome) => {
-        switch (outcome) {
-            case TestReviewOutcome.ToInvestigate:
-                return <span className="to-investigate">?</span>;
-            case TestReviewOutcome.NotRepro:
-                return <span className="not-repro">NR</span>;
-            case TestReviewOutcome.ProductBug:
-                return (
+    const renderTestComments = (test: TestVm) => (
+        <td
+            className="test-comment-container"
+            onClick={() => openModalForCell(EditTestReviewMode.comments, test)}
+            style={{ cursor: 'pointer' }} // Add pointer cursor for clickable effect
+        >
+            {test.testReview.comments}
+        </td>
+    );
+
+    const renderTestReviewer = (test: TestVm) => (
+        <td
+            className="test-reviewer-container"
+            onClick={() => openModalForCell(EditTestReviewMode.reviewer, test)}
+            style={{ cursor: 'pointer' }} // Add pointer cursor for clickable effect
+        >
+            {reviewerEmails[test.testReview.reviewerId] || '-'}
+        </td>
+    );
+
+    const renderTestOutcome = (outcome: TestReviewOutcome, test: TestVm) => {
+        return (
+            <td
+                className="test-review-outcome-container"
+                onClick={() => openModalForCell(EditTestReviewMode.outcome, test)}
+                style={{ cursor: 'pointer' }} // Add pointer cursor for clickable effect
+            >
+                {outcome === TestReviewOutcome.ToInvestigate && <span className="to-investigate">?</span>}
+                {outcome === TestReviewOutcome.NotRepro && <span className="not-repro">NR</span>}
+                {outcome === TestReviewOutcome.ProductBug && (
                     <div className="product-bug">
                         BUG
                         <span className="bug-id">0</span>
                     </div>
-                );
-            default:
-                return null;
-        }
+                )}
+            </td>
+        );
     };
 
     const getBreadcrumbPath = (): { name: string; id: number | null }[] => {
@@ -265,6 +296,8 @@ const RunPage: React.FC = () => {
         const folder = folders.find(folder => folder.id === folderId);
         if (folder) {
             setCurrentFolderId(folderId);
+            setSelectedTests([]); // Clear selected tests when switching folders
+            setAllSelected(false); // Uncheck "Select All" as well
         }
     };
 
@@ -307,7 +340,7 @@ const RunPage: React.FC = () => {
                 mode = null;
         }
 
-        if (mode) {
+        if (mode!=null) {
             openModal(mode);
         }
 
@@ -324,10 +357,6 @@ const RunPage: React.FC = () => {
                 <option value="Add Comments">Add Comments</option>
                 <option value="Update Selected Tests"></option>
             </select>
-            {/*<button onClick={() => openModal(EditTestReviewMode.reviewer)} className="update-reviewer-button">Update Reviewer</button>*/}
-            {/*<button onClick={() => openModal(EditTestReviewMode.outcome)} className="update-outcome-button">Update Outcome</button>*/}
-            {/*<button onClick={() => openModal(EditTestReviewMode.comments)} className="update-comments-button">Update Comments</button>*/}
-            {/*<button onClick={() => openModal(EditTestReviewMode.all)} className="update-tests-button">Update Selected Tests</button>*/}
         </div>
     );
 
