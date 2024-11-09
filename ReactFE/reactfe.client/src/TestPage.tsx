@@ -85,15 +85,15 @@ const TestPage: React.FC = () => {
                 <div className="tab-content">
                     {activeTab !== null && testResults[activeTab] && (
                         <div>
-                            <p><strong>Error Message:</strong> {testResults[activeTab].errorMessage}</p>
-                            <p><strong>Stack Trace:</strong> {testResults[activeTab].stackTrace}</p>
                             <p><strong>Outcome:</strong> {testResults[activeTab].testOutcome}</p>
+                            <p><strong>Error Message:</strong> {testResults[activeTab].errorMessage}</p>
                             {testResults[activeTab].screenShot && (
                                 <div>
                                     <strong>Screenshot:</strong>
                                     <img src={`data:image/png;base64,${testResults[activeTab].screenShot}`} alt="Test screenshot" />
                                 </div>
                             )}
+                            <p><strong>Stack Trace:</strong> {testResults[activeTab].stackTrace}</p>
                         </div>
                     )}
                 </div>
