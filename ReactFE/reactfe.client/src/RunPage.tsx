@@ -47,6 +47,7 @@ const RunPage: React.FC = () => {
     const [reviewerEmails, setReviewerEmails] = useState<{ [key: number]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTests, setSelectedTests] = useState<number[]>([]); // Track selected test IDs
+    const [allSelected, setAllSelected] = useState(false);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
     const [editMode, setEditMode] = useState<EditTestReviewMode>(EditTestReviewMode.all);
 
@@ -159,14 +160,17 @@ const RunPage: React.FC = () => {
                 <table className="folder-table">
                     <thead>
                         <tr>
-                            {childFolders.length > 0 ? (
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    checked={allSelected && selectedTests.length === tests.filter(test => test.folderId === currentFolderId).length}
+                                    onChange={handleSelectAll}
+                                    disabled={tests.filter(test => test.folderId === currentFolderId).length === 0}
+                                />
+                            </th>
+                            <th>Name</th>
+                            {childFolders.length === 0 && (
                                 <>
-                                    <th>Name</th>
-                                    <th>Tests Count</th>
-                                </>
-                            ) : (
-                                <>
-                                    <th>Name</th>
                                     <th>Outcome</th>
                                     <th>Reviewer</th>
                                     <th>Comments</th>
@@ -177,6 +181,7 @@ const RunPage: React.FC = () => {
                     <tbody>
                         {childFolders.map(folder => (
                             <tr key={folder.id} className="folder-row">
+                                <td></td> {/* Empty cell for checkbox column */}
                                 <td className="folder" onClick={() => openFolder(folder.id)}>
                                     {folder.name}
                                 </td>
@@ -185,35 +190,20 @@ const RunPage: React.FC = () => {
                         ))}
                         {folderTests.map(test => (
                             <tr key={test.id} className="test-row">
-                                <td className="test-container">
+                                <td>
                                     <input
                                         type="checkbox"
                                         checked={selectedTests.includes(test.id)}
-                                        onChange={() => {
-                                            setSelectedTests(prev =>
-                                                prev.includes(test.id)
-                                                    ? prev.filter(id => id !== test.id)
-                                                    : [...prev, test.id]
-                                            );
-                                        }}
+                                        onChange={() => handleCheckboxChange(test.id)}
                                     />
+                                </td>
+                                <td className="test-container">
                                     <span className="test-name" onClick={() => handleTestClick(test.id, test.folderId)}>
                                         {test.name}
                                     </span>
                                 </td>
                                 <td className="test-review-outcome-container">
-                                    {test.testReview.testReviewOutcome === TestReviewOutcome.ToInvestigate && (
-                                        <span className="to-investigate">?</span>
-                                    )}
-                                    {test.testReview.testReviewOutcome === TestReviewOutcome.NotRepro && (
-                                        <span className="not-repro">NR</span>
-                                    )}
-                                    {test.testReview.testReviewOutcome === TestReviewOutcome.ProductBug && (
-                                        <div className="product-bug">
-                                            BUG
-                                            <span className="bug-id">0</span>
-                                        </div>
-                                    )}
+                                    {renderTestOutcome(test.testReview.testReviewOutcome)}
                                 </td>
                                 <td className="test-reviewer-container">
                                     {reviewerEmails[test.testReview.reviewerId] || 'No reviewer'}
@@ -227,6 +217,24 @@ const RunPage: React.FC = () => {
                 </table>
             </div>
         );
+    };
+
+    const renderTestOutcome = (outcome: TestReviewOutcome) => {
+        switch (outcome) {
+            case TestReviewOutcome.ToInvestigate:
+                return <span className="to-investigate">?</span>;
+            case TestReviewOutcome.NotRepro:
+                return <span className="not-repro">NR</span>;
+            case TestReviewOutcome.ProductBug:
+                return (
+                    <div className="product-bug">
+                        BUG
+                        <span className="bug-id">0</span>
+                    </div>
+                );
+            default:
+                return null;
+        }
     };
 
     const getBreadcrumbPath = (): { name: string; id: number | null }[] => {
@@ -259,6 +267,23 @@ const RunPage: React.FC = () => {
             setCurrentFolderId(folderId);
         }
     };
+
+    const handleSelectAll = () => {
+        const folderTests = tests.filter(test => test.folderId === currentFolderId);
+        const allTestsSelected = selectedTests.length === folderTests.length;
+
+        setAllSelected(!allTestsSelected);
+        setSelectedTests(allTestsSelected ? [] : folderTests.map(test => test.id));
+    };
+
+    const handleCheckboxChange = (testId: number) => {
+        setSelectedTests(prev =>
+            prev.includes(testId)
+                ? prev.filter(id => id !== testId) // Deselect if already selected
+                : [...prev, testId] // Select if not already selected
+        );
+    };
+
 
     const handleActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const action = event.target.value;

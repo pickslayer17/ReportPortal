@@ -202,3 +202,26 @@ button {
     border-radius: 5px;
     cursor: pointer;
 }
+
+.folder-table th, .folder-table td {
+    padding: 8px;
+    border: 1px solid #555;
+    text-align: left;
+}
+
+    .folder-table th:first-child {
+        width: 50px; /* Narrower width for the checkbox column */
+    }
+
+.folder-table input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* Refined Styling for Test Outcome Spans */
+.test-review-outcome-container span, .test-review-outcome-container div {
+    display: inline; /* Change to 'inline' to reduce inner borders */
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+    border-radius: 3px;
+}
