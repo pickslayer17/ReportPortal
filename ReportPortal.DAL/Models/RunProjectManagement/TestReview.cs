@@ -12,5 +12,6 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
         public virtual User Reviewer { get; set; }
         public string? Comments { get; set; }
         public TestReviewOutcome TestReviewOutcome { get; set; }
+        public int? ProductBug { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace ReportPortal.ViewModels.TestRun
         public int? ReviewerId { get; set; }
         public string? Comments { get; set; }
         public TestReviewOutcome TestReviewOutcome { get; set; }
+        public int? ProductBug { get; set; }
 
     }
 }

@@ -44,7 +44,11 @@ namespace ReportPortal.BL.Services
                 testReview.Comments = testReviewUpdateDto.Comments.Value;
 
             if (testReviewUpdateDto.TestReviewOutcome.HasValue)
+            {
                 testReview.TestReviewOutcome = testReviewUpdateDto.TestReviewOutcome.Value;
+                if (testReview.TestReviewOutcome == DAL.Enums.TestReviewOutcome.ProductBug)
+                    testReview.ProductBug = testReviewUpdateDto.ProductBug;
+            }
 
             // Save the updated domain model
             var testReviewUpdated = await _testReviewRepository.UpdateItem(testReview);

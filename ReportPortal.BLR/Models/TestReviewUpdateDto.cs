@@ -8,5 +8,6 @@ namespace ReportPortal.BL.Models
         public Optional<int?> ReviewerId { get; set; } = Optional<int?>.None();
         public Optional<string?> Comments { get; set; } = Optional<string?>.None();
         public Optional<TestReviewOutcome> TestReviewOutcome { get; set; } = Optional<TestReviewOutcome>.None();
+        public int? ProductBug { get; set; }
     }
 }
