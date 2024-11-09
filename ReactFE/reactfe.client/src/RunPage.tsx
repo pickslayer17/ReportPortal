@@ -261,8 +261,32 @@ const RunPage: React.FC = () => {
     };
 
     const handleActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedAction(event.target.value);
-        openModal(EditTestReviewMode.all);
+        const action = event.target.value;
+
+        // Determine the EditTestReviewMode based on the selected action
+        let mode: EditTestReviewMode | null = null;
+        switch (action) {
+            case "Set Outcome":
+                mode = EditTestReviewMode.outcome;
+                break;
+            case "Select Reviewer":
+                mode = EditTestReviewMode.reviewer;
+                break;
+            case "Add Comments":
+                mode = EditTestReviewMode.comments;
+                break;
+            case "Update Selected Tests":
+                mode = EditTestReviewMode.all;
+                break;
+            default:
+                mode = null;
+        }
+
+        if (mode) {
+            openModal(mode);
+        }
+
+        // Reset the selected action to the placeholder option
         setSelectedAction(null);
     };
 
@@ -273,11 +297,12 @@ const RunPage: React.FC = () => {
                 <option value="Set Outcome">Set Outcome</option>
                 <option value="Select Reviewer">Select Reviewer</option>
                 <option value="Add Comments">Add Comments</option>
+                <option value="Update Selected Tests"></option>
             </select>
-            <button onClick={() => openModal(EditTestReviewMode.reviewer)} className="update-reviewer-button">Update Reviewer</button>
-            <button onClick={() => openModal(EditTestReviewMode.outcome)} className="update-outcome-button">Update Outcome</button>
-            <button onClick={() => openModal(EditTestReviewMode.comments)} className="update-comments-button">Update Comments</button>
-            <button onClick={() => openModal(EditTestReviewMode.all)} className="update-tests-button">Update Selected Tests</button>
+            {/*<button onClick={() => openModal(EditTestReviewMode.reviewer)} className="update-reviewer-button">Update Reviewer</button>*/}
+            {/*<button onClick={() => openModal(EditTestReviewMode.outcome)} className="update-outcome-button">Update Outcome</button>*/}
+            {/*<button onClick={() => openModal(EditTestReviewMode.comments)} className="update-comments-button">Update Comments</button>*/}
+            {/*<button onClick={() => openModal(EditTestReviewMode.all)} className="update-tests-button">Update Selected Tests</button>*/}
         </div>
     );
 

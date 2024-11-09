@@ -27,8 +27,8 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
         try {
             for (const review of updatedTestReviews) {
                 const url =
-                    editMode === EditTestReviewMode.reviewer ? `api/TestReviewManagement/TestReview/${review.id}/UpdateReviewer/${selectedReviewerId}`
-                        : editMode === EditTestReviewMode.outcome ? `api/TestReviewManagement/TestReview/${review.id}/UpdateOutcome/${selectedOutcome}`
+                    editMode === EditTestReviewMode.reviewer ? `api/TestReviewManagement/TestReview/${review.id}/UpdateReviewer`
+                        : editMode === EditTestReviewMode.outcome ? `api/TestReviewManagement/TestReview/${review.id}/UpdateOutcome`
                             : editMode === EditTestReviewMode.comments ? `api/TestReviewManagement/TestReview/${review.id}/UpdateComments`
                                 : `api/TestReviewManagement/UpdateTestReview`; // Fall back to default
 

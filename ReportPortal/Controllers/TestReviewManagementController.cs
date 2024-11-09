@@ -49,14 +49,14 @@ namespace ReportPortal.Controllers
             return Ok(_mapper.Map<TestReviewVm>(testReviewDtoUpdated));
         }
 
-        [HttpPut("TestReview/{id:int}/UpdateReviewer/{reviewerId:int}")]
+        [HttpPut("TestReview/{id:int}/UpdateReviewer")]
         [Authorize]
-        public async Task<IActionResult> UpdateReviewer(int id, int? reviwerId)
+        public async Task<IActionResult> UpdateReviewer(int id, [FromBody] TestReviewVm testReview)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
                 Id = id,
-                ReviewerId = new Optional<int?>(reviwerId)
+                ReviewerId = new Optional<int?>(testReview.ReviewerId)
             };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
 
@@ -67,14 +67,14 @@ namespace ReportPortal.Controllers
         }
 
 
-        [HttpPut("TestReview/{id:int}/UpdateOutcome/{outcome:int}")]
+        [HttpPut("TestReview/{id:int}/UpdateOutcome")]
         [Authorize]
-        public async Task<IActionResult> UpdateOutcome(int id, TestReviewOutcome outcome)
+        public async Task<IActionResult> UpdateOutcome(int id, [FromBody] TestReviewVm testReview)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
                 Id = id,
-                TestReviewOutcome = new Optional<TestReviewOutcome>(outcome)
+                TestReviewOutcome = new Optional<TestReviewOutcome>(testReview.TestReviewOutcome)
             };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
 
@@ -86,12 +86,12 @@ namespace ReportPortal.Controllers
 
         [HttpPut("TestReview/{id:int}/UpdateComments")]
         [Authorize]
-        public async Task<IActionResult> UpdateComments(int id, [FromBody] string comments)
+        public async Task<IActionResult> UpdateComments(int id, [FromBody] TestReviewVm testReview)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
                 Id = id,
-                Comments = new Optional<string?>(comments)
+                Comments = new Optional<string?>(testReview.Comments)
             };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
 
