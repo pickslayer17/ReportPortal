@@ -14,7 +14,6 @@ interface TestVm {
 interface TestResultVm {
     id: number;
     testId: number;
-    runId: number;
     errorMessage: string;
     stackTrace: string;
     screenShot: string; // This will be a base64 string for the image
