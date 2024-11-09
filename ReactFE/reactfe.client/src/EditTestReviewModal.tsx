@@ -15,6 +15,7 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
     const [selectedOutcome, setSelectedOutcome] = useState<TestReviewOutcome | null>(null);
     const [selectedReviewerId, setSelectedReviewerId] = useState<number | null>(null);
     const [comment, setComment] = useState<string>('');
+    const [bugId, setBugId] = useState<number | null>(null);
 
     const handleUpdate = async () => {
         const updatedTestReviews = testReviews.map(testReview => ({
@@ -22,6 +23,7 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
             ...(editMode === EditTestReviewMode.outcome || editMode === EditTestReviewMode.all ? { testReviewOutcome: selectedOutcome } : {}),
             ...(editMode === EditTestReviewMode.reviewer || editMode === EditTestReviewMode.all ? { reviewerId: selectedReviewerId } : {}),
             ...(editMode === EditTestReviewMode.comments || editMode === EditTestReviewMode.all ? { comments: comment } : {}),
+            ...(selectedOutcome === TestReviewOutcome.ProductBug && bugId !== null ? { productBug: bugId } : {}), // Add bugId for ProductBug outcome
         }));
 
         try {
@@ -66,6 +68,21 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                         </select>
                     </div>
                 )}
+
+                {(selectedOutcome === TestReviewOutcome.ProductBug) && (
+                    <div>
+                        <label htmlFor="bugId">Bug Id:</label>
+                        <input
+                            type="number"
+                            id="bugId"
+                            value={bugId !== null ? bugId : ''}
+                            onChange={(e) => setBugId(Number(e.target.value))}
+                            placeholder="Enter Bug Id"
+                            style={{ width: '100%' }}
+                        />
+                    </div>
+                )}
+
                 {(editMode === EditTestReviewMode.reviewer || editMode === EditTestReviewMode.all) && (
                     <div>
                         <label htmlFor="reviewer">Reviewer:</label>
@@ -84,6 +101,7 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                         </select>
                     </div>
                 )}
+
                 {(editMode === EditTestReviewMode.comments || editMode === EditTestReviewMode.all) && (
                     <div>
                         <label htmlFor="comment">Comments:</label>
@@ -97,6 +115,7 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                         />
                     </div>
                 )}
+
                 <button onClick={handleUpdate}>Update</button>
                 <button className="button-secondary" onClick={onClose}>Cancel</button>
             </div>

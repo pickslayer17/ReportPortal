@@ -13,6 +13,7 @@ export interface TestReviewVm {
     reviewerId: number;
     comments: string;
     testReviewOutcome: TestReviewOutcome;
+    productBug: number;
 }
 export enum TestReviewOutcome {
     ToInvestigate = 0,

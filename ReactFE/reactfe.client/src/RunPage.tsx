@@ -261,7 +261,7 @@ const RunPage: React.FC = () => {
                 {outcome === TestReviewOutcome.ProductBug && (
                     <div className="product-bug">
                         BUG
-                        <span className="bug-id">0</span>
+                        <span className="bug-id">{test.testReview.productBug?? ''}</span>
                     </div>
                 )}
             </td>

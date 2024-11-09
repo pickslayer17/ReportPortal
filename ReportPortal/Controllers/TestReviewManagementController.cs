@@ -74,7 +74,8 @@ namespace ReportPortal.Controllers
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
                 Id = id,
-                TestReviewOutcome = new Optional<TestReviewOutcome>(testReview.TestReviewOutcome)
+                TestReviewOutcome = new Optional<TestReviewOutcome>(testReview.TestReviewOutcome),
+                ProductBug = testReview.ProductBug
             };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
 
