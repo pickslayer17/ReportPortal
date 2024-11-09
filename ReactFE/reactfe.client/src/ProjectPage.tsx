@@ -1,5 +1,5 @@
 import './App.css';
-import './ProjectPage.css'; // Assume we have styles for ProjectPage
+import './ProjectPage.css';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api';
@@ -11,7 +11,7 @@ interface Run {
 }
 
 function ProjectPage() {
-    const { projectId } = useParams<{ projectId: string }>(); // Retrieve projectId from URL params
+    const { projectId } = useParams<{ projectId: string }>();
     const [runs, setRuns] = useState<Run[]>([]);
     const navigate = useNavigate();
 
@@ -37,17 +37,17 @@ function ProjectPage() {
             <div className="project-header">
                 <h1>Project Runs</h1>
             </div>
-            <table className="folder-table" >
+            <table className="run-table"> {/* Update class for consistent styling */}
                 <thead>
                     <tr>
-                        <th></th>
+                        <th className="run-header">Run Name</th> {/* Add headers for alignment */}
                     </tr>
                 </thead>
                 <tbody>
                     {runs.map((run) => (
-                        <tr key={run.id} className="test-row">
+                        <tr key={run.id} className="run-row">
                             <td className="run-item" onClick={() => handleRunClick(run.id)}>
-                                    {run.name}
+                                {run.name}
                             </td>
                         </tr>
                     ))}

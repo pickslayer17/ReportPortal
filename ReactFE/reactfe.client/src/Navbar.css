@@ -33,18 +33,28 @@
     margin-left: auto; /* Push Logout button to the right */
 }
 
-.project-page {
-    padding-top: calc(var(--navbar-height) + 10px); 
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fff; /* Adjust as needed */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow */
 }
 
-.settings-page {
-    padding-top: calc(var(--navbar-height) + 10px); /* Add some extra space if needed */
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
 }
 
-.run-page {
-    padding-top: calc(var(--navbar-height) + 10px); /* Add some extra space if needed */
+/* Adjust content below the navbar to avoid overlap */
+.content {
+    margin-top: 60px; /* Same height as Navbar */
 }
 
-.test-page {
-    padding-top: calc(var(--navbar-height) + 10px); /* Add some extra space if needed */
+.navbar {
+    height: 4rem; /* Example height */
+    --navbar-height: 4rem; /* Define variable for navbar height */
+    /* other navbar styles */
 }
