@@ -23,6 +23,13 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
             setSelectedReviewerId(null);
             setComment('');
             setBugId(null);
+            if (testReviews.length == 1) {
+                let tr = testReviews[0];
+                setSelectedOutcome(tr.testReviewOutcome);
+                setSelectedReviewerId(tr.reviewerId);
+                setComment(tr.comments);
+                setBugId(tr.productBug);
+            } 
         }
     }, [isOpen]);
 
@@ -75,20 +82,19 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                                     </option>
                                 ))}
                         </select>
-                    </div>
-                )}
-
-                {(selectedOutcome === TestReviewOutcome.ProductBug) && (
-                    <div>
-                        <label htmlFor="bugId">Bug Id:</label>
-                        <input
-                            type="number"
-                            id="bugId"
-                            value={bugId !== null ? bugId : ''}
-                            onChange={(e) => setBugId(Number(e.target.value))}
-                            placeholder="Enter Bug Id"
-                            style={{ width: '100%' }}
-                        />
+                        {(selectedOutcome === TestReviewOutcome.ProductBug) && (
+                            <div>
+                                <label htmlFor="bugId">Bug Id:</label>
+                                <input
+                                    type="number"
+                                    id="bugId"
+                                    value={bugId !== null ? bugId : ''}
+                                    onChange={(e) => setBugId(Number(e.target.value))}
+                                    placeholder="Enter Bug Id"
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
 
