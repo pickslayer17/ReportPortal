@@ -158,6 +158,11 @@ const RunPage: React.FC = () => {
         setSelectedTests([]);
     };
 
+    const handleCloseModal = () => {
+        setIsModalOpen(false);  // Close the modal
+        setTestReviews([]);     // Clear the test reviews data
+    };
+
     const renderFoldersAndTests = (parentId: number | null) => {
         const childFolders = folders.filter(folder => folder.parentId === parentId);
         const folderTests = tests.filter(test => test.folderId === parentId);
@@ -394,7 +399,7 @@ const RunPage: React.FC = () => {
             {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
             <EditTestReviewModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={handleCloseModal}
                 users={users}
                 testReviews={testReviews}
                 editMode={editMode}

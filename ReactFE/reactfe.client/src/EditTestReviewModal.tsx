@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import { EditTestReviewModalProps } from './interfaces/EditTestReviewModalProps';
 import { EditTestReviewMode } from './enums/EditTestReviewMode'
@@ -16,6 +16,15 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
     const [selectedReviewerId, setSelectedReviewerId] = useState<number | null>(null);
     const [comment, setComment] = useState<string>('');
     const [bugId, setBugId] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            setSelectedOutcome(null);
+            setSelectedReviewerId(null);
+            setComment('');
+            setBugId(null);
+        }
+    }, [isOpen]);
 
     const handleUpdate = async () => {
         const updatedTestReviews = testReviews.map(testReview => ({
