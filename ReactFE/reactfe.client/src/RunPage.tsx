@@ -198,9 +198,9 @@ const RunPage: React.FC = () => {
                         <th>Passed</th>
                         <th>Failed</th>
                         <th>Not Run</th>
-                        <th>To Investigate</th>
-                        <th>Not Repro</th>
-                        <th>Product Bug</th>
+                        <th><span className="to-investigate">?</span></th>
+                        <th><span className="not-repro">NR</span></th>
+                        <th><div className="product-bug">BUG</div></th>
                     </tr>
                 </thead>
                 <tbody>
