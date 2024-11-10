@@ -172,73 +172,99 @@ const RunPage: React.FC = () => {
         setTestReviews([]);     // Clear the test reviews data
     };
 
+    const renderFolderTable = (childFolders: FolderVm[], currentFolderId: number | null) => {
+        return (
+            <table className="folder-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input
+                                type="checkbox"
+                                checked={allSelected && selectedTests.length === tests.filter(test => test.folderId === currentFolderId).length}
+                                onChange={handleSelectAll}
+                                disabled={tests.filter(test => test.folderId === currentFolderId).length === 0}
+                            />
+                        </th>
+                        <th>Name</th>
+                        <th>Total</th> {/* Example of adding a total column */}
+                    </tr>
+                </thead>
+                <tbody>
+                    {childFolders.map(folder => (
+                        <tr key={folder.id} className="folder-row">
+                            <td></td> {/* Empty cell for checkbox column */}
+                            <td className="folder" onClick={() => openFolder(folder.id)}>
+                                {folder.name}
+                            </td>
+                            <td>({getTotalTestCountForFolder(folder.id)} tests)</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        );
+    };
+
+    const renderTestTable = (folderTests: TestVm[]) => {
+        return (
+            <table className="folder-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input
+                                type="checkbox"
+                                checked={allSelected && selectedTests.length === tests.filter(test => test.folderId === currentFolderId).length}
+                                onChange={handleSelectAll}
+                                disabled={tests.filter(test => test.folderId === currentFolderId).length === 0}
+                            />
+                        </th>
+                        <th>Name</th>
+                        <th>Outcome</th>
+                        <th>Reviewer</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {folderTests.map(test => (
+                        <tr key={test.id} className="test-row">
+                            <td
+                                onClick={(e) => {
+                                    if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") {
+                                        return; // Do nothing if clicked on checkbox
+                                    }
+                                    handleCheckboxChange(test.id); // Otherwise, toggle checkbox
+                                }}
+                                style={{ cursor: "pointer" }}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={selectedTests.includes(test.id)}
+                                    onChange={() => handleCheckboxChange(test.id)}
+                                />
+                            </td>
+                            <td className="test-container">
+                                <span className="test-name" onClick={() => handleTestClick(test.id, test.folderId)}>
+                                    {test.name}
+                                </span>
+                            </td>
+                            {renderTestOutcome(test.testReview.testReviewOutcome, test)}
+                            {renderTestReviewer(test)}
+                            {renderTestComments(test)}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        );
+    };
+
     const renderFoldersAndTests = (parentId: number | null) => {
         const childFolders = folders.filter(folder => folder.parentId === parentId);
         const folderTests = tests.filter(test => test.folderId === parentId);
 
         return (
             <div className="folder-container">
-                <table className="folder-table">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input
-                                    type="checkbox"
-                                    checked={allSelected && selectedTests.length === tests.filter(test => test.folderId === currentFolderId).length}
-                                    onChange={handleSelectAll}
-                                    disabled={tests.filter(test => test.folderId === currentFolderId).length === 0}
-                                />
-                            </th>
-                            <th>Name</th>
-                            {childFolders.length === 0 && (
-                                <>
-                                    <th>Outcome</th>
-                                    <th>Reviewer</th>
-                                    <th>Comments</th>
-                                </>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {childFolders.map(folder => (
-                            <tr key={folder.id} className="folder-row">
-                                <td></td> {/* Empty cell for checkbox column */}
-                                <td className="folder" onClick={() => openFolder(folder.id)}>
-                                    {folder.name}
-                                </td>
-                                <td>({getTotalTestCountForFolder(folder.id)} tests)</td>
-                            </tr>
-                        ))}
-                        {folderTests.map(test => (
-                            <tr key={test.id} className="test-row">
-                                <td
-                                    onClick={(e) => {
-                                        // Only toggle if the click is outside the checkbox itself
-                                        if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") {
-                                            return; // If clicked on the checkbox, do nothing here
-                                        }
-                                        handleCheckboxChange(test.id); // Otherwise, toggle as usual
-                                    }}
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedTests.includes(test.id)}
-                                        onChange={() => handleCheckboxChange(test.id)} // Handles direct checkbox clicks
-                                    />
-                                </td>
-                                <td className="test-container">
-                                    <span className="test-name" onClick={() => handleTestClick(test.id, test.folderId)}>
-                                        {test.name}
-                                    </span>
-                                </td>
-                                {renderTestOutcome(test.testReview.testReviewOutcome, test)}
-                                {renderTestReviewer(test)}
-                                {renderTestComments(test)}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                {folderTests.length > 0
+                    ? renderTestTable(folderTests)
+                    : renderFolderTable(childFolders, parentId)}
             </div>
         );
     };
