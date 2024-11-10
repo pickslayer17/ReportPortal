@@ -98,11 +98,20 @@ const RunPage: React.FC = () => {
 
                     connection.off("AddTest");
                     connection.off("UpdateTest");
+                    connection.off("RemoveFolder");
                     connection.on("AddTest", async (test: TestVm) => {
                         const folderData: FolderVm[] = await fetchWithToken(`api/FolderManagement/Runs/${runId}/folders`);
                         setFolders(folderData);
                         setTests(prevTests => [...prevTests, test]);
                         console.log("Received updated data:", test);
+                    });
+
+                    connection.on("RemoveFolder", async (folder: FolderVm) => {
+                        const folderData: FolderVm[] = await fetchWithToken(`api/FolderManagement/Runs/${runId}/folders`);
+                        setFolders(folderData);
+                        const testData: TestVm[] = await fetchWithToken(`api/TestManagement/Runs/${runId}/tests`);
+                        setTests(testData);
+                        console.log("Folder was removed:", folder);
                     });
 
                     connection.on("UpdateTest", async (test: TestVm) => {

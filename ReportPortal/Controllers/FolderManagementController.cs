@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Models;
+using ReportPortal.BL.Services;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
@@ -14,11 +17,13 @@ namespace ReportPortal.Controllers
     {
         private readonly IFolderService _folderService;
         private readonly IMapper _mapper;
+        private readonly IHubContext<RunUpdatesHub> _hubContext;
 
-        public FolderManagementController(IFolderService folderService, IMapper mapper)
+        public FolderManagementController(IFolderService folderService, IMapper mapper, IHubContext<RunUpdatesHub> hubContext)
         {
             _folderService = folderService;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         [HttpGet("Runs/{runId:int}/folders")]
@@ -34,7 +39,17 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteFolder(int folderId)
         {
+            var folder = await _folderService.GetByIdAsync(folderId);
+            if (folder == null)  
+                throw new Exception($"Folder not found with id {folderId}"); 
+
+            var runId = folder.RunId;
+            var removedFolderVm = _mapper.Map<FolderVm>(folder);
+
             await _folderService.DeleteFolder(folderId);
+
+            await _hubContext.Clients.Group(runId.ToString()).SendAsync("RemoveFolder", removedFolderVm);
+
             return Ok();
         }
     }
