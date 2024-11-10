@@ -28,7 +28,7 @@ namespace ReportPortal.Controllers
 
         [HttpPost("AddTest")]
         [Authorize]
-        public async Task<IActionResult> AddTest([FromBody] TestVm testVm)
+        public async Task<IActionResult> AddTest([FromBody] TestSaveVm testVm)
         {
             var testDto = _mapper.Map<TestDto>(testVm);
             var folderId = await _folderService.GetIdOrAddFolderInRun(testVm.RunId, testVm.Path);

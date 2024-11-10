@@ -172,7 +172,7 @@ const RunPage: React.FC = () => {
         setTestReviews([]);     // Clear the test reviews data
     };
 
-    const renderFolderTable = (childFolders: FolderVm[], currentFolderId: number | null) => {
+    const renderFolderTable = (childFolders: FolderVm[], folderTests: TestVm[], currentFolderId: number | null) => {
         return (
             <table className="folder-table">
                 <thead>
@@ -264,7 +264,7 @@ const RunPage: React.FC = () => {
             <div className="folder-container">
                 {folderTests.length > 0
                     ? renderTestTable(folderTests)
-                    : renderFolderTable(childFolders, parentId)}
+                    : renderFolderTable(childFolders, folderTests, parentId)}
             </div>
         );
     };

@@ -9,7 +9,7 @@ namespace ReportPortal.BL.Models
         public int RunId { get; set; }
         public string Name { get; set; }
         public int FolderId { get; set; }
-        public List<TestResult> TestResults { get; set; }
+        public List<TestResultDto> TestResults { get; set; }
         public virtual TestReviewDto TestReview { get; set; }
     }
 }

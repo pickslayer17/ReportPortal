@@ -11,14 +11,7 @@ interface TestVm {
     name: string;
 }
 
-interface TestResultVm {
-    id: number;
-    testId: number;
-    errorMessage: string;
-    stackTrace: string;
-    screenShot: string; // This will be a base64 string for the image
-    testOutcome: 'Passed' | 'Failed' | 'NotRun';
-}
+
 
 const TestPage: React.FC = () => {
     const { testId } = useParams<{ testId: string }>();

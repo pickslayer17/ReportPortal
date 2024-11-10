@@ -1,10 +1,13 @@
+import { TestResultVm } from './TestResultVmProps';
+
 export interface TestVm {
     id: number;
     folderId: number;
     path: string;
     runId: number;
     name: string;
-    testReview: TestReviewVm
+    testReview: TestReviewVm,
+    testResults: TestResultVm[]
 }
 
 export interface TestReviewVm {
