@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api';
 import * as signalR from '@microsoft/signalr'; // Import SignalR
+import { testOutcome } from './enums/testOutcome';
 
 interface FolderVm {
     id: number;
@@ -172,7 +173,14 @@ const RunPage: React.FC = () => {
         setTestReviews([]);     // Clear the test reviews data
     };
 
-    const renderFolderTable = (childFolders: FolderVm[], folderTests: TestVm[], currentFolderId: number | null) => {
+    const getAllTestsForFolder = (folderId: number): TestVm[] => {
+        const directTests = tests.filter(test => test.folderId === folderId);
+        const childFolders = folders.filter(folder => folder.parentId === folderId);
+        const childTests = childFolders.flatMap(childFolder => getAllTestsForFolder(childFolder.id));
+        return [...directTests, ...childTests];
+    };
+
+    const renderFolderTable = (childFolders: FolderVm[], currentFolderId: number | null) => {
         return (
             <table className="folder-table">
                 <thead>
@@ -186,19 +194,60 @@ const RunPage: React.FC = () => {
                             />
                         </th>
                         <th>Name</th>
-                        <th>Total</th> {/* Example of adding a total column */}
+                        <th>Total</th>
+                        <th>Passed</th>
+                        <th>Failed</th>
+                        <th>Not Run</th>
+                        <th>To Investigate</th>
+                        <th>Not Repro</th>
+                        <th>Product Bug</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {childFolders.map(folder => (
-                        <tr key={folder.id} className="folder-row">
-                            <td></td> {/* Empty cell for checkbox column */}
-                            <td className="folder" onClick={() => openFolder(folder.id)}>
-                                {folder.name}
-                            </td>
-                            <td>({getTotalTestCountForFolder(folder.id)} tests)</td>
-                        </tr>
-                    ))}
+                    {childFolders.map(folder => {
+                        // Get all tests for the folder and its child folders
+                        const folderTests = getAllTestsForFolder(folder.id);
+
+                        // Calculate totals for TestOutcome
+                        const outcomeCounts = folderTests.reduce(
+                            (acc, test) => {
+                                const latestTestResult = test.testResults?.[test.testResults.length - 1]?.testOutcome;
+                                if (latestTestResult === testOutcome.Passed) acc.passed += 1;
+                                else if (latestTestResult === testOutcome.Failed) acc.failed += 1;
+                                else if (latestTestResult === testOutcome.NotRun) acc.notRun += 1;
+                                return acc;
+                            },
+                            { passed: 0, failed: 0, notRun: 0 }
+                        );
+
+                        // Calculate totals for TestReviewOutcome
+                        const reviewCounts = folderTests.reduce(
+                            (acc, test) => {
+                                const reviewOutcome = test.testReview?.testReviewOutcome;
+                                if (reviewOutcome === TestReviewOutcome.ToInvestigate) acc.toInvestigate += 1;
+                                else if (reviewOutcome === TestReviewOutcome.NotRepro) acc.notRepro += 1;
+                                else if (reviewOutcome === TestReviewOutcome.ProductBug) acc.productBug += 1;
+                                return acc;
+                            },
+                            { toInvestigate: 0, notRepro: 0, productBug: 0 }
+                        );
+
+                        return (
+                            <tr key={folder.id} className="folder-row">
+                                <td></td> {/* Empty cell for checkbox column */}
+                                <td className="folder" onClick={() => openFolder(folder.id)}>
+                                    {folder.name}
+                                </td>
+                                <td>({folderTests.length} tests)</td>
+                                <td>{outcomeCounts.passed}</td>
+                                <td>{outcomeCounts.failed}</td>
+                                <td>{outcomeCounts.notRun}</td>
+                                <td>{reviewCounts.toInvestigate}</td>
+                                <td>{reviewCounts.notRepro}</td>
+                                <td>{reviewCounts.productBug}</td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         );
@@ -264,7 +313,7 @@ const RunPage: React.FC = () => {
             <div className="folder-container">
                 {folderTests.length > 0
                     ? renderTestTable(folderTests)
-                    : renderFolderTable(childFolders, folderTests, parentId)}
+                    : renderFolderTable(childFolders, parentId)}
             </div>
         );
     };
