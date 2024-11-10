@@ -11,6 +11,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api';
 import * as signalR from '@microsoft/signalr'; // Import SignalR
 import { testOutcome } from './enums/testOutcome';
+import { capitalizeFirstLetter } from './helpers/render';
 
 interface FolderVm {
     id: number;
@@ -114,7 +115,7 @@ const RunPage: React.FC = () => {
                         setTests(testData);
                         console.log("Folder was removed:", folder);
                     });
-
+                    
                     connection.on("UpdateTest", async (test: TestVm) => {
                         try {
                             setTests((prevTests) => {
@@ -129,6 +130,27 @@ const RunPage: React.FC = () => {
                             console.error("Error updating tests:", error);
                         }
                     });
+
+                    connection.on("UpdateTestResult", async (test: TestVm) => {
+                        try {
+                            setTests((prevTests) => {
+                                const updatedTests = prevTests.map((t) =>
+                                    t.id === test.id
+                                        ? { ...t, testResults: [...test.testResults] } // Only update testResults with a new array reference
+                                        : t
+                                );
+                                console.log("Tests after update:", updatedTests); // Optional logging
+                                return updatedTests;
+                            });
+
+                            console.log("Received updated data:", test);
+                            // Optionally notify the user of the update (e.g., using a toast)
+                        } catch (error) {
+                            console.error("Error updating tests:", error);
+                        }
+                    });
+
+                   
                 })
                 .catch(error => console.error("Error establishing SignalR connection: ", error));
 
@@ -236,7 +258,7 @@ const RunPage: React.FC = () => {
                             <tr key={folder.id} className="folder-row">
                                 <td></td> {/* Empty cell for checkbox column */}
                                 <td className="folder" onClick={() => openFolder(folder.id)}>
-                                    {folder.name}
+                                    {capitalizeFirstLetter(folder.name)}
                                 </td>
                                 <td>({folderTests.length} tests)</td>
                                 <td>{outcomeCounts.passed}</td>
@@ -292,7 +314,7 @@ const RunPage: React.FC = () => {
                             </td>
                             <td className="test-container">
                                 <span className="test-name" onClick={() => handleTestClick(test.id, test.folderId)}>
-                                    {test.name}
+                                    {capitalizeFirstLetter(test.name)}
                                 </span>
                             </td>
                             {renderTestOutcome(test.testReview.testReviewOutcome, test)}
@@ -363,7 +385,7 @@ const RunPage: React.FC = () => {
 
         // Traverse back up to the root folder
         while (currentFolder && currentFolder.name !== '$$Root$$') {
-            path.unshift({ name: currentFolder.name, id: currentFolder.id });
+            path.unshift({ name: capitalizeFirstLetter(currentFolder.name), id: currentFolder.id });
 
             // Move to the parent folder if the parentId exists
             if (currentFolder.parentId !== undefined && currentFolder.parentId !== null) {

@@ -35,7 +35,7 @@ namespace ReportPortal.BL.Services
             var run = await _runRepository.GetByAsync(r => r.Id == runId);
             if (run == null) throw new DirectoryNotFoundException($"There is no run with such id {runId}!");
 
-            var folderNames = path.Split('.');
+            var folderNames = path.ToLower().Split('.');
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
             Folder rootFolder;
