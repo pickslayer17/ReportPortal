@@ -164,13 +164,6 @@ const RunPage: React.FC = () => {
         navigate(`/TestPage/${testId}`, { state: { folderId } });
     };
 
-    const getTotalTestCountForFolder = (folderId: number): number => {
-        const directTestCount = tests.filter(test => test.folderId === folderId).length;
-        const childFolders = folders.filter(folder => folder.parentId === folderId);
-        const childTestCount = childFolders.reduce((total, folder) => total + getTotalTestCountForFolder(folder.id), 0);
-        return directTestCount + childTestCount;
-    };
-
     const openModalForCell = (mode: EditTestReviewMode, test: TestVm) => {
         setTestReviews([test.testReview]); // Only open for the selected test
         setEditMode(mode); // Set the mode based on the clicked cell

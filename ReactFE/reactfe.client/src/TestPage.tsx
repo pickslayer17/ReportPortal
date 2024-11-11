@@ -2,6 +2,7 @@ import './TestPage.css';
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api';
+import { TestResultVm } from './interfaces/TestResultVmProps';
 
 interface TestVm {
     id: number;
@@ -10,8 +11,6 @@ interface TestVm {
     runId: number;
     name: string;
 }
-
-
 
 const TestPage: React.FC = () => {
     const { testId } = useParams<{ testId: string }>();
