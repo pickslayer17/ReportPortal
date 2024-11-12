@@ -19,7 +19,7 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<Test> GetByAsync(Expression<Func<Test, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            var test =  await _dbContext.Tests.FirstOrDefaultAsync(predicate, cancellationToken);
+            var test =  await _dbContext.Tests.Include(t => t.TestResults).FirstOrDefaultAsync(predicate, cancellationToken);
             if (test == null) throw new TestNotFoundException($"There is no test with such predicate {predicate}");
 
             return test;
