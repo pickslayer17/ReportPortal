@@ -15,6 +15,7 @@ using ReportPortal.Services.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+string FrontEndUrl = builder.Configuration["FrontEndUrl"];
 
 // DaaBase
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -69,17 +70,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
+    options.AddPolicy("AllowAll",
         builder => builder
-            .WithOrigins("https://localhost:5173") // Your frontend URL
+            .WithOrigins(FrontEndUrl) // Your frontend URL
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials()); // <-- Add this line to allow credentials
+            .AllowCredentials());
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -87,21 +87,20 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseRouting();
-
-app.MapControllers();
-
-app.MapRazorPages();
-app.MapHub<RunUpdatesHub>("/hubs/runUpdates");
-
-// Use CORS
-app.UseCors("AllowSpecificOrigin");
+// Use CORS first
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
+// Authentication and Authorization should come after CORS
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapRazorPages();
+app.MapHub<RunUpdatesHub>("/hubs/runUpdates");
 
 app.Run();
 
