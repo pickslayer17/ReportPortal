@@ -70,12 +70,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder
-            .WithOrigins(FrontEndUrl) // Your frontend URL
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
             .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
+            .AllowAnyHeader();
+    });
 });
 
 var app = builder.Build();
@@ -88,11 +88,10 @@ if (app.Environment.IsDevelopment())
 }
 
 // Use CORS first
+app.UseRouting();
 app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
-
-app.UseRouting();
 
 // Authentication and Authorization should come after CORS
 app.UseAuthentication();
