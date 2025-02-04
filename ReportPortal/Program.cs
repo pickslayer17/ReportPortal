@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ReportPortal.BL.Maps;
@@ -68,11 +69,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // CORS
+var corsPolicyName = "CorsPolicy";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", builder =>
+    options.AddPolicy(corsPolicyName, builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.WithOrigins(FrontEndUrl)
+            .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
@@ -88,8 +91,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // Use CORS first
+app.UseCors(corsPolicyName);
 app.UseRouting();
-app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
