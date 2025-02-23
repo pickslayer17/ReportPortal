@@ -9,5 +9,6 @@ namespace ReportPortal.BL.Services.Interfaces
         public Task<FolderDto> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         public Task<IEnumerable<FolderDto>> GetAllFolders(int runId, CancellationToken cancellationToken = default);
         public Task DeleteFolder(int folderId);
+        public Task<int> DoesFolderExists(int runId, string path);
     }
 }

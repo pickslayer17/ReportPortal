@@ -30,6 +30,44 @@ namespace ReportPortal.BL.Services
             return folderDto;
         }
 
+        public async Task<int> DoesFolderExists(int runId, string path)
+        {
+            var run = await _runRepository.GetByAsync(r => r.Id == runId);
+            if (run == null) throw new DirectoryNotFoundException($"There is no run with such id {runId}!");
+
+            var folderNames = path.ToLower().Split('.');
+            if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
+
+            Folder rootFolder;
+            rootFolder = run.Folders.FirstOrDefault(f => f.FolderLevel == 0);
+            if (rootFolder == null)
+            {
+                throw new Exception($"Critical app error - no root folder for the run with id {runId}");
+            }
+
+            var folder = await GetFolder(rootFolder, folderNames);
+
+            return folder.Id;
+        }
+
+        private async Task<Folder> GetFolder(Folder parentFolder, string[] folderNames)
+        {
+            var currentFolderName = folderNames[0];
+            var currentFolder = parentFolder.Children.FirstOrDefault(f => f.Name.ToLower() == currentFolderName);
+            if (currentFolder == null)
+                throw new Exception(
+                    $"Folder with name {currentFolderName} was not found in parent folder {parentFolder.Name} id: {parentFolder.Id}");
+
+            if (folderNames.Length == 1)
+            {
+                return currentFolder;
+            }
+            else
+            {
+                return await GetFolder(currentFolder, folderNames.Skip(1).ToArray());
+            }
+        }
+
         public async Task<int> GetIdOrAddFolderInRun(int runId, string path)
         {
             var run = await _runRepository.GetByAsync(r => r.Id == runId);

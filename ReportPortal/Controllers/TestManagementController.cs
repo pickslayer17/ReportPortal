@@ -40,6 +40,16 @@ namespace ReportPortal.Controllers
             return Ok(testCreated);
         }
 
+        [HttpPost("getTestId")]
+        public async Task<IActionResult> GetTestId([FromBody] TestSaveVm model)
+        {
+            var testFolderId = await _folderService.DoesFolderExists(model.RunId, model.Path);
+            if (testFolderId == null) return NotFound();
+
+            var testId = await _testService.GetTestId(testFolderId, model.Name);
+            return Ok(testId);
+        }
+
         [HttpGet("tests/{testId:int}")]
         [Authorize]
         public async Task<IActionResult> GetTestById( int testId)

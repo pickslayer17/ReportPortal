@@ -59,6 +59,17 @@ namespace ReportPortal.BL.Services
             return testCreated;
         }
 
+        public async Task<int> GetTestId(int folderId, string testName, CancellationToken cancellationToken = default)
+        {
+            var folder = await _folderRepository.GetByAsync(f => f.Id == folderId);
+            if (folder == null) throw new FolderNotFoundException($"folder with id {folderId} not found");
+
+            var test = folder.Tests.FirstOrDefault(t => t.Name.ToLower() == testName.ToLower());
+            if (test == null) return - 1;
+
+            return test.Id;
+        }
+
         public Task<TestCreatedDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
