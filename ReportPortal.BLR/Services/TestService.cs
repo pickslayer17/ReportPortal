@@ -75,9 +75,9 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            await _testRepository.RemoveByIdAsync(id);
         }
 
         public Task<IEnumerable<TestDto>> GetAllAsync(CancellationToken cancellationToken = default)

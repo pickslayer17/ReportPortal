@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 
@@ -48,6 +49,22 @@ namespace ReportPortal.Controllers
 
             var testId = await _testService.GetTestId(testFolderId, model.Name);
             return Ok(testId);
+        }
+
+        [HttpDelete("tests/{testId:int}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteTestById(int testId)
+        {
+            var test = await _testService.GetByIdAsync(testId);
+            if(test == null) return NotFound();
+
+            var runId = test.RunId;
+            var folderId = test.FolderId;
+            await _testService.DeleteByIdAsync(testId);
+
+            await _hubContext.Clients.Group(runId.ToString()).SendAsync("RemoveTest", testId);
+
+            return Ok();
         }
 
         [HttpGet("tests/{testId:int}")]
