@@ -110,9 +110,10 @@ const RunPage: React.FC = () => {
                         setTests(prevTests => [...prevTests, test]);
                         console.log("Received updated data:", test);
                     });
-                    connection.on("RemoveTest", async () => {
+                    connection.on("RemoveTest", async (testId: number) => {
                         const testData: TestVm[] = await fetchWithToken(`api/TestManagement/Runs/${runId}/tests`);
                         setTests(testData);
+                        console.log("Test was removed:", testId);
                     });
 
                     connection.on("RemoveFolder", async (folder: FolderVm) => {
@@ -202,6 +203,18 @@ const RunPage: React.FC = () => {
         return [...directTests, ...childTests];
     };
 
+    const handleDeleteTest = (testId: number) => {
+        if (window.confirm('Are you sure you want to delete this test id: ' + testId + '?')) {
+            deleteWithToken(`api/TestManagement/tests/${testId}`)
+        }
+    };
+
+    const handleDeleteFolder = (folderId: number) => {
+        if (window.confirm('Are you sure you want to delete this folder id: ' + folderId + '?')) {
+            deleteWithToken(`api/FolderManagement/folder/${folderId}/delete`)
+        }
+    };
+
     const renderFolderTable = (childFolders: FolderVm[], currentFolderId: number | null) => {
         return (
             <table className="folder-table">
@@ -267,18 +280,19 @@ const RunPage: React.FC = () => {
                                 <td>{reviewCounts.toInvestigate}</td>
                                 <td>{reviewCounts.notRepro}</td>
                                 <td>{reviewCounts.productBug}</td>
+                                <td>
+                                    <button
+                                        className="delete-button"
+                                        onClick={() => handleDeleteFolder(folder.id)}>
+                                        <FaTrash /> { }
+                                    </button>
+                                </td>
                             </tr>
                         );
                     })}
                 </tbody>
             </table>
         );
-    };
-
-    const handleDeleteTest = (testId: number) => {
-        if (window.confirm('Are you sure you want to delete this folder?')) {
-            deleteWithToken(`api/TestManagement/tests/${testId}`)
-        }
     };
 
     const renderTestTable = (folderTests: TestVm[]) => {
