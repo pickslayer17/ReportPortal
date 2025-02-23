@@ -2,12 +2,14 @@ import './RunPage.css';
 import './App.css';
 import './dropdown.css';
 
+import { FaTrash } from 'react-icons/fa';
 import EditTestReviewModal from './EditTestReviewModal';
 import { EditTestReviewMode } from './enums/EditTestReviewMode'
 import { TestVm, TestReviewOutcome, TestReviewVm } from './interfaces/TestVmProps';
 import { UserVm } from './interfaces/UserVmProps';
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { deleteWithToken } from './helpers/api';
 import { fetchWithToken } from './helpers/api';
 import * as signalR from '@microsoft/signalr'; // Import SignalR
 import { testOutcome } from './enums/testOutcome';
@@ -273,6 +275,12 @@ const RunPage: React.FC = () => {
         );
     };
 
+    const handleDeleteTest = (testId: number) => {
+        if (window.confirm('Are you sure you want to delete this folder?')) {
+            deleteWithToken(`api/TestManagement/tests/${testId}`)
+        }
+    };
+
     const renderTestTable = (folderTests: TestVm[]) => {
         return (
             <table className="folder-table">
@@ -318,6 +326,13 @@ const RunPage: React.FC = () => {
                             {renderTestOutcome(test.testReview.testReviewOutcome, test)}
                             {renderTestReviewer(test)}
                             {renderTestComments(test)}
+                            <td>
+                                <button
+                                    className="delete-button"
+                                    onClick={() => handleDeleteTest(test.id)}>
+                                    <FaTrash /> { }
+                                </button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
