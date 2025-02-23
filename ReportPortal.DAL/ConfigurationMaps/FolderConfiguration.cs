@@ -17,6 +17,7 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.HasOne(e => e.Parent).WithMany(e => e.Children).HasForeignKey(e => e.ParentId).OnDelete(deleteBehavior: DeleteBehavior.Restrict);
             builder.Property(e => e.RunId).HasColumnName("RunId").HasColumnType("int");
             builder.HasOne(e => e.Run).WithMany(e => e.Folders).HasForeignKey(e => e.RunId).OnDelete(deleteBehavior: DeleteBehavior.Cascade);
+            builder.HasMany(e => e.Tests).WithOne(e => e.Folder).HasForeignKey(e => e.FolderId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
