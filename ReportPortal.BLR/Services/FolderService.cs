@@ -55,7 +55,7 @@ namespace ReportPortal.BL.Services
             var currentFolderName = folderNames[0];
             var currentFolder = parentFolder.Children.FirstOrDefault(f => f.Name.ToLower() == currentFolderName);
             if (currentFolder == null)
-                throw new Exception(
+                throw new FolderNotFoundException(
                     $"Folder with name {currentFolderName} was not found in parent folder {parentFolder.Name} id: {parentFolder.Id}");
 
             if (folderNames.Length == 1)

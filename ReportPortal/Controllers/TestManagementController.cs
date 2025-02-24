@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
-using ReportPortal.DAL.Models.RunProjectManagement;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 
@@ -44,8 +44,15 @@ namespace ReportPortal.Controllers
         [HttpPost("getTestId")]
         public async Task<IActionResult> GetTestId([FromBody] TestSaveVm model)
         {
-            var testFolderId = await _folderService.DoesFolderExists(model.RunId, model.Path);
-            if (testFolderId == null) return NotFound();
+            int testFolderId;
+            try
+            {
+                testFolderId = await _folderService.DoesFolderExists(model.RunId, model.Path);
+            }
+            catch (FolderNotFoundException)
+            {
+                return Ok(-1);
+            }
 
             var testId = await _testService.GetTestId(testFolderId, model.Name);
             return Ok(testId);
@@ -56,7 +63,7 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> DeleteTestById(int testId)
         {
             var test = await _testService.GetByIdAsync(testId);
-            if(test == null) return NotFound();
+            if (test == null) return NotFound();
 
             var runId = test.RunId;
             var folderId = test.FolderId;
@@ -69,7 +76,7 @@ namespace ReportPortal.Controllers
 
         [HttpGet("tests/{testId:int}")]
         [Authorize]
-        public async Task<IActionResult> GetTestById( int testId)
+        public async Task<IActionResult> GetTestById(int testId)
         {
             var test = await _testService.GetByIdAsync(testId);
             return Ok(_mapper.Map<TestVm>(test));
