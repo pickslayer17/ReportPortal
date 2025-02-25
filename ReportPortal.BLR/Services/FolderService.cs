@@ -77,16 +77,16 @@ namespace ReportPortal.BL.Services
             if (folderNames.Length == 0) throw new DirectoryNotFoundException($"Test cannot be added without directory.");
 
             Folder rootFolder;
-            rootFolder = run.Folders.FirstOrDefault(f => f.FolderLevel == 0);
+            rootFolder = run.Folders.FirstOrDefault(f => f.Name == FolderNames.RootFolderName);
             if (rootFolder == null)
             {
-                rootFolder = await CreateFolder(null, run, FolderNames.RootFolderName, 0);
+                throw new Exception($"No root folder for run id {run.Id}");
             }
 
-            return await GetIdOrAddFolder(rootFolder, run, 1, folderNames);
+            return await GetIdOrAddFolder(rootFolder, run.Id, 1, folderNames);
         }
 
-        private async Task<int> GetIdOrAddFolder(Folder parentFolder, Run run, int folderLevel, string[] folderNames)
+        private async Task<int> GetIdOrAddFolder(Folder parentFolder, int runId, int folderLevel, string[] folderNames)
         {
             var currentFolderName = folderNames[0];
 
@@ -98,7 +98,7 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    var newFolder = await CreateFolder(parentFolder, run, currentFolderName, folderLevel);
+                    var newFolder = await CreateFolder(parentFolder, runId, currentFolderName, folderLevel);
 
                     return newFolder.Id;
                 }
@@ -112,21 +112,35 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    childFolder = await CreateFolder(parentFolder, run, currentFolderName, folderLevel);
+                    childFolder = await CreateFolder(parentFolder, runId, currentFolderName, folderLevel);
                 }
 
                 folderNames = folderNames.Skip(1).ToArray();
 
-                return await GetIdOrAddFolder(childFolder, run, ++folderLevel, folderNames);
+                return await GetIdOrAddFolder(childFolder, runId, ++folderLevel, folderNames);
             }
         }
 
-        private async Task<Folder> CreateFolder(Folder parentFolder, Run run, string folderName, int folderLevel)
+        public async Task CreateRootFolder(int runId)
+        {
+            var potentialRootFolder = await _folderRepository.GetByAsync(f => f.Name == FolderNames.RootFolderName && f.RunId == runId);
+
+            if (potentialRootFolder == null)
+            {
+                var rootFolder = await CreateFolder(null, runId, FolderNames.RootFolderName, 0);
+            }
+            else
+            {
+                throw new Exception($"Run id {runId} already has a root folder");
+            }
+        }
+
+        private async Task<Folder> CreateFolder(Folder parentFolder, int runId, string folderName, int folderLevel)
         {
             var folder = new Folder
             {
                 Name = folderName,
-                RunId = run.Id,
+                RunId = runId,
                 FolderLevel = folderLevel,
                 Parent = parentFolder
             };

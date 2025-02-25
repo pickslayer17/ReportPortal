@@ -10,5 +10,6 @@ namespace ReportPortal.BL.Services.Interfaces
         public Task<IEnumerable<FolderDto>> GetAllFolders(int runId, CancellationToken cancellationToken = default);
         public Task DeleteFolder(int folderId);
         public Task<int> DoesFolderExists(int runId, string path);
+        public Task CreateRootFolder(int runId);
     }
 }

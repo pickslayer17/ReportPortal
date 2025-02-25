@@ -15,11 +15,13 @@ namespace ReportPortal.Controllers
     {
         private readonly IRunService _runService;
         private readonly IMapper _mapper;
+        private readonly IFolderService _folderService;
 
-        public RunManagementController(IRunService runService, IMapper mapper)
+        public RunManagementController(IRunService runService, IMapper mapper, IFolderService folderService)
         {
             _runService = runService;
             _mapper = mapper;
+            _folderService = folderService;
         }
 
         [HttpPost("AddRun")]
@@ -31,6 +33,7 @@ namespace ReportPortal.Controllers
             try
             {
                 runCreatedDto = await _runService.CreateAsync(runDto);
+                _folderService.CreateRootFolder(runCreatedDto.Id);
             }
             catch (ProjectNotFoundException ex)
             {
