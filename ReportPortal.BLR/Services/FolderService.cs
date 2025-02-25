@@ -151,6 +151,13 @@ namespace ReportPortal.BL.Services
 
         public async Task DeleteFolder(int folderId)
         {
+            var folder = await GetByIdAsync(folderId);
+
+            foreach (var child in folder.Children)
+            {
+                await DeleteFolder(child.Id);
+            }
+
             await _folderRepository.RemoveByIdAsync(folderId);
         }
     }
