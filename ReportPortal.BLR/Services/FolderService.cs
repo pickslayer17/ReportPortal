@@ -123,9 +123,9 @@ namespace ReportPortal.BL.Services
 
         public async Task CreateRootFolder(int runId)
         {
-            var potentialRootFolder = await _folderRepository.GetByAsync(f => f.Name == FolderNames.RootFolderName && f.RunId == runId);
+            bool exists = await _folderRepository.ExistsAsync(f => f.Name == FolderNames.RootFolderName && f.RunId == runId);
 
-            if (potentialRootFolder == null)
+            if (!exists)
             {
                 var rootFolder = await CreateFolder(null, runId, FolderNames.RootFolderName, 0);
             }

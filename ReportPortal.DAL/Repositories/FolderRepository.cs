@@ -9,6 +9,7 @@ namespace ReportPortal.DAL.Repositories
     {
         public FolderRepository(ApplicationContext dbContext) : base(dbContext)
         {
+            Console.WriteLine("FolderRepository created");
         }
 
         public async Task<IEnumerable<Folder>> GetAllByAsync(Expression<Func<Folder, bool>> predicate, CancellationToken cancellationToken = default)
@@ -18,7 +19,7 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<Folder> GetByAsync(Expression<Func<Folder, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Folders.FirstOrDefaultAsync(predicate);
+            return await _dbContext.Folders.AsNoTracking().FirstOrDefaultAsync(predicate);
         }
 
         public async Task<int> InsertAsync(Folder folder)
@@ -43,6 +44,11 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync();
 
             return item;
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<Folder, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Folders.AnyAsync(predicate);
         }
     }
 }

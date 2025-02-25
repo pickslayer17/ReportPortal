@@ -1,4 +1,6 @@
 ﻿using ReportPortal.BL.Models;
+using ReportPortal.DAL.Models.RunProjectManagement;
+using System.Linq.Expressions;
 
 namespace ReportPortal.BL.Services.Interfaces
 {
