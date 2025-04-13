@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using ReportPortal.BL.Services.Interfaces;
-using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Hubs
 {

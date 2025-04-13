@@ -26,7 +26,7 @@ namespace ReportPortal.Controllers
 
         [HttpPost("AddRun")]
         [Authorize]
-        public async Task<IActionResult> AddRun([FromBody] RunVm runVm, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> AddRun([FromBody] RunCreateVm runVm, CancellationToken cancellationToken = default)
         {
             var runDto = _mapper.Map<RunDto>(runVm);
             RunCreatedDto runCreatedDto = null;
@@ -39,7 +39,7 @@ namespace ReportPortal.Controllers
                 return BadRequest(ex.Message);
             }
 
-            return Ok(runCreatedDto);
+            return Ok(_mapper.Map<RunVm>(runCreatedDto));
         }
 
         [HttpGet("Runs/{runId:int}")]

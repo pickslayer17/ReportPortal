@@ -46,13 +46,13 @@ namespace ReportPortal.Controllers
 
         [HttpPost("CreateUser")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> CreateUser([FromBody] UserVm userModel, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateVm userModel, CancellationToken cancellationToken = default)
         {
             var userDto = _mapper.Map<UserDto>(userModel);
 
             var userCreated = await _userService.CreateAsync(userDto, cancellationToken);
 
-            return Ok(userCreated);
+            return Ok(_mapper.Map<UserVm>(userCreated));
         }
 
         [HttpPost("DeleteUser/{userId:int}")]
@@ -73,10 +73,11 @@ namespace ReportPortal.Controllers
 
         [AllowAnonymous]
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] UserDto login, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Login([FromBody] UserLoginVm userLoginVm, CancellationToken cancellationToken = default)
         {
             IActionResult response = Unauthorized();
-            var user = await _authenticationService.AuthenticateUserAsync(login, cancellationToken);
+            var userLoginDto = _mapper.Map<UserDto>(userLoginVm);
+            var user = await _authenticationService.AuthenticateUserAsync(userLoginDto, cancellationToken);
 
             if (user != null)
             {

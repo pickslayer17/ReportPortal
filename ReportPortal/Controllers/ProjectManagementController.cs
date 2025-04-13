@@ -43,10 +43,10 @@ namespace ReportPortal.Controllers
 
         [HttpPost("AddProject")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> AddProject([FromBody] ProjectVm projectForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> AddProject([FromBody] ProjectCreateVm projectForCreationVm, CancellationToken cancellationToken = default)
         {
-            var projectDto = _mapper.Map<ProjectDto>(projectForCreationDto);
-            return Ok(await _projectService.CreateAsync(projectDto, cancellationToken));
+            var projectDto = _mapper.Map<ProjectDto>(projectForCreationVm);
+            return Ok(_mapper.Map<ProjectVm>( _projectService.CreateAsync(projectDto, cancellationToken).Result));
         }
 
         [HttpPost("DeleteProject/{projectId:int}")]

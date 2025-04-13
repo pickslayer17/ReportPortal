@@ -38,7 +38,7 @@ namespace ReportPortal.Controllers
             var testDtoForHub = await _testService.GetByIdAsync(testCreated.Id, cancellationToken);
             await _hubContext.Clients.Group(testVm.RunId.ToString()).SendAsync("AddTest", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
-            return Ok(testCreated);
+            return Ok(_mapper.Map<TestVm>(testCreated));
         }
 
         [HttpPost("getTestId")]
@@ -66,7 +66,6 @@ namespace ReportPortal.Controllers
             if (test == null) return NotFound();
 
             var runId = test.RunId;
-            var folderId = test.FolderId;
             await _testService.DeleteByIdAsync(testId, cancellationToken);
 
             await _hubContext.Clients.Group(runId.ToString()).SendAsync("RemoveTest", testId, cancellationToken);
