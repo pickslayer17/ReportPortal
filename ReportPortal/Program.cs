@@ -13,6 +13,7 @@ using ReportPortal.Interfaces;
 using ReportPortal.Maps;
 using ReportPortal.Services;
 using ReportPortal.Services.Interfaces;
+using ReportPortal.DAL.Seeders;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -82,6 +83,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+    var seeder = new UserSeeder(dbContext);
+    await seeder.SeedAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {
