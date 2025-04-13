@@ -26,13 +26,13 @@ namespace ReportPortal.Controllers
 
         [HttpPost("AddRun")]
         [Authorize]
-        public async Task<IActionResult> AddRun([FromBody] RunVm runVm)
+        public async Task<IActionResult> AddRun([FromBody] RunVm runVm, CancellationToken cancellationToken = default)
         {
             var runDto = _mapper.Map<RunDto>(runVm);
             RunCreatedDto runCreatedDto = null;
             try
             {
-                runCreatedDto = await _runService.CreateAsync(runDto);
+                runCreatedDto = await _runService.CreateAsync(runDto, cancellationToken);
             }
             catch (ProjectNotFoundException ex)
             {
@@ -44,18 +44,18 @@ namespace ReportPortal.Controllers
 
         [HttpGet("Runs/{runId:int}")]
         [Authorize]
-        public async Task<IActionResult> GetRun(int runId)
+        public async Task<IActionResult> GetRun(int runId, CancellationToken cancellationToken = default)
         {
-            var run = await _runService.GetByIdAsync(runId);
+            var run = await _runService.GetByIdAsync(runId, cancellationToken);
 
             return Ok(_mapper.Map<RunVm>(run));
         }
 
         [HttpGet("Project/{projectId:int}/Runs")]
         [Authorize]
-        public async Task<IActionResult> GetAllRuns(int projectId)
+        public async Task<IActionResult> GetAllRuns(int projectId, CancellationToken cancellationToken = default)
         {
-            var allRunsDto = await _runService.GetAllByAsync(r => r.ProjectId == projectId);
+            var allRunsDto = await _runService.GetAllByAsync(r => r.ProjectId == projectId, cancellationToken);
             var resultVms = allRunsDto.Select(rdto => _mapper.Map<RunVm>(rdto));
 
             return Ok(resultVms);
@@ -64,11 +64,11 @@ namespace ReportPortal.Controllers
 
         [HttpPost("Runs/{runId:int}/delete")]
         [Authorize]
-        public async Task<IActionResult> DeleteRun(int runId)
+        public async Task<IActionResult> DeleteRun(int runId, CancellationToken cancellationToken = default)
         {
             try
             {
-                await _runService.DeleteByIdAsync(runId);
+                await _runService.DeleteByIdAsync(runId, cancellationToken);
 
                 return Ok();
             }

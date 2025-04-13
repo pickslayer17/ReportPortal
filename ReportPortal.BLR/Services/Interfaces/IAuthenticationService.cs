@@ -4,7 +4,7 @@ namespace ReportPortal.BL.Services.Interfaces
 {
     public interface IAuthenticationService
     {
-        public Task<UserDto> AuthenticateUser(UserDto login, CancellationToken cancellationToken = default);
+        public Task<UserDto> AuthenticateUserAsync(UserDto login, CancellationToken cancellationToken = default);
         public string GenerateJSONWebToken(UserDto userDto);
         public string GenerateSalt();
         public string HashPassword(string password);
