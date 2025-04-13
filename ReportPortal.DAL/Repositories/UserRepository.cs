@@ -42,7 +42,7 @@ namespace ReportPortal.Services
             return user;
         }
 
-        public Task<User> UpdateItem(User item, CancellationToken cancellationToken = default)
+        public Task<User> UpdateItemAsync(User item, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

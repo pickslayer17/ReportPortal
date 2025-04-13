@@ -40,7 +40,7 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Test> UpdateItem(Test item, CancellationToken cancellationToken = default)
+        public async Task<Test> UpdateItemAsync(Test item, CancellationToken cancellationToken = default)
         {
             var oldItem = await GetByAsync(t => t.Id == item.Id, cancellationToken);
             _dbContext.Tests.Entry(oldItem).CurrentValues.SetValues(item);

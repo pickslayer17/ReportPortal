@@ -37,7 +37,7 @@ namespace ReportPortal.BL.Services
         public async Task<TestCreatedDto> CreateAsync(TestDto testDto, int folderId, CancellationToken cancellationToken = default)
         {
             /// verify if test with such name already exists
-            var folder = await _folderService.GetByIdAsync(folderId);
+            var folder = await _folderService.GetByIdAsync(folderId, cancellationToken);
             if (folder.Tests != null && folder.Tests.Count > 0)
             {
                 foreach (var test in folder.Tests)
@@ -49,19 +49,19 @@ namespace ReportPortal.BL.Services
             // insert test to databse
             var testRunItem = _mapper.Map<Test>(testDto);
             testRunItem.FolderId = folderId;
-            var testCreatedId = await _testRepository.InsertAsync(testRunItem);
+            var testCreatedId = await _testRepository.InsertAsync(testRunItem, cancellationToken);
             var testCreated = _mapper.Map<TestCreatedDto>(testRunItem);
             testCreated.Id = testCreatedId;
             var testReview = new TestReview();
             testReview.Test = testRunItem;
-            await _testReviewRepository.InsertAsync(_mapper.Map<TestReview>(testReview));
+            await _testReviewRepository.InsertAsync(_mapper.Map<TestReview>(testReview), cancellationToken);
 
             return testCreated;
         }
 
-        public async Task<int> GetTestId(int folderId, string testName, CancellationToken cancellationToken = default)
+        public async Task<int> GetTestIdAsync(int folderId, string testName, CancellationToken cancellationToken = default)
         {
-            var folder = await _folderRepository.GetByAsync(f => f.Id == folderId);
+            var folder = await _folderRepository.GetByAsync(f => f.Id == folderId, cancellationToken);
             if (folder == null) throw new FolderNotFoundException($"folder with id {folderId} not found");
 
             var test = folder.Tests.FirstOrDefault(t => t.Name.ToLower() == testName.ToLower());
@@ -75,9 +75,9 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            await _testRepository.RemoveByIdAsync(id);
+            await _testRepository.RemoveByIdAsync(id, cancellationToken);
         }
 
         public Task<IEnumerable<TestDto>> GetAllAsync(CancellationToken cancellationToken = default)

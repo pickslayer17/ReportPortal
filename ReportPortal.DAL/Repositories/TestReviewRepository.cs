@@ -37,7 +37,7 @@ namespace ReportPortal.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<TestReview> UpdateItem(TestReview testReview, CancellationToken cancellationToken = default)
+        public async Task<TestReview> UpdateItemAsync(TestReview testReview, CancellationToken cancellationToken = default)
         {
             var existingTestReview = await _dbContext.TestReviews.FirstOrDefaultAsync(tr => tr.Id == testReview.Id, cancellationToken);
             _dbContext.TestReviews.Entry(existingTestReview).CurrentValues.SetValues(testReview);

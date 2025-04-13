@@ -40,7 +40,7 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public Task<TestResult> UpdateItem(TestResult item, CancellationToken cancellationToken = default)
+        public Task<TestResult> UpdateItemAsync(TestResult item, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

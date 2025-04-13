@@ -32,7 +32,7 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> AddTest([FromBody] TestSaveVm testVm)
         {
             var testDto = _mapper.Map<TestDto>(testVm);
-            var folderId = await _folderService.GetIdOrAddFolderInRun(testVm.RunId, testVm.Path);
+            var folderId = await _folderService.GetIdOrAddFolderInRunAsync(testVm.RunId, testVm.Path);
             var testCreated = await _testService.CreateAsync(testDto, folderId);
 
             var testDtoForHub = await _testService.GetByIdAsync(testCreated.Id);
@@ -47,14 +47,14 @@ namespace ReportPortal.Controllers
             int testFolderId;
             try
             {
-                testFolderId = await _folderService.DoesFolderExists(model.RunId, model.Path);
+                testFolderId = await _folderService.DoesFolderExistsAsync(model.RunId, model.Path);
             }
             catch (FolderNotFoundException)
             {
                 return Ok(-1);
             }
 
-            var testId = await _testService.GetTestId(testFolderId, model.Name);
+            var testId = await _testService.GetTestIdAsync(testFolderId, model.Name);
             return Ok(testId);
         }
 

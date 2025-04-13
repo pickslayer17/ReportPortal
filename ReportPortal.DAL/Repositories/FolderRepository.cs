@@ -37,7 +37,7 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Folder> UpdateItem(Folder item, CancellationToken cancellationToken = default)
+        public async Task<Folder> UpdateItemAsync(Folder item, CancellationToken cancellationToken = default)
         {
             var oldItem = await _dbContext.Folders.FirstOrDefaultAsync(f => f.Id == item.Id, cancellationToken);
             _dbContext.Folders.Entry(oldItem).CurrentValues.SetValues(item);

@@ -3,7 +3,6 @@ using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
-using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
 using System.Linq.Expressions;
@@ -25,7 +24,7 @@ namespace ReportPortal.BL.Services
 
         public async Task<ProjectCreatedDto> CreateAsync(ProjectDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
-            var existingProject = await _projectRepository.GetByAsync(pr => pr.Name == projectForCreationDto.Name);
+            var existingProject = await _projectRepository.GetByAsync(pr => pr.Name == projectForCreationDto.Name, cancellationToken);
 
             if (existingProject != null)
             {
@@ -38,27 +37,27 @@ namespace ReportPortal.BL.Services
                     Name = projectForCreationDto.Name,
                     ProjectStatus = ProjectStatus.Started
                 };
-                var projectId = await _projectRepository.InsertAsync(projectToAdd);
+                var projectId = await _projectRepository.InsertAsync(projectToAdd, cancellationToken);
 
                 return new ProjectCreatedDto { IsCreated = true, Id = projectId };
             }
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            await _projectRepository.RemoveByIdAsync(id);
+            await _projectRepository.RemoveByIdAsync(id, cancellationToken);
         }
 
         public async Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var project = await _projectRepository.GetByAsync(pr => pr.Id == id);
+            var project = await _projectRepository.GetByAsync(pr => pr.Id == id, cancellationToken);
 
             return _mapper.Map<ProjectDto>(project);
         }
 
         public async Task<IEnumerable<ProjectDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var allProjects = await _projectRepository.GetAllByAsync(pr => true);
+            var allProjects = await _projectRepository.GetAllByAsync(pr => true, cancellationToken);
             var allProjectsDto = allProjects.Select(pr => _mapper.Map<ProjectDto>(pr));
 
             return allProjectsDto;

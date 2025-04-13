@@ -26,14 +26,14 @@ namespace ReportPortal.BL.Services
 
         public async Task<TestReviewDto> UpdateTestReviewAsync(TestReviewDto testReviewDto, CancellationToken cancellationToken = default)
         {
-            var testReviewUpdated = await _testReviewRepository.UpdateItem(_mapper.Map<TestReview>(testReviewDto));
+            var testReviewUpdated = await _testReviewRepository.UpdateItemAsync(_mapper.Map<TestReview>(testReviewDto), cancellationToken);
 
             return _mapper.Map<TestReviewDto>(testReviewUpdated);
         }
 
-        public async Task<TestReviewDto> UpdateTestReviewAsync(TestReviewUpdateDto testReviewUpdateDto)
+        public async Task<TestReviewDto> UpdateTestReviewAsync(TestReviewUpdateDto testReviewUpdateDto, CancellationToken cancellationToken = default)
         {
-            var testReview = await _testReviewRepository.GetByAsync(testReview => testReview.Id == testReviewUpdateDto.Id);
+            var testReview = await _testReviewRepository.GetByAsync(testReview => testReview.Id == testReviewUpdateDto.Id, cancellationToken);
             if (testReview == null) throw new Exception($"TestReview  with ID {testReviewUpdateDto.Id} not found");
 
             // Apply updates from the DTO
@@ -51,7 +51,7 @@ namespace ReportPortal.BL.Services
             }
 
             // Save the updated domain model
-            var testReviewUpdated = await _testReviewRepository.UpdateItem(testReview);
+            var testReviewUpdated = await _testReviewRepository.UpdateItemAsync(testReview, cancellationToken);
             return _mapper.Map<TestReviewDto>(testReviewUpdated);
         }
     }

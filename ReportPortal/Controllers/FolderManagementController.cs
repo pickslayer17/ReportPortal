@@ -30,7 +30,7 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllFolders(int runId)
         {
-            var allFoldersDto = await _folderService.GetAllFolders(runId);
+            var allFoldersDto = await _folderService.GetAllFoldersAsync(runId);
             var allProjectsVm = allFoldersDto.Select(f => _mapper.Map<FolderVm>(f));
             return Ok(allProjectsVm);
         }
@@ -46,7 +46,7 @@ namespace ReportPortal.Controllers
             var runId = folder.RunId;
             var removedFolderVm = _mapper.Map<FolderVm>(folder);
 
-            await _folderService.DeleteFolder(folderId);
+            await _folderService.DeleteFolderAsync(folderId);
 
             await _hubContext.Clients.Group(runId.ToString()).SendAsync("RemoveFolder", removedFolderVm);
 

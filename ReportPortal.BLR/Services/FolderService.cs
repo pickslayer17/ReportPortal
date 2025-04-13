@@ -5,7 +5,6 @@ using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
-using System.Linq.Expressions;
 
 namespace ReportPortal.BL.Services
 {
@@ -22,7 +21,7 @@ namespace ReportPortal.BL.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<FolderDto>> GetAllFolders(int runId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<FolderDto>> GetAllFoldersAsync(int runId, CancellationToken cancellationToken = default)
         {
             var folders = await _folderRepository.GetAllByAsync(f => f.RunId == runId, cancellationToken);
             var folderDto = folders.Select(f => _mapper.Map<FolderDto>(f));
@@ -30,9 +29,9 @@ namespace ReportPortal.BL.Services
             return folderDto;
         }
 
-        public async Task<int> DoesFolderExists(int runId, string path)
+        public async Task<int> DoesFolderExistsAsync(int runId, string path, CancellationToken cancellationToken = default)
         {
-            var run = await _runRepository.GetByAsync(r => r.Id == runId);
+            var run = await _runRepository.GetByAsync(r => r.Id == runId, cancellationToken);
             if (run == null) throw new DirectoryNotFoundException($"There is no run with such id {runId}!");
 
             var folderNames = path.ToLower().Split('.');
@@ -45,12 +44,12 @@ namespace ReportPortal.BL.Services
                 throw new Exception($"Critical app error - no root folder for the run with id {runId}");
             }
 
-            var folder = await GetFolder(rootFolder, folderNames);
+            var folder = await GetFolderAsync(rootFolder, folderNames, cancellationToken);
 
             return folder.Id;
         }
 
-        private async Task<Folder> GetFolder(Folder parentFolder, string[] folderNames)
+        private async Task<Folder> GetFolderAsync(Folder parentFolder, string[] folderNames, CancellationToken cancellationToken = default)
         {
             var currentFolderName = folderNames[0];
             var currentFolder = parentFolder.Children.FirstOrDefault(f => f.Name.ToLower() == currentFolderName);
@@ -64,13 +63,13 @@ namespace ReportPortal.BL.Services
             }
             else
             {
-                return await GetFolder(currentFolder, folderNames.Skip(1).ToArray());
+                return await GetFolderAsync(currentFolder, folderNames.Skip(1).ToArray(), cancellationToken);
             }
         }
 
-        public async Task<int> GetIdOrAddFolderInRun(int runId, string path)
+        public async Task<int> GetIdOrAddFolderInRunAsync(int runId, string path, CancellationToken cancellationToken = default)
         {
-            var run = await _runRepository.GetByAsync(r => r.Id == runId);
+            var run = await _runRepository.GetByAsync(r => r.Id == runId, cancellationToken);
             if (run == null) throw new DirectoryNotFoundException($"There is no run with such id {runId}!");
 
             var folderNames = path.ToLower().Split('.');
@@ -83,10 +82,10 @@ namespace ReportPortal.BL.Services
                 throw new Exception($"No root folder for run id {run.Id}");
             }
 
-            return await GetIdOrAddFolder(rootFolder, run.Id, 1, folderNames);
+            return await GetIdOrAddFolderAsync(rootFolder, run.Id, 1, folderNames, cancellationToken);
         }
 
-        private async Task<int> GetIdOrAddFolder(Folder parentFolder, int runId, int folderLevel, string[] folderNames)
+        private async Task<int> GetIdOrAddFolderAsync(Folder parentFolder, int runId, int folderLevel, string[] folderNames, CancellationToken cancellationToken = default)
         {
             var currentFolderName = folderNames[0];
 
@@ -98,7 +97,7 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    var newFolder = await CreateFolder(parentFolder, runId, currentFolderName, folderLevel);
+                    var newFolder = await CreateFolderAsync(parentFolder, runId, currentFolderName, folderLevel, cancellationToken);
 
                     return newFolder.Id;
                 }
@@ -112,22 +111,22 @@ namespace ReportPortal.BL.Services
                 }
                 else
                 {
-                    childFolder = await CreateFolder(parentFolder, runId, currentFolderName, folderLevel);
+                    childFolder = await CreateFolderAsync(parentFolder, runId, currentFolderName, folderLevel, cancellationToken);
                 }
 
                 folderNames = folderNames.Skip(1).ToArray();
 
-                return await GetIdOrAddFolder(childFolder, runId, ++folderLevel, folderNames);
+                return await GetIdOrAddFolderAsync(childFolder, runId, ++folderLevel, folderNames, cancellationToken);
             }
         }
 
-        public async Task CreateRootFolder(int runId)
+        public async Task CreateRootFolderAsync(int runId, CancellationToken cancellationToken = default)
         {
-            bool exists = await _folderRepository.ExistsAsync(f => f.Name == FolderNames.RootFolderName && f.RunId == runId);
+            bool exists = await _folderRepository.ExistsAsync(f => f.Name == FolderNames.RootFolderName && f.RunId == runId, cancellationToken);
 
             if (!exists)
             {
-                var rootFolder = await CreateFolder(null, runId, FolderNames.RootFolderName, 0);
+                var rootFolder = await CreateFolderAsync(null, runId, FolderNames.RootFolderName, 0, cancellationToken);
             }
             else
             {
@@ -135,7 +134,7 @@ namespace ReportPortal.BL.Services
             }
         }
 
-        private async Task<Folder> CreateFolder(Folder parentFolder, int runId, string folderName, int folderLevel)
+        private async Task<Folder> CreateFolderAsync(Folder parentFolder, int runId, string folderName, int folderLevel, CancellationToken cancellationToken = default)
         {
             var folder = new Folder
             {
@@ -145,14 +144,9 @@ namespace ReportPortal.BL.Services
                 Parent = parentFolder
             };
 
-            await _folderRepository.InsertAsync(folder);
+            await _folderRepository.InsertAsync(folder, cancellationToken);
 
             return folder;
-        }
-
-        public async Task AttachTestToFolder(int folderId, int testId)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<FolderDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -163,16 +157,16 @@ namespace ReportPortal.BL.Services
             return _mapper.Map<FolderDto>(folderRunItem);
         }
 
-        public async Task DeleteFolder(int folderId)
+        public async Task DeleteFolderAsync(int folderId, CancellationToken cancellationToken = default)
         {
-            var folder = await GetByIdAsync(folderId);
+            var folder = await GetByIdAsync(folderId, cancellationToken);
 
             foreach (var child in folder.Children)
             {
-                await DeleteFolder(child.Id);
+                await DeleteFolderAsync(child.Id);
             }
 
-            await _folderRepository.RemoveByIdAsync(folderId);
+            await _folderRepository.RemoveByIdAsync(folderId, cancellationToken);
         }
     }
 }

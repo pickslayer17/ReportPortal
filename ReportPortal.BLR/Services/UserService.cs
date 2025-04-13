@@ -29,7 +29,7 @@ namespace ReportPortal.Services
             User userByEmailResult = null;
             try
             {
-                userByEmailResult = await _userRepository.GetByAsync(u => u.Email == userForCreationDto.Email);
+                userByEmailResult = await _userRepository.GetByAsync(u => u.Email == userForCreationDto.Email, cancellationToken);
             }
             catch (UserNotFoundException) { }
             if (userByEmailResult != null) throw new Exception("User already exists!");
@@ -39,7 +39,7 @@ namespace ReportPortal.Services
             userDbModel.Password = _authenticationService.HashPassword(userForCreationDto.Password);
             userDbModel.UserRole = userForCreationDto.UserRole;
 
-            var createdUserId = await _userRepository.InsertAsync(userDbModel);
+            var createdUserId = await _userRepository.InsertAsync(userDbModel, cancellationToken);
 
             var userCreated = new UserCreatedDto
             {
@@ -50,9 +50,9 @@ namespace ReportPortal.Services
             return await Task.Run(() => userCreated);
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            await _userRepository.RemoveByIdAsync(id);
+            await _userRepository.RemoveByIdAsync(id, cancellationToken);
         }
 
         public async Task<IEnumerable<UserDto>> GetAllAsync(CancellationToken cancellationToken = default)

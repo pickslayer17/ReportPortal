@@ -33,7 +33,6 @@ namespace ReportPortal.Controllers
             try
             {
                 runCreatedDto = await _runService.CreateAsync(runDto);
-                await _folderService.CreateRootFolder(runCreatedDto.Id);
             }
             catch (ProjectNotFoundException ex)
             {

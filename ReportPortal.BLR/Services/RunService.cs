@@ -16,6 +16,7 @@ namespace ReportPortal.BL.Services
     public class RunService : IRunService
     {
         private readonly IFolderRepository _folderRepository;
+        private readonly IFolderService _folderService;
         private readonly ITestRepository _testRepository;
         private readonly ITestResultRepository _testResultRepository;
         private readonly IRunRepository _runRepository;
@@ -28,7 +29,8 @@ namespace ReportPortal.BL.Services
             ITestRepository testRepository,
             ITestResultRepository testResultRepository,
             IProjectRepository projectRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IFolderService folderService)
         {
             _runRepository = runRepository;
             _folderRepository = folderRepository;
@@ -36,6 +38,7 @@ namespace ReportPortal.BL.Services
             _testResultRepository = testResultRepository;
             _projectRepository = projectRepository;
             _mapper = mapper;
+            _folderService = folderService;
         }
 
         public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
@@ -52,10 +55,12 @@ namespace ReportPortal.BL.Services
                 Id = runId,
             };
 
+            await _folderService.CreateRootFolderAsync(runCreatedDto.Id, cancellationToken);
+
             return runCreatedDto;
         }
 
-        public async Task DeleteByIdAsync(int runId)
+        public async Task DeleteByIdAsync(int runId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -67,7 +72,7 @@ namespace ReportPortal.BL.Services
 
         public async Task<IEnumerable<RunDto>> GetAllByAsync(Expression<Func<RunDto, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            var allRunModels = await _runRepository.GetAllByAsync(r => true);
+            var allRunModels = await _runRepository.GetAllByAsync(r => true, cancellationToken);
             var resultDto = allRunModels.Select(rm => _mapper.Map<RunDto>(rm)).Where(predicate.Compile());
 
             return resultDto;
@@ -80,7 +85,7 @@ namespace ReportPortal.BL.Services
 
         public async Task<RunDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var run = await _runRepository.GetByAsync(r => r.Id == id);
+            var run = await _runRepository.GetByAsync(r => r.Id == id, cancellationToken);
             return _mapper.Map<RunDto>(run);
         }
     }

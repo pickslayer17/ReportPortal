@@ -23,7 +23,7 @@ namespace ReportPortal.BL.Services
 
         public async Task<int> AddTestResultToTestAsync(int testId, TestResultDto testDto, CancellationToken cancellationToken = default)
         {
-            var test = await _testRepository.GetByAsync(t => t.Id == testId);
+            var test = await _testRepository.GetByAsync(t => t.Id == testId, cancellationToken);
             if (test == null)
             {
                 throw new Exception();
@@ -54,7 +54,7 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task DeleteByIdAsync(int id)
+        public Task DeleteByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

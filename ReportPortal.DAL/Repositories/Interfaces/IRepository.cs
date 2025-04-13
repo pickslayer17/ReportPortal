@@ -8,6 +8,6 @@ namespace ReportPortal.DAL.Repositories.Interfaces
         public Task<T> GetByAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         public Task<int> InsertAsync(T item, CancellationToken cancellationToken = default);
         public Task RemoveByIdAsync(int itemId, CancellationToken cancellationToken = default);
-        public Task<T> UpdateItem(T item, CancellationToken cancellationToken = default);
+        public Task<T> UpdateItemAsync(T item, CancellationToken cancellationToken = default);
     }
 }

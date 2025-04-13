@@ -21,7 +21,7 @@ namespace ReportPortal.BL.Services
             _userRepository = userRepository;
         }
 
-        public async Task<UserDto> AuthenticateUser(UserDto login)
+        public async Task<UserDto> AuthenticateUser(UserDto login, CancellationToken cancellationToken = default)
         {
             var userFromDb = await _userRepository.GetByAsync(u => u.Email == login.Email);
             if (userFromDb == null) throw new UnauthorizedAccessException();
