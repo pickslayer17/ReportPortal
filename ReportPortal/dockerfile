@@ -2,20 +2,22 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Копируем csproj и восстанавливаем зависимости
-COPY *.csproj ./
-RUN dotnet restore
-
-# Копируем остальные файлы и собираем
+# Копируем все файлы
 COPY . ./
-RUN dotnet publish -c Release -o out
+
+# Переходим в директорию веб-проекта
+WORKDIR /app/ReportPortal
+
+# Восстанавливаем зависимости и публикуем
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/out
 
 # Используем официальный рантайм-образ для запуска
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
 
-# Указываем, какой порт будет слушать контейнер
+# Указываем порт, который будет слушать контейнер
 EXPOSE 80
 
 # Стартовая команда
