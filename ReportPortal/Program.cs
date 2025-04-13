@@ -15,6 +15,7 @@ using ReportPortal.Services;
 using ReportPortal.Services.Interfaces;
 using ReportPortal.DAL.Seeders;
 using System.Text;
+using ReportPortal.MiddleWare;
 
 var builder = WebApplication.CreateBuilder(args);
 string FrontEndUrl = builder.Configuration["FrontEndUrl"];
@@ -83,6 +84,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
