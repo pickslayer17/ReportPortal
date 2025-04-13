@@ -20,15 +20,5 @@ namespace ReportPortal.Hubs
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, runId);
         }
-
-        public async Task SendFolderUpdate(FolderVm[] folders)
-        {
-            await Clients.All.SendAsync("UpdateFolders", folders);
-        }
-
-        public async Task SendTestUpdate(TestVm[] tests)
-        {
-            await Clients.All.SendAsync("UpdateTests", tests);
-        }
     }
 }
