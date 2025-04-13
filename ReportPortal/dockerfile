@@ -1,27 +1,23 @@
-# --- Stage 0: клонируем проект ---
-FROM alpine/git as git-clone
-ARG GIT_REPO
-ARG GIT_BRANCH
-RUN git clone --branch ${GIT_BRANCH} --single-branch ${GIT_REPO} /repo
-
-# --- Stage 1: build .NET проект ---
+# --- Stage 1: Build .NET проект ---
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY --from=git-clone /repo .
-
+# Копируем проекты
 COPY ReportPortal.DAL/ReportPortal.DAL.csproj ReportPortal.DAL/
 COPY ReportPortal.BLR/ReportPortal.BL.csproj ReportPortal.BLR/
 COPY ReportPortal/ReportPortal.csproj ReportPortal/
 
-WORKDIR /src/ReportPortal
-RUN dotnet restore
+# Восстанавливаем зависимости
+RUN dotnet restore ReportPortal/ReportPortal.csproj
 
+# Копируем остальные файлы
 COPY . .
 
+# Публикуем сборку
+WORKDIR /src/ReportPortal
 RUN dotnet publish -c Release -o /app/publish
 
-# --- Stage 2: runtime ---
+# --- Stage 2: Runtime ---
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
