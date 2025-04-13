@@ -14,7 +14,7 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<IEnumerable<Project>> GetAllByAsync(Expression<Func<Project, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Projects.Where(predicate).ToListAsync();
+            return await _dbContext.Projects.Where(predicate).ToListAsync(cancellationToken);
         }
 
         public async Task<Project> GetByAsync(Expression<Func<Project, bool>> predicate, CancellationToken cancellationToken = default)
@@ -24,22 +24,22 @@ namespace ReportPortal.DAL.Repositories
             return project;
         }
 
-        public async Task<int> InsertAsync(Project project)
+        public async Task<int> InsertAsync(Project project, CancellationToken cancellationToken = default)
         {
             _dbContext.Projects.Add(project);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return project.Id;
         }
 
-        public async Task RemoveByIdAsync(int projectId)
+        public async Task RemoveByIdAsync(int projectId, CancellationToken cancellationToken = default)
         {
-            var project = await GetByAsync(pr => pr.Id == projectId);
+            var project = await GetByAsync(pr => pr.Id == projectId, cancellationToken);
             _dbContext.Projects.Remove(project);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public Task<Project> UpdateItem(Project item)
+        public Task<Project> UpdateItem(Project item, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

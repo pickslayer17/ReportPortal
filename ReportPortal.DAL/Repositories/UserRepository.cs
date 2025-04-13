@@ -19,30 +19,30 @@ namespace ReportPortal.Services
             return await _dbContext.Users.Where(predicate).ToListAsync();
         }
 
-        public async Task<int> InsertAsync(User user)
+        public async Task<int> InsertAsync(User user, CancellationToken cancellationToken = default)
         {
             _dbContext.Users.Add(user);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return user.Id.Value;
         }
 
-        public async Task RemoveByIdAsync(int uesrId)
+        public async Task RemoveByIdAsync(int uesrId, CancellationToken cancellationToken = default)
         {
-            var user = await GetByAsync(u => u.Id == uesrId);
+            var user = await GetByAsync(u => u.Id == uesrId, cancellationToken);
             _dbContext.Users.Remove(user);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<User> GetByAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(predicate);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(predicate, cancellationToken);
             if(user == null) throw new UserNotFoundException($"User with predicate {predicate} cannot be found.");
 
             return user;
         }
 
-        public Task<User> UpdateItem(User item)
+        public Task<User> UpdateItem(User item, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

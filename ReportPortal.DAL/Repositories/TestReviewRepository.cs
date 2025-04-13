@@ -24,24 +24,24 @@ namespace ReportPortal.DAL.Repositories
             return testReview;
         }
 
-        public async Task<int> InsertAsync(TestReview testReview)
+        public async Task<int> InsertAsync(TestReview testReview, CancellationToken cancellationToken = default)
         {
             _dbContext.TestReviews.Add(testReview);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return testReview.Id;
         }
 
-        public Task RemoveByIdAsync(int itemId)
+        public Task RemoveByIdAsync(int itemId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<TestReview> UpdateItem(TestReview testReview)
+        public async Task<TestReview> UpdateItem(TestReview testReview, CancellationToken cancellationToken = default)
         {
-            var existingTestReview = await _dbContext.TestReviews.FirstOrDefaultAsync(tr => tr.Id == testReview.Id);
+            var existingTestReview = await _dbContext.TestReviews.FirstOrDefaultAsync(tr => tr.Id == testReview.Id, cancellationToken);
             _dbContext.TestReviews.Entry(existingTestReview).CurrentValues.SetValues(testReview);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return existingTestReview;
         }

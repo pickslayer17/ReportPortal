@@ -13,7 +13,7 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<IEnumerable<Run>> GetAllByAsync(Expression<Func<Run, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Runs.Where(predicate).ToListAsync();
+            return await _dbContext.Runs.Where(predicate).ToListAsync(cancellationToken);
         }
 
         public async Task<Run> GetByAsync(Expression<Func<Run, bool>> predicate, CancellationToken cancellationToken = default)
@@ -21,22 +21,22 @@ namespace ReportPortal.DAL.Repositories
             return await _dbContext.Runs.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
-        public async Task<int> InsertAsync(Run item)
+        public async Task<int> InsertAsync(Run item, CancellationToken cancellationToken = default)
         {
             _dbContext.Runs.Add(item);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return item.Id;
         }
 
-        public async Task RemoveByIdAsync(int runId)
+        public async Task RemoveByIdAsync(int runId, CancellationToken cancellationToken = default)
         {
-            var run = await GetByAsync(r => r.Id == runId);
+            var run = await GetByAsync(r => r.Id == runId, cancellationToken);
             _dbContext.Runs.Remove(run);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public Task<Run> UpdateItem(Run item)
+        public Task<Run> UpdateItem(Run item, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

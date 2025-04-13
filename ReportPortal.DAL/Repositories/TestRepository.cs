@@ -25,26 +25,26 @@ namespace ReportPortal.DAL.Repositories
             return test;
         }
 
-        public async Task<int> InsertAsync(Test testRunItem)
+        public async Task<int> InsertAsync(Test testRunItem, CancellationToken cancellationToken = default)
         {
             _dbContext.Tests.Add(testRunItem);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return testRunItem.Id;
         }
 
-        public async Task RemoveByIdAsync(int testId)
+        public async Task RemoveByIdAsync(int testId, CancellationToken cancellationToken = default)
         {
-            var test = await GetByAsync(t => t.Id == testId);
+            var test = await GetByAsync(t => t.Id == testId, cancellationToken);
             _dbContext.Tests.Remove(test);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Test> UpdateItem(Test item)
+        public async Task<Test> UpdateItem(Test item, CancellationToken cancellationToken = default)
         {
-            var oldItem = await GetByAsync(t => t.Id == item.Id);
+            var oldItem = await GetByAsync(t => t.Id == item.Id, cancellationToken);
             _dbContext.Tests.Entry(oldItem).CurrentValues.SetValues(item);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return item;
         }
