@@ -1,27 +1,30 @@
-# Используем SDK-образ для сборки
+# --- Stage 0: клонируем проект ---
+FROM alpine/git as git-clone
+ARG GIT_REPO
+ARG GIT_BRANCH
+RUN git clone --branch ${GIT_BRANCH} --single-branch ${GIT_REPO} /repo
+
+# --- Stage 1: build .NET проект ---
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Копируем все .csproj-файлы для всех проектов
+COPY --from=git-clone /repo .
+
 COPY ReportPortal.DAL/ReportPortal.DAL.csproj ReportPortal.DAL/
 COPY ReportPortal.BLR/ReportPortal.BL.csproj ReportPortal.BLR/
 COPY ReportPortal/ReportPortal.csproj ReportPortal/
 
-# Восстанавливаем зависимости
 WORKDIR /src/ReportPortal
 RUN dotnet restore
 
-# Копируем остальной код
 COPY . .
 
-# Публикуем
 RUN dotnet publish -c Release -o /app/publish
 
-# Используем рантайм-образ
+# --- Stage 2: runtime ---
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
 EXPOSE 80
-
 ENTRYPOINT ["dotnet", "ReportPortal.dll"]
