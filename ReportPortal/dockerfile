@@ -1,24 +1,27 @@
-# Используем официальный SDK-образ для сборки
+# Используем SDK-образ для сборки
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+WORKDIR /src
 
-# Копируем все файлы
-COPY . ./
+# Копируем все .csproj-файлы для всех проектов
+COPY ReportPortal.DAL/ReportPortal.DAL.csproj ReportPortal.DAL/
+COPY ReportPortal.BLR/ReportPortal.BL.csproj ReportPortal.BLR/
+COPY ReportPortal/ReportPortal.csproj ReportPortal/
 
-# Переходим в директорию веб-проекта
-WORKDIR /app/ReportPortal
-
-# Восстанавливаем зависимости и публикуем
+# Восстанавливаем зависимости
+WORKDIR /src/ReportPortal
 RUN dotnet restore
-RUN dotnet publish -c Release -o /app/out
 
-# Используем официальный рантайм-образ для запуска
+# Копируем остальной код
+COPY . .
+
+# Публикуем
+RUN dotnet publish -c Release -o /app/publish
+
+# Используем рантайм-образ
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/out .
+COPY --from=build /app/publish .
 
-# Указываем порт, который будет слушать контейнер
 EXPOSE 80
 
-# Стартовая команда
 ENTRYPOINT ["dotnet", "ReportPortal.dll"]
