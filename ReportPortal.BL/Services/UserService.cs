@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Models.Dto;
-using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.UserManagement;
@@ -23,7 +22,7 @@ namespace ReportPortal.Services
             _mapper = mapper;
         }
 
-        public async Task<UserCreatedDto> CreateAsync(UserDto userForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<UserDto> CreateAsync(UserDto userForCreationDto, CancellationToken cancellationToken = default)
         {
             // verify if user already exists
             User userByEmailResult = null;
@@ -41,13 +40,13 @@ namespace ReportPortal.Services
 
             var createdUserId = await _userRepository.InsertAsync(userDbModel, cancellationToken);
 
-            var userCreated = new UserCreatedDto
+            var userCreated = new UserDto
             {
                 Email = userDbModel.Email,
                 Id = createdUserId
             };
 
-            return await Task.Run(() => userCreated);
+            return userCreated;
         }
 
         public async Task DeleteByIdAsync(int id, CancellationToken cancellationToken = default)

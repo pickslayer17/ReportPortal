@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ReportPortal.BL.Models;
-using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
@@ -49,7 +48,7 @@ namespace ReportPortal.BL.Services
             return _mapper.Map<TestResultDto>(testResult);
         }
 
-        public Task<TestResultCreatedDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public Task<TestResultDto> CreateAsync(TestResultDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

@@ -120,13 +120,15 @@ namespace ReportPortal.BL.Services
             }
         }
 
-        public async Task CreateRootFolderAsync(int runId, CancellationToken cancellationToken = default)
+        public async Task<int> CreateRootFolderAsync(int runId, CancellationToken cancellationToken = default)
         {
             bool exists = await _folderRepository.ExistsAsync(f => f.Name == FolderNames.RootFolderName && f.RunId == runId, cancellationToken);
 
             if (!exists)
             {
                 var rootFolder = await CreateFolderAsync(null, runId, FolderNames.RootFolderName, 0, cancellationToken);
+
+                return rootFolder.Id;
             }
             else
             {

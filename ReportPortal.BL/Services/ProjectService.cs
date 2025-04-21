@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ReportPortal.BL.Models;
-using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
 using ReportPortal.DAL.Models.RunProjectManagement;
@@ -22,13 +21,13 @@ namespace ReportPortal.BL.Services
             _runService = runService;
         }
 
-        public async Task<ProjectCreatedDto> CreateAsync(ProjectDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<ProjectDto> CreateAsync(ProjectDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             var existingProject = await _projectRepository.GetByAsync(pr => pr.Name == projectForCreationDto.Name, cancellationToken);
 
             if (existingProject != null)
             {
-                return new ProjectCreatedDto { IsCreated = false };
+                throw new Exception($"Project with name {projectForCreationDto.Name} already exists.");
             }
             else
             {
@@ -39,7 +38,7 @@ namespace ReportPortal.BL.Services
                 };
                 var projectId = await _projectRepository.InsertAsync(projectToAdd, cancellationToken);
 
-                return new ProjectCreatedDto { IsCreated = true, Id = projectId };
+                return new ProjectDto { Name = projectForCreationDto.Name, Id = projectId };
             }
         }
 

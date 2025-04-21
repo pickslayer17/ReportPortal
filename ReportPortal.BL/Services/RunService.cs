@@ -1,15 +1,10 @@
 ﻿using AutoMapper;
-using ReportPortal.BL.Constatnts;
 using ReportPortal.BL.Models;
-using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
-using ReportPortal.DAL.Repositories;
 using ReportPortal.DAL.Repositories.Interfaces;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace ReportPortal.BL.Services
 {
@@ -41,21 +36,24 @@ namespace ReportPortal.BL.Services
             _folderService = folderService;
         }
 
-        public async Task<RunCreatedDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
+        public async Task<RunDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
         {
-            var project = await _projectRepository.GetByAsync(p => p.Id ==  runForCreationDto.ProjectId);
+            var project = await _projectRepository.GetByAsync(p => p.Id == runForCreationDto.ProjectId);
             if (project == null) throw new ProjectNotFoundException($"no project with such id: {runForCreationDto.ProjectId}");
 
             var run = _mapper.Map<Run>(runForCreationDto);
-            
+
             var runId = await _runRepository.InsertAsync(run);
 
-            var runCreatedDto = new RunCreatedDto
+            var runCreatedDto = new RunDto
             {
                 Id = runId,
+                ProjectId = project.Id,
+                Name = runForCreationDto.Name,
             };
 
-            await _folderService.CreateRootFolderAsync(runCreatedDto.Id, cancellationToken);
+            var rootFolderId = _folderService.CreateRootFolderAsync(runCreatedDto.Id, cancellationToken).Result;
+            runCreatedDto.RootFolderId = rootFolderId;
 
             return runCreatedDto;
         }

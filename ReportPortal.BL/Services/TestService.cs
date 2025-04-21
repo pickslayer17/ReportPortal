@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ReportPortal.BL.Models;
-using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
@@ -34,7 +33,7 @@ namespace ReportPortal.BL.Services
             _testReviewRepository = testReviewRepository;
         }
 
-        public async Task<TestCreatedDto> CreateAsync(TestDto testDto, int folderId, CancellationToken cancellationToken = default)
+        public async Task<TestDto> CreateAsync(TestDto testDto, int folderId, CancellationToken cancellationToken = default)
         {
             /// verify if test with such name already exists
             var folder = await _folderService.GetByIdAsync(folderId, cancellationToken);
@@ -50,7 +49,7 @@ namespace ReportPortal.BL.Services
             var testRunItem = _mapper.Map<Test>(testDto);
             testRunItem.FolderId = folderId;
             var testCreatedId = await _testRepository.InsertAsync(testRunItem, cancellationToken);
-            var testCreated = _mapper.Map<TestCreatedDto>(testRunItem);
+            var testCreated = _mapper.Map<TestDto>(testRunItem);
             testCreated.Id = testCreatedId;
             var testReview = new TestReview();
             testReview.Test = testRunItem;
@@ -70,7 +69,7 @@ namespace ReportPortal.BL.Services
             return test.Id;
         }
 
-        public Task<TestCreatedDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
+        public Task<TestDto> CreateAsync(TestDto projectForCreationDto, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

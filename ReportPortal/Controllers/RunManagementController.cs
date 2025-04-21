@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportPortal.BL.Models;
-using ReportPortal.BL.Models.Created;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.ViewModels.TestRun;
@@ -29,7 +28,7 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> AddRun([FromBody] RunCreateVm runVm, CancellationToken cancellationToken = default)
         {
             var runDto = _mapper.Map<RunDto>(runVm);
-            RunCreatedDto runCreatedDto = null;
+            RunDto runCreatedDto = null;
             try
             {
                 runCreatedDto = await _runService.CreateAsync(runDto, cancellationToken);
