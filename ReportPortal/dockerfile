@@ -4,7 +4,7 @@ WORKDIR /src
 
 # Копируем проекты
 COPY ReportPortal.DAL/ReportPortal.DAL.csproj ReportPortal.DAL/
-COPY ReportPortal.BLR/ReportPortal.BL.csproj ReportPortal.BLR/
+COPY ReportPortal.BL/ReportPortal.BL.csproj ReportPortal.BL/
 COPY ReportPortal/ReportPortal.csproj ReportPortal/
 
 # Восстанавливаем зависимости
