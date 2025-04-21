@@ -103,7 +103,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - FrontEndUrl=http://frontend:3000
+      - FrontEndUrl=http://localhost:3000
       - DefaultConnection=Server=sql,1433;Database=ReportPortal;User Id=ReportPortalUser;Password=sgbn3w805tyh-hgb-9h345bg;TrustServerCertificate=True
   
   frontend:
@@ -111,7 +111,7 @@ services:
       context: ./ReactFE/reactfe.client
       dockerfile: Dockerfile.frontend
       args:
-        VITE_API_URL: http://backend:80
+        VITE_API_URL: http://localhost:5000
     ports:
       - "3000:80"
     depends_on:
