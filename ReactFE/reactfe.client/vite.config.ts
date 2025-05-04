@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
             }
         },
         server: {
-            port: 5173,
+            port: 100,
             host: true
         },
         define: {
