@@ -25,22 +25,22 @@ namespace ReportPortal.DAL.Repositories
             return testResult;
         }
 
-        public async Task<int> InsertAsync(TestResult testResult)
+        public async Task<int> InsertAsync(TestResult testResult, CancellationToken cancellationToken = default)
         {
             _dbContext.TestResults.Add(testResult);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return testResult.Id;
         }
 
-        public async Task RemoveByIdAsync(int testResultId)
+        public async Task RemoveByIdAsync(int testResultId, CancellationToken cancellationToken = default)
         {
-            var testResult = await GetByAsync(tr => tr.Id == testResultId);
+            var testResult = await GetByAsync(tr => tr.Id == testResultId, cancellationToken);
             _dbContext.TestResults.Remove(testResult);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public Task<TestResult> UpdateItem(TestResult item)
+        public Task<TestResult> UpdateItemAsync(TestResult item, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

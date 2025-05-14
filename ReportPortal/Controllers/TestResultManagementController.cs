@@ -29,22 +29,22 @@ namespace ReportPortal.Controllers
 
         [HttpPost("test/{testId:int}/AddTestResult")]
         [Authorize]
-        public async Task<IActionResult> AddTestResult(int testId, [FromBody] TestResultVm testVm)
+        public async Task<IActionResult> AddTestResult(int testId, [FromBody] TestResultCreateVm testResultVm, CancellationToken cancellationToken = default)
         {
-            var testResultDto = _mapper.Map<TestResultDto>(testVm);
-            var testResultCreated = await _testResultService.AddTestResultToTestAsync(testId, testResultDto);
+            var testResultDto = _mapper.Map<TestResultDto>(testResultVm);
+            var testResultCreatedId = await _testResultService.AddTestResultToTestAsync(testId, testResultDto, cancellationToken);
 
             var testDtoForHub = await _testService.GetByIdAsync(testId);
-            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTestResult", _mapper.Map<TestVm>(testDtoForHub));
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTestResult", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
-            return Ok(testResultCreated);
+            return Ok(testResultCreatedId);
         }
 
         [HttpGet("test/{testId:int}/TestResults")]
         [Authorize]
-        public async Task<IActionResult> GetTestResultIds(int testId)
+        public async Task<IActionResult> GetTestResultIds(int testId, CancellationToken cancellationToken = default)
         {
-            var testResult = await _testResultService.GetTestTestResultsAsync(testId);
+            var testResult = await _testResultService.GetTestTestResultsAsync(testId, cancellationToken);
 
             return Ok(testResult.Select(tr => _mapper.Map<TestResultVm>(tr)));
         }
@@ -52,9 +52,9 @@ namespace ReportPortal.Controllers
 
         [HttpGet("TestResult/{testResultId:int}")]
         [Authorize]
-        public async Task<IActionResult> GetTestResult(int testResultId)
+        public async Task<IActionResult> GetTestResult(int testResultId, CancellationToken cancellationToken = default)
         {
-            var testResultDto = await _testResultService.GetByIdAsync(testResultId);
+            var testResultDto = await _testResultService.GetByIdAsync(testResultId, cancellationToken);
 
             return Ok(_mapper.Map<TestResultVm>(testResultDto));
         }

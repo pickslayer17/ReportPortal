@@ -27,18 +27,18 @@ namespace ReportPortal.Controllers
 
         [HttpGet("GetUser/{userId:int}")]
         [Authorize]
-        public async Task<IActionResult> GetUser(int userId)
+        public async Task<IActionResult> GetUser(int userId, CancellationToken cancellationToken = default)
         {
-            var userDto = await _userService.GetByIdAsync(userId);
+            var userDto = await _userService.GetByIdAsync(userId, cancellationToken);
             var userVm = _mapper.Map<UserVm>(userDto);
             return Ok(userVm);
         }
 
         [HttpGet("GetUsers")]
         [Authorize]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers(CancellationToken cancellationToken = default)
         {
-            var usersDto = await _userService.GetAllAsync();
+            var usersDto = await _userService.GetAllAsync(cancellationToken);
             var usersVm = usersDto.Select(u => _mapper.Map<UserVm>(u));
 
             return Ok(usersVm);
@@ -46,22 +46,22 @@ namespace ReportPortal.Controllers
 
         [HttpPost("CreateUser")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> CreateUser([FromBody] UserVm userModel)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateVm userModel, CancellationToken cancellationToken = default)
         {
             var userDto = _mapper.Map<UserDto>(userModel);
 
-            var userCreated = await _userService.CreateAsync(userDto);
+            var userCreated = await _userService.CreateAsync(userDto, cancellationToken);
 
-            return Ok(userCreated);
+            return Ok(_mapper.Map<UserVm>(userCreated));
         }
 
         [HttpPost("DeleteUser/{userId:int}")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> DeleteUser(int userId)
+        public async Task<IActionResult> DeleteUser(int userId, CancellationToken cancellationToken = default)
         {
             try
             {
-                await _userService.DeleteByIdAsync(userId);
+                await _userService.DeleteByIdAsync(userId, cancellationToken);
             }
             catch (UserNotFoundException ex)
             {
@@ -73,10 +73,11 @@ namespace ReportPortal.Controllers
 
         [AllowAnonymous]
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] UserDto login)
+        public async Task<IActionResult> Login([FromBody] UserLoginVm userLoginVm, CancellationToken cancellationToken = default)
         {
             IActionResult response = Unauthorized();
-            var user = await _authenticationService.AuthenticateUser(login);
+            var userLoginDto = _mapper.Map<UserDto>(userLoginVm);
+            var user = await _authenticationService.AuthenticateUserAsync(userLoginDto, cancellationToken);
 
             if (user != null)
             {
@@ -89,7 +90,7 @@ namespace ReportPortal.Controllers
 
         [HttpGet("ValidateToken")]
         [Authorize]
-        public async Task<IActionResult> ValidateToken()
+        public async Task<IActionResult> ValidateToken(CancellationToken cancellationToken = default)
         {
             return Ok();
         }

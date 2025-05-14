@@ -25,37 +25,37 @@ namespace ReportPortal.Controllers
 
         [HttpGet("GetAllProject")]
         [Authorize]
-        public async Task<IActionResult> GetAllProjects()
+        public async Task<IActionResult> GetAllProjects(CancellationToken cancellationToken = default)
         {
-            var allProjectsDto = await _projectService.GetAllAsync();
+            var allProjectsDto = await _projectService.GetAllAsync(cancellationToken);
             var allProjectsVm = allProjectsDto.Select(pr => _mapper.Map<ProjectVm>(pr));
             return Ok(allProjectsVm);
         }
 
         [HttpGet("GetProject/{projectId:int}")]
         [Authorize]
-        public async Task<IActionResult> GetProject(int projectId)
+        public async Task<IActionResult> GetProject(int projectId, CancellationToken cancellationToken = default)
         {
-            var projectDto = await _projectService.GetByIdAsync(projectId);
+            var projectDto = await _projectService.GetByIdAsync(projectId, cancellationToken);
             var projectVm = _mapper.Map<ProjectDto>(projectDto);
             return Ok(projectVm);
         }
 
         [HttpPost("AddProject")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> AddProject([FromBody] ProjectVm projectForCreationDto)
+        public async Task<IActionResult> AddProject([FromBody] ProjectCreateVm projectForCreationVm, CancellationToken cancellationToken = default)
         {
-            var projectDto = _mapper.Map<ProjectDto>(projectForCreationDto);
-            return Ok(await _projectService.CreateAsync(projectDto));
+            var projectDto = _mapper.Map<ProjectDto>(projectForCreationVm);
+            return Ok(_mapper.Map<ProjectVm>( _projectService.CreateAsync(projectDto, cancellationToken).Result));
         }
 
         [HttpPost("DeleteProject/{projectId:int}")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> DeleteProject(int projectId)
+        public async Task<IActionResult> DeleteProject(int projectId, CancellationToken cancellationToken = default)
         {
             try
             {
-                await _projectService.DeleteByIdAsync(projectId);
+                await _projectService.DeleteByIdAsync(projectId, cancellationToken);
             }
             catch (ProjectNotFoundException ex)
             {

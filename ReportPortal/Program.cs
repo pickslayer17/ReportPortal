@@ -13,13 +13,22 @@ using ReportPortal.Interfaces;
 using ReportPortal.Maps;
 using ReportPortal.Services;
 using ReportPortal.Services.Interfaces;
+using ReportPortal.DAL.Seeders;
 using System.Text;
+using ReportPortal.MiddleWare;
 
 var builder = WebApplication.CreateBuilder(args);
-string FrontEndUrl = builder.Configuration["FrontEndUrl"];
 
-// DaaBase
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string backendUrl = Environment.GetEnvironmentVariable("ASPNETCORE_URLS")
+                    ?? builder.Configuration["Urls"];
+
+string frontEndUrl = Environment.GetEnvironmentVariable("FrontEndUrl")
+                     ?? builder.Configuration["FrontEndUrl"];
+
+string connectionString = Environment.GetEnvironmentVariable("DefaultConnection")
+                          ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.WebHost.UseUrls(backendUrl);
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString));
 
 // Add services to the container.
@@ -74,7 +83,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsPolicyName, builder =>
     {
-        builder.WithOrigins(FrontEndUrl)
+        builder.WithOrigins(frontEndUrl)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -82,6 +91,14 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+    var seeder = new UserSeeder(dbContext);
+    await seeder.SeedAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {

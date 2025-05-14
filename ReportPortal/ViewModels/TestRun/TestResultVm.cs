@@ -11,5 +11,4 @@ namespace ReportPortal.ViewModels.TestRun
         public byte[] ScreenShot { get; set; }
         public TestOutcome TestOutcome { get; set; }
     }
-
 }

@@ -10,7 +10,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal", "ReportPorta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.DAL", "ReportPortal.DAL\ReportPortal.DAL.csproj", "{84E5A7BA-80D8-43FC-9755-42B3C20419C6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.BL", "ReportPortal.BLR\ReportPortal.BL.csproj", "{ECE47167-41DB-47DF-B65E-B3192090AA2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.BL", "ReportPortal.BL\ReportPortal.BL.csproj", "{ECE47167-41DB-47DF-B65E-B3192090AA2A}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "reactfe.client", "ReactFE\reactfe.client\reactfe.client.esproj", "{92F19E12-A51B-4789-9549-85E1560E8B4C}"
 EndProject

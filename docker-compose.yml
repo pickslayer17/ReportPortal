@@ -1,0 +1,123 @@
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "StrongPassword123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlvolume:/var/opt/mssql
+
+  sql-checker:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      - sql
+    volumes:
+      - ./tools/sqlcheck.sh:/tools/sqlcheck.sh
+    entrypoint: [ "bash", "/tools/sqlcheck.sh" ]
+    
+  git-clone:
+    image: alpine/git
+    entrypoint: >
+      sh -c "rm -rf /src/repo && git clone --single-branch --branch mentor-fixes-1 https://github.com/pickslayer17/ReportPortal /src/repo"
+    volumes:
+      - backend-code:/src
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      sql-checker:
+        condition: service_completed_successfully
+    volumes:
+      - ./sql:/init
+    entrypoint: >
+      bash -c "
+        echo 'SQL Server is ready. Running init.sql...' &&
+        /opt/mssql-tools/bin/sqlcmd -S sql -U sa -P 'StrongPassword123!' -i /init/init.sql
+      "
+
+  builder:
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    depends_on:
+      git-clone:
+        condition: service_completed_successfully
+      db-init:
+        condition: service_completed_successfully
+    working_dir: /src
+    volumes:
+      - backend-code:/src
+      - backend-build:/out
+    entrypoint: >
+      sh -c "while [ ! -f /src/repo/ReportPortal/ReportPortal.csproj ]; do sleep 1; done &&
+             dotnet publish /src/repo/ReportPortal/ReportPortal.csproj -c Release -o /out"
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrator
+    depends_on:
+      builder:
+        condition: service_completed_successfully
+    working_dir: /src/repo/ReportPortal
+    volumes:
+      - backend-code:/src
+    entrypoint: >
+      bash -c "
+        while [ ! -f /src/repo/ReportPortal/bin/Release/net8.0/ReportPortal.deps.json ]; do
+          echo 'Waiting for compiled files...';
+          sleep 1;
+        done &&
+        dotnet ef database update --no-build --project /src/repo/ReportPortal/ReportPortal.csproj --configuration Release &&
+        touch /src/repo/migration_done.flag
+      "
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sql,1433;Database=ReportPortal;User Id=ReportPortalUser;Password=sgbn3w805tyh-hgb-9h345bg;TrustServerCertificate=True
+
+  backend:
+    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    depends_on:
+      builder:
+        condition: service_completed_successfully
+      migrator:
+        condition: service_completed_successfully
+    working_dir: /app
+    volumes:
+      - backend-build:/app
+      - backend-code:/src
+    ports:
+      - "5000:80"
+    restart: on-failure
+    entrypoint: >
+      sh -c "
+        echo 'Waiting for migration_done.flag...' &&
+        while [ ! -f /src/repo/migration_done.flag ]; do sleep 1; done &&
+        echo 'Waiting for ReportPortal.dll...' &&
+        while [ ! -f /app/ReportPortal.dll ]; do sleep 1; done &&
+        echo 'Starting backend...' &&
+        dotnet ReportPortal.dll
+      "
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - FrontEndUrl=http://localhost:3000
+      - DefaultConnection=Server=sql,1433;Database=ReportPortal;User Id=ReportPortalUser;Password=sgbn3w805tyh-hgb-9h345bg;TrustServerCertificate=True
+  
+  frontend:
+    build:
+      context: ./ReactFE/reactfe.client
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: http://localhost:5000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  backend-code:
+  backend-build:
+  sqlvolume:

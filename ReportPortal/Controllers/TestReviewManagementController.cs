@@ -29,39 +29,39 @@ namespace ReportPortal.Controllers
 
         [HttpGet("test/{testId:int}/TestReview")]
         [Authorize]
-        public async Task<IActionResult> GetTestReview(int testId)
+        public async Task<IActionResult> GetTestReview(int testId, CancellationToken cancellationToken = default)
         {
-            var testReviewDto = await _testReviewService.GetTestReviewAsync(testId);
+            var testReviewDto = await _testReviewService.GetTestReviewAsync(testId, cancellationToken);
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
         }
 
         [HttpPut("UpdateTestReview")]
         [Authorize]
-        public async Task<IActionResult> UpdateTestReview([FromBody] TestReviewVm testReview)
+        public async Task<IActionResult> UpdateTestReview([FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
             var testReviewDto = _mapper.Map<TestReviewDto>(testReview);
-            var testReviewDtoUpdated = await _testReviewService.UpdateTestReviewAsync(testReviewDto);
+            var testReviewDtoUpdated = await _testReviewService.UpdateTestReviewAsync(testReviewDto, cancellationToken);
 
-            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
-            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId, cancellationToken);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDtoUpdated));
         }
 
         [HttpPut("TestReview/{id:int}/UpdateReviewer")]
         [Authorize]
-        public async Task<IActionResult> UpdateReviewer(int id, [FromBody] TestReviewVm testReview)
+        public async Task<IActionResult> UpdateReviewer(int id, [FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
                 Id = id,
                 ReviewerId = new Optional<int?>(testReview.ReviewerId)
             };
-            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
+            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto, cancellationToken);
 
-            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
-            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId, cancellationToken);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
         }
@@ -69,7 +69,7 @@ namespace ReportPortal.Controllers
 
         [HttpPut("TestReview/{id:int}/UpdateOutcome")]
         [Authorize]
-        public async Task<IActionResult> UpdateOutcome(int id, [FromBody] TestReviewVm testReview)
+        public async Task<IActionResult> UpdateOutcome(int id, [FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
@@ -77,27 +77,27 @@ namespace ReportPortal.Controllers
                 TestReviewOutcome = new Optional<TestReviewOutcome>(testReview.TestReviewOutcome),
                 ProductBug = testReview.ProductBug
             };
-            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
+            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto, cancellationToken);
 
-            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
-            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId, cancellationToken);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
         }
 
         [HttpPut("TestReview/{id:int}/UpdateComments")]
         [Authorize]
-        public async Task<IActionResult> UpdateComments(int id, [FromBody] TestReviewVm testReview)
+        public async Task<IActionResult> UpdateComments(int id, [FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
                 Id = id,
                 Comments = new Optional<string?>(testReview.Comments)
             };
-            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto);
+            var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto, cancellationToken);
 
-            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId);
-            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub));
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId, cancellationToken);
+            await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
         }
