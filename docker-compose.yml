@@ -20,7 +20,7 @@ services:
   git-clone:
     image: alpine/git
     entrypoint: >
-      sh -c "rm -rf /src/repo && git clone --single-branch --branch mentor-fixes-1 https://github.com/pickslayer17/ReportPortal /src/repo"
+      sh -c "rm -rf /src/repo && git clone --single-branch --branch master https://github.com/pickslayer17/ReportPortal /src/repo"
     volumes:
       - backend-code:/src
 
