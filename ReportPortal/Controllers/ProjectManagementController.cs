@@ -62,7 +62,7 @@ namespace ReportPortal.Controllers
                 return BadRequest(ex.Message);
             }
 
-            return Ok();
+            return Ok(new { message = "Проект был удален" });
         }
     }
 }

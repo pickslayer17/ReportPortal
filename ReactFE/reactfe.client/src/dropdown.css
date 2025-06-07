@@ -1,17 +1,22 @@
 .dropdown {
-    position: absolute; /* Absolute position for dropdown */
-    background-color: #444; /* Dark background for dropdown */
-    min-width: 150px; /* Minimum width for dropdown */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
-    z-index: 1000; /* Ensure dropdown stays on top */
+    position: absolute;
+    background: var(--bg-secondary);
+    min-width: 150px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    border-radius: var(--radius);
+    padding: 6px 0;
 }
 
     .dropdown li {
-        padding: 10px; /* Padding for dropdown items */
-        color: #fff; /* White text */
-        cursor: pointer; /* Pointer cursor */
+        padding: 10px 18px;
+        color: var(--text-main);
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.2s, color 0.2s;
     }
 
         .dropdown li:hover {
-            background-color: #555; /* Highlight effect on hover */
+            background: var(--accent);
+            color: var(--text-secondary);
         }
