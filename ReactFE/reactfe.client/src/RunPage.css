@@ -17,13 +17,16 @@
 /* Folder and Test Table */
 .folder-container {
     width: 100%;
-    max-width: 1100px;
+    max-width: none; /* allow full width */
     margin: 0 auto;
+    padding: 0 24px; /* add some horizontal padding for large screens */
+    box-sizing: border-box;
 }
 
 .folder-table {
     width: 100%;
-    table-layout: fixed;
+    min-width: 0;
+    table-layout: auto; /* allow columns to grow/shrink naturally */
     border-collapse: collapse;
     background: var(--bg-secondary);
     color: var(--text-main);
@@ -42,6 +45,9 @@
     height: 48px;
     min-height: 48px;
     max-height: 48px;
+    min-width: 0;
+    max-width: none;
+    width: auto;
 }
 
 .folder-table th {
@@ -83,6 +89,21 @@
 
 .folder-table input[type="checkbox"] {
     cursor: pointer;
+}
+
+/* --- Folder Table: 4-digit width for outcome columns --- */
+.folder-table th.toinvestigate-col,
+.folder-table td.toinvestigate-col,
+.folder-table th.notrepro-col,
+.folder-table td.notrepro-col,
+.folder-table th.productbug-col,
+.folder-table td.productbug-col {
+    width: 56px;      /* enough for 4 digits + padding */
+    min-width: 56px;
+    max-width: 64px;
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 /* --- ДЛЯ ТАБЛИЦЫ С ТЕСТАМИ --- */
@@ -440,4 +461,11 @@ button {
 .bug-input:focus {
     border: 1.5px solid #ffb300;
     background: #181818;
+}
+
+/* --- Responsive: allow table to grow with window --- */
+@media (max-width: 900px) {
+    .folder-container {
+        padding: 0 4px;
+    }
 }

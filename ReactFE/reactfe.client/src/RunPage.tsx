@@ -243,9 +243,10 @@ const RunPage: React.FC = () => {
                         <th>Passed</th>
                         <th>Failed</th>
                         <th>Not Run</th>
-                        <th><span className="to-investigate">?</span></th>
-                        <th><span className="not-repro">NR</span></th>
-                        <th><div className="product-bug">BUG</div></th>
+                        <th className="toinvestigate-col"><span className="to-investigate">?</span></th>
+                        <th className="notrepro-col"><span className="not-repro">NR</span></th>
+                        <th className="productbug-col"><div className="product-bug">BUG</div></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -287,9 +288,9 @@ const RunPage: React.FC = () => {
                                 <td>{outcomeCounts.passed}</td>
                                 <td>{outcomeCounts.failed}</td>
                                 <td>{outcomeCounts.notRun}</td>
-                                <td>{reviewCounts.toInvestigate}</td>
-                                <td>{reviewCounts.notRepro}</td>
-                                <td>{reviewCounts.productBug}</td>
+                                <td className="toinvestigate-col">{reviewCounts.toInvestigate}</td>
+                                <td className="notrepro-col">{reviewCounts.notRepro}</td>
+                                <td className="productbug-col">{reviewCounts.productBug}</td>
                                 <td>
                                     <button
                                         className="delete-button"

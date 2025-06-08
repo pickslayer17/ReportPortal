@@ -131,8 +131,10 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
                     </div>
                 )}
 
-                <button onClick={handleUpdate}>Update</button>
-                <button className="button-secondary" onClick={onClose}>Cancel</button>
+                <div className="modal-actions">
+                    <button className="update-tests-button" onClick={handleUpdate}>Update</button>
+                    <button className="go-back-button" onClick={onClose}>Cancel</button>
+                </div>
             </div>
         </Modal>
     );
