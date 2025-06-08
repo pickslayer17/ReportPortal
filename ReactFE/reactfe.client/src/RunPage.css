@@ -1,4 +1,4 @@
-/* Base Styles */
+﻿/* Base Styles */
 .run-page {
     padding: 40px 0;
     font-family: inherit;
@@ -17,12 +17,13 @@
 /* Folder and Test Table */
 .folder-container {
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
 .folder-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     background: var(--bg-secondary);
     color: var(--text-main);
@@ -31,17 +32,164 @@
     overflow: hidden;
 }
 
-    .folder-table th, .folder-table td {
-        padding: 12px;
-        border: 1px solid #444;
-        text-align: left;
-    }
+.folder-table th, .folder-table td {
+    padding: 0 12px;
+    border: 1px solid #444;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+}
+
+.folder-table th {
+    height: 52px;
+    min-height: 52px;
+    max-height: 52px;
+    vertical-align: middle;
+    font-size: 1.08rem;
+}
+
+.folder-table th:first-child {
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+}
+
+.folder-table th:nth-child(2),
+.folder-table td:nth-child(2) {
+    min-width: 220px;
+    max-width: 400px;
+    width: 30%;
+}
+
+.folder-table th:nth-last-child(2),
+.folder-table td:nth-last-child(2) {
+    min-width: 180px;
+    width: 20%;
+    max-width: 350px;
+}
+
+.folder-table th:last-child,
+.folder-table td:last-child {
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    text-align: center;
+    padding: 0;
+}
+
+.folder-table input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* --- ДЛЯ ТАБЛИЦЫ С ТЕСТАМИ --- */
+.folder-table.test-table th,
+.folder-table.test-table td {
+    min-width: unset !important;
+    max-width: unset !important;
+    width: unset !important;
+}
+
+.folder-table.test-table th:first-child,
+.folder-table.test-table td:first-child {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+}
+
+.folder-table.test-table th:nth-child(2),
+.folder-table.test-table td:nth-child(2) {
+    min-width: 220px !important;
+    max-width: 400px !important;
+    width: 30% !important;
+}
+
+.folder-table.test-table th:nth-child(3),
+.folder-table.test-table td:nth-child(3) {
+    width: 120px !important;
+    min-width: 100px !important;
+    max-width: 160px !important;
+}
+
+.folder-table.test-table th:nth-child(4),
+.folder-table.test-table td:nth-child(4) {
+    width: 140px !important;
+    min-width: 100px !important;
+    max-width: 180px !important;
+}
+
+.folder-table.test-table th:nth-child(5),
+.folder-table.test-table td:nth-child(5) {
+    width: auto !important;
+    min-width: 220px !important;
+    max-width: 1fr !important;
+}
+
+.folder-table.test-table th:last-child,
+.folder-table.test-table td:last-child {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    text-align: center;
+    padding: 0 !important;
+}
+
+/* --- ДЛЯ ТАБЛИЦЫ С ТЕСТАМИ ПО КЛАССАМ КОЛОНОК --- */
+.folder-table.test-table th.col-checkbox,
+.folder-table.test-table td.col-checkbox {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+}
+
+.folder-table.test-table th.col-name,
+.folder-table.test-table td.col-name {
+    min-width: 220px !important;
+    max-width: 400px !important;
+    width: 30% !important;
+}
+
+.folder-table.test-table th.col-outcome,
+.folder-table.test-table td.col-outcome {
+    width: 120px !important;
+    min-width: 100px !important;
+    max-width: 160px !important;
+}
+
+.folder-table.test-table th.col-reviewer,
+.folder-table.test-table td.col-reviewer {
+    width: 140px !important;
+    min-width: 100px !important;
+    max-width: 180px !important;
+}
+
+.folder-table.test-table th.col-comments,
+.folder-table.test-table td.col-comments {
+    width: auto !important;
+    min-width: 220px !important;
+    max-width: 1fr !important;
+}
+
+.folder-table.test-table th.col-delete,
+.folder-table.test-table td.col-delete {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    text-align: center;
+    padding: 0 !important;
+}
 
 /* Folder Row Styling */
 .folder-row .folder {
     cursor: pointer;
     color: var(--accent);
     font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
     .folder-row .folder:hover {
@@ -54,8 +202,10 @@
 }
 
 .test-container {
-    display: flex;
-    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    /* убираем flex, чтобы span растягивался как block */
 }
 
     .test-container input[type="checkbox"] {
@@ -63,8 +213,16 @@
     }
 
 .test-name {
+    color: #aaa !important;
+    font-weight: 500;
+    display: block;      /* обязательно block */
+    width: 100%;         /* растягиваем на всю ширину td */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     cursor: pointer;
-    color: var(--accent);
+    padding: 0 4px;      /* небольшой внутренний отступ */
+    box-sizing: border-box;
 }
 
     .test-name:hover {
@@ -193,14 +351,6 @@ button {
     cursor: pointer;
 }
 
-.folder-table th:first-child {
-    width: 50px; /* Narrower width for the checkbox column */
-}
-
-.folder-table input[type="checkbox"] {
-    cursor: pointer;
-}
-
 /* Refined Styling for Test Outcome Spans */
 .test-review-outcome-container span, .test-review-outcome-container div {
     display: inline; /* Change to 'inline' to reduce inner borders */
@@ -238,3 +388,56 @@ button {
     .delete-button:hover svg {
         fill: #c9302c;
     }
+
+/* Outcome, Reviewer, Comments spans должны быть на всю ширину */
+.col-outcome .outcome-span,
+.col-reviewer .reviewer-span,
+.col-comments .comments-span {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+/* Красивый дропдаун для outcome/reviewer */
+.styled-dropdown {
+    width: 100%;
+    min-width: 0;
+    background: var(--bg-secondary);
+    color: var(--text-main);
+    border: 1.5px solid #ffd000;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 1em;
+    font-family: inherit;
+    outline: none;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+
+.styled-dropdown:focus {
+    border: 1.5px solid #ffb300;
+    background: #181818;
+}
+
+.bug-input {
+    background: var(--bg-secondary);
+    color: var(--text-main);
+    border: 1.5px solid #f44336;
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-size: 0.95em;
+    margin-top: 2px;
+    box-sizing: border-box;
+}
+
+.bug-input:focus {
+    border: 1.5px solid #ffb300;
+    background: #181818;
+}

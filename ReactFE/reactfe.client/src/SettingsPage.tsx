@@ -3,6 +3,12 @@ import './SettingsPage.css';
 import { postWithToken, fetchWithToken } from './helpers/api';
 import { getUserRoleFromToken } from './helpers/auth';
 
+// 1. Define the enum to match your backend
+export enum UserRole {
+    User = 0,
+    Administrator = 1
+}
+
 type DeleteTarget = { id: number; name: string };
 
 function SettingsPage() {
@@ -15,7 +21,8 @@ function SettingsPage() {
     const [inputValue, setInputValue] = useState('');
     const [userPassword, setUserPassword] = useState('test');
     const [showPassword, setShowPassword] = useState(false);
-    const [userRole, setUserRole] = useState<'User' | 'Admin'>('User');
+    // 2. Use the enum for state
+    const [userRole, setUserRole] = useState<UserRole>(UserRole.User);
     const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
 
@@ -44,14 +51,14 @@ function SettingsPage() {
         setShowModal(true);
         setInputValue('');
         setUserPassword('test');
-        setUserRole('User');
+        setUserRole(UserRole.User);
     };
 
     const closeModal = () => {
         setShowModal(false);
         setInputValue('');
         setUserPassword('test');
-        setUserRole('User');
+        setUserRole(UserRole.User);
         setShowPassword(false);
         setDeleteTarget(null);
         setDeleteSuccess(false);
@@ -67,7 +74,7 @@ function SettingsPage() {
             : {
                 email: inputValue,
                 password: userPassword,
-                userRole: userRole === 'Admin' ? 1 : 0 // enum!
+                userRole: userRole // use enum value directly
             };
 
         try {
@@ -169,25 +176,17 @@ function SettingsPage() {
                                             value={inputValue}
                                             onChange={(e) => setInputValue(e.target.value)}
                                         />
-                                        <div style={{ position: 'relative', marginBottom: '20px' }}>
+                                        <div className="password-field-container">
                                             <input
+                                                className="password-input"
                                                 type={showPassword ? 'text' : 'password'}
                                                 placeholder="Password"
                                                 value={userPassword}
                                                 onChange={(e) => setUserPassword(e.target.value)}
-                                                style={{ width: '100%', paddingRight: '40px' }}
                                             />
                                             <span
+                                                className="password-toggle"
                                                 onClick={() => setShowPassword((v) => !v)}
-                                                style={{
-                                                    position: 'absolute',
-                                                    right: '10px',
-                                                    top: '50%',
-                                                    transform: 'translateY(-50%)',
-                                                    cursor: 'pointer',
-                                                    color: '#ffd000',
-                                                    fontSize: '1.2em'
-                                                }}
                                                 title={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
                                             >
                                                 {showPassword ? '🙈' : '👁️'}
@@ -195,11 +194,11 @@ function SettingsPage() {
                                         </div>
                                         <select
                                             value={userRole}
-                                            onChange={e => setUserRole(e.target.value as 'User' | 'Admin')}
+                                            onChange={e => setUserRole(Number(e.target.value) as UserRole)}
                                             style={{ width: '100%', padding: '10px', borderRadius: '8px', marginBottom: '20px' }}
                                         >
-                                            <option value="User">User</option>
-                                            <option value="Admin">Admin</option>
+                                            <option value={UserRole.User}>User</option>
+                                            <option value={UserRole.Administrator}>Administrator</option>
                                         </select>
                                     </>
                                 )}

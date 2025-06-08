@@ -1,4 +1,4 @@
-import './RunPage.css';
+﻿import './RunPage.css';
 import './App.css';
 import './dropdown.css';
 
@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { deleteWithToken } from './helpers/api';
 import { fetchWithToken } from './helpers/api';
+import { putWithToken } from './helpers/api'; // обязательно импортировать
 import * as signalR from '@microsoft/signalr'; // Import SignalR
 import { testOutcome } from './enums/testOutcome';
 import { capitalizeFirstLetter } from './helpers/render';
@@ -34,6 +35,12 @@ interface TestPageState {
     folderId: number;
 }
 
+const outcomeOptions = [
+    { value: TestReviewOutcome.ToInvestigate, label: 'To Investigate' },
+    { value: TestReviewOutcome.NotRepro, label: 'Not Repro' },
+    { value: TestReviewOutcome.ProductBug, label: 'Product Bug' }
+];
+
 const RunPage: React.FC = () => {
     const apiUrl = import.meta.env.VITE_API_URL;
     const { runId } = useParams<{ runId: string }>();
@@ -54,6 +61,9 @@ const RunPage: React.FC = () => {
     const [allSelected, setAllSelected] = useState(false);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
     const [editMode, setEditMode] = useState<EditTestReviewMode>(EditTestReviewMode.all);
+    const [editingOutcomeId, setEditingOutcomeId] = useState<number | null>(null);
+    const [editingReviewerId, setEditingReviewerId] = useState<number | null>(null);
+    const [bugNumber, setBugNumber] = useState<string>(''); // для Product Bug
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -297,10 +307,10 @@ const RunPage: React.FC = () => {
 
     const renderTestTable = (folderTests: TestVm[]) => {
         return (
-            <table className="folder-table">
+            <table className="folder-table test-table">
                 <thead>
                     <tr>
-                        <th>
+                        <th className="col-checkbox">
                             <input
                                 type="checkbox"
                                 checked={allSelected && selectedTests.length === tests.filter(test => test.folderId === currentFolderId).length}
@@ -308,21 +318,22 @@ const RunPage: React.FC = () => {
                                 disabled={tests.filter(test => test.folderId === currentFolderId).length === 0}
                             />
                         </th>
-                        <th>Name</th>
-                        <th>Outcome</th>
-                        <th>Reviewer</th>
-                        <th>Comments</th>
+                        <th className="col-name">Name</th>
+                        <th className="col-outcome">Outcome</th>
+                        <th className="col-reviewer">Reviewer</th>
+                        <th className="col-comments">Comments</th>
+                        <th className="col-delete"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {folderTests.map(test => (
                         <tr key={test.id} className="test-row">
-                            <td
+                            <td className="col-checkbox"
                                 onClick={(e) => {
                                     if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") {
-                                        return; // Do nothing if clicked on checkbox
+                                        return;
                                     }
-                                    handleCheckboxChange(test.id); // Otherwise, toggle checkbox
+                                    handleCheckboxChange(test.id);
                                 }}
                                 style={{ cursor: "pointer" }}
                             >
@@ -332,15 +343,82 @@ const RunPage: React.FC = () => {
                                     onChange={() => handleCheckboxChange(test.id)}
                                 />
                             </td>
-                            <td className="test-container">
-                                <span className="test-name" onClick={() => handleTestClick(test.id, test.folderId)}>
+                            <td className="test-container col-name">
+                                <span
+                                    className="test-name"
+                                    title={test.name}
+                                    onClick={() => handleTestClick(test.id, test.folderId)}
+                                >
                                     {capitalizeFirstLetter(test.name)}
                                 </span>
                             </td>
-                            {renderTestOutcome(test.testReview.testReviewOutcome, test)}
-                            {renderTestReviewer(test)}
-                            {renderTestComments(test)}
-                            <td>
+                            <td className="col-outcome">
+                                {editingOutcomeId === test.id ? (
+                                    <select
+                                        className="outcome-span styled-dropdown"
+                                        value={test.testReview.testReviewOutcome}
+                                        onChange={e => {
+                                            const val = Number(e.target.value);
+                                            handleOutcomeChange(test, val);
+                                        }}
+                                        autoFocus
+                                        onBlur={() => setEditingOutcomeId(null)}
+                                    >
+                                        {outcomeOptions.map(opt => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <span
+                                        className="outcome-span"
+                                        onClick={() => setEditingOutcomeId(test.id)}
+                                        title="Изменить Outcome"
+                                    >
+                                        {test.testReview.testReviewOutcome === TestReviewOutcome.ToInvestigate && <span className="to-investigate">To Investigate</span>}
+                                        {test.testReview.testReviewOutcome === TestReviewOutcome.NotRepro && <span className="not-repro">Not Repro</span>}
+                                        {test.testReview.testReviewOutcome === TestReviewOutcome.ProductBug && (
+                                            <div className="product-bug">
+                                                Product Bug
+                                                <span className="bug-id">{test.testReview.productBug ?? ''}</span>
+                                            </div>
+                                        )}
+                                    </span>
+                                )}
+                            </td>
+                            <td className="col-reviewer">
+                                {editingReviewerId === test.id ? (
+                                    <select
+                                        className="reviewer-span styled-dropdown"
+                                        value={test.testReview.reviewerId ?? ''}
+                                        onChange={e => handleReviewerChange(test, Number(e.target.value))}
+                                        onBlur={() => setEditingReviewerId(null)}
+                                        autoFocus
+                                    >
+                                        <option value="">-</option>
+                                        {users.map(u => (
+                                            <option key={u.id} value={u.id}>{u.email}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <span
+                                        className="reviewer-span"
+                                        onClick={() => setEditingReviewerId(test.id)}
+                                        title="Изменить Reviewer"
+                                    >
+                                        {reviewerEmails[test.testReview.reviewerId] || '-'}
+                                    </span>
+                                )}
+                            </td>
+                            <td className="col-comments">
+                                <span
+                                    className="comments-span"
+                                    onClick={() => openModalForCell(EditTestReviewMode.comments, test)}
+                                    title="Изменить Comments"
+                                >
+                                    {test.testReview.comments}
+                                </span>
+                            </td>
+                            <td className="col-delete">
                                 <button
                                     className="delete-button"
                                     onClick={() => handleDeleteTest(test.id)}>
@@ -512,6 +590,71 @@ const RunPage: React.FC = () => {
                 ))}
             </div>
         );
+    };
+
+    const handleOutcomeChange = async (test: TestVm, newOutcome: TestReviewOutcome) => {
+        setEditingOutcomeId(null);
+
+        // Если выбран Product Bug — открываем попап с выбранным Product Bug
+        if (newOutcome === TestReviewOutcome.ProductBug) {
+            // Передаём в testReview нужный outcome
+            setTestReviews([
+                {
+                    ...test.testReview,
+                    testReviewOutcome: TestReviewOutcome.ProductBug
+                }
+            ]);
+            setEditMode(EditTestReviewMode.outcome);
+            setIsModalOpen(true);
+            setSelectedTests([]);
+            return;
+        }
+
+        const updatedReview = {
+            ...test.testReview,
+            testReviewOutcome: newOutcome,
+            productBug: null
+        };
+
+        try {
+            await putWithToken(
+                `api/TestReviewManagement/TestReview/${test.testReview.id}/UpdateOutcome`,
+                updatedReview
+            );
+            setTests(prev =>
+                prev.map(t =>
+                    t.id === test.id
+                        ? { ...t, testReview: updatedReview }
+                        : t
+                )
+            );
+        } catch (error) {
+            console.error('Failed to update outcome', error);
+        }
+    };
+
+    const handleReviewerChange = async (test: TestVm, newReviewerId: number) => {
+        setEditingReviewerId(null);
+        const updatedReview = {
+            ...test.testReview,
+            reviewerId: newReviewerId
+        };
+        try {
+            await putWithToken(
+                `api/TestReviewManagement/TestReview/${test.testReview.id}/UpdateReviewer`,
+                updatedReview
+            );
+            setTests(prev =>
+                prev.map(t =>
+                    t.id === test.id
+                        ? { ...t, testReview: updatedReview }
+                        : t
+                )
+            );
+        } catch (error) {
+            // обработка ошибки (можно добавить toast)
+            console.error('Failed to update reviewer', error);
+        }
     };
 
     if (loading) {
