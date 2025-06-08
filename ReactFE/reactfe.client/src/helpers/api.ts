@@ -108,3 +108,30 @@ export const postWithToken = async (endpoint: string, body: object, options: Req
         return {};
     }
 };
+
+export const uploadWithToken = async (endpoint: string, formData: FormData, options: RequestInit = {}) => {
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+
+    const headers: Record<string, string> = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        // Не указываем 'Content-Type'!
+    };
+
+    const response = await fetch(`${apiUrl}/${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+        ...options,
+    });
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const text = await response.text();
+    try {
+        return text ? JSON.parse(text) : {};
+    } catch {
+        return {};
+    }
+};

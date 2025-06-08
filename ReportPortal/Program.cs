@@ -57,6 +57,7 @@ builder.Services.AddScoped<IRunService, RunService>();
 builder.Services.AddScoped<ITestService, TestService>();
 builder.Services.AddScoped<ITestResultService, TestResultService>();
 builder.Services.AddScoped<ITestReviewService, TestReviewService>();
+builder.Services.AddScoped<ITrxParserService, TrxParserService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(ServiceMappingProfile));

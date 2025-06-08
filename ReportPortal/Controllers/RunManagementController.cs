@@ -15,12 +15,14 @@ namespace ReportPortal.Controllers
         private readonly IRunService _runService;
         private readonly IMapper _mapper;
         private readonly IFolderService _folderService;
+        private readonly ITrxParserService _trxParserService;
 
-        public RunManagementController(IRunService runService, IMapper mapper, IFolderService folderService)
+        public RunManagementController(IRunService runService, IMapper mapper, IFolderService folderService, ITrxParserService trxParserService)
         {
             _runService = runService;
             _mapper = mapper;
             _folderService = folderService;
+            _trxParserService = trxParserService;
         }
 
         [HttpPost("AddRun")]
@@ -60,7 +62,6 @@ namespace ReportPortal.Controllers
             return Ok(resultVms);
         }
 
-
         [HttpPost("Runs/{runId:int}/delete")]
         [Authorize]
         public async Task<IActionResult> DeleteRun(int runId, CancellationToken cancellationToken = default)
@@ -75,6 +76,34 @@ namespace ReportPortal.Controllers
             {
                 return BadRequest($"There were some troubles with run deleting (run.id = {runId})\n{ex.Message}");
             }
+        }
+
+        [HttpPost("Project/{projectId:int}/upload-trx")]
+        [Authorize]
+        [RequestSizeLimit(524288000)] // 500 MB, при необходимости увеличьте
+        public async Task<IActionResult> UploadTrxFile([FromForm] IFormFile file, CancellationToken cancellationToken = default)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Файл не выбран или пустой.");
+
+            if(!file.FileName.EndsWith(".trx", StringComparison.OrdinalIgnoreCase))
+                return BadRequest("Неверный формат файла. Ожидается .trx файл.");
+
+            // Пример: сохраняем файл во временную папку
+            var uploadsFolder = Path.Combine(Path.GetTempPath(), "trx_uploads");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var filePath = Path.Combine(uploadsFolder, $"{Guid.NewGuid()}_{file.FileName}");
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream, cancellationToken);
+            }
+
+            await _trxParserService.AddTestsFromXml(filePath);
+            // Здесь можно добавить обработку .trx файла
+
+            return Ok(new { message = "Файл успешно загружен", filePath });
         }
     }
 }
