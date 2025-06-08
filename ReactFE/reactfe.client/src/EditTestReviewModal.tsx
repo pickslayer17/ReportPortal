@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import Modal from './Modal';
+﻿import React, { useState, useEffect } from 'react';
 import { EditTestReviewModalProps } from './interfaces/EditTestReviewModalProps';
 import { EditTestReviewMode } from './enums/EditTestReviewMode'
 import { TestReviewOutcome } from './interfaces/TestVmProps';
@@ -60,83 +59,82 @@ const EditTestReviewModal: React.FC<EditTestReviewModalProps> = ({
         }
     };
 
+    // Убираем modal-content/modal-small, возвращаем только контент
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
-            <div>
-                <h2>Edit Test Reviews</h2>
-                {(editMode === EditTestReviewMode.outcome || editMode === EditTestReviewMode.all) && (
-                    <div>
-                        <label htmlFor="outcome">Outcome:</label>
-                        <select
-                            id="outcome"
-                            value={selectedOutcome !== null ? selectedOutcome : ''}
-                            onChange={(e) => setSelectedOutcome(Number(e.target.value) as TestReviewOutcome)}
-                            style={{ width: '100%' }}
-                        >
-                            <option value="">Select Outcome</option>
-                            {Object.keys(TestReviewOutcome)
-                                .filter(key => isNaN(Number(key)))
-                                .map(key => (
-                                    <option key={key} value={TestReviewOutcome[key as keyof typeof TestReviewOutcome]}>
-                                        {key}
-                                    </option>
-                                ))}
-                        </select>
-                        {(selectedOutcome === TestReviewOutcome.ProductBug) && (
-                            <div>
-                                <label htmlFor="bugId">Bug Id:</label>
-                                <input
-                                    type="number"
-                                    id="bugId"
-                                    value={bugId !== null ? bugId : ''}
-                                    onChange={(e) => setBugId(Number(e.target.value))}
-                                    placeholder="Enter Bug Id"
-                                    style={{ width: '100%' }}
-                                />
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {(editMode === EditTestReviewMode.reviewer || editMode === EditTestReviewMode.all) && (
-                    <div>
-                        <label htmlFor="reviewer">Reviewer:</label>
-                        <select
-                            id="reviewer"
-                            value={selectedReviewerId !== null ? String(selectedReviewerId) : ''}
-                            onChange={(e) => setSelectedReviewerId(e.target.value ? Number(e.target.value) : null)}
-                            style={{ width: '100%' }}
-                        >
-                            <option value="">Select Reviewer</option>
-                            {users.map(user => (
-                                <option key={user.id} value={user.id}>
-                                    {user.email}
+        <>
+            <h2>Edit Test Reviews</h2>
+            {(editMode === EditTestReviewMode.outcome || editMode === EditTestReviewMode.all) && (
+                <div>
+                    <label htmlFor="outcome">Outcome:</label>
+                    <select
+                        id="outcome"
+                        value={selectedOutcome !== null ? selectedOutcome : ''}
+                        onChange={(e) => setSelectedOutcome(Number(e.target.value) as TestReviewOutcome)}
+                        style={{ width: '100%' }}
+                    >
+                        <option value="">Select Outcome</option>
+                        {Object.keys(TestReviewOutcome)
+                            .filter(key => isNaN(Number(key)))
+                            .map(key => (
+                                <option key={key} value={TestReviewOutcome[key as keyof typeof TestReviewOutcome]}>
+                                    {key}
                                 </option>
                             ))}
-                        </select>
-                    </div>
-                )}
-
-                {(editMode === EditTestReviewMode.comments || editMode === EditTestReviewMode.all) && (
-                    <div>
-                        <label htmlFor="comment">Comments:</label>
-                        <textarea
-                            id="comment"
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                            placeholder="Enter your comments here"
-                            rows={4}
-                            style={{ width: '100%' }}
-                        />
-                    </div>
-                )}
-
-                <div className="modal-actions">
-                    <button className="update-tests-button" onClick={handleUpdate}>Update</button>
-                    <button className="go-back-button" onClick={onClose}>Cancel</button>
+                    </select>
+                    {(selectedOutcome === TestReviewOutcome.ProductBug) && (
+                        <div>
+                            <label htmlFor="bugId">Bug Id:</label>
+                            <input
+                                type="number"
+                                id="bugId"
+                                value={bugId !== null ? bugId : ''}
+                                onChange={(e) => setBugId(Number(e.target.value))}
+                                placeholder="Enter Bug Id"
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+                    )}
                 </div>
+            )}
+
+            {(editMode === EditTestReviewMode.reviewer || editMode === EditTestReviewMode.all) && (
+                <div>
+                    <label htmlFor="reviewer">Reviewer:</label>
+                    <select
+                        id="reviewer"
+                        value={selectedReviewerId !== null ? String(selectedReviewerId) : ''}
+                        onChange={(e) => setSelectedReviewerId(e.target.value ? Number(e.target.value) : null)}
+                        style={{ width: '100%' }}
+                    >
+                        <option value="">Select Reviewer</option>
+                        {users.map(user => (
+                            <option key={user.id} value={user.id}>
+                                {user.email}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
+            {(editMode === EditTestReviewMode.comments || editMode === EditTestReviewMode.all) && (
+                <div>
+                    <label htmlFor="comment">Comments:</label>
+                    <textarea
+                        id="comment"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder="Enter your comments here"
+                        rows={4}
+                        style={{ width: '100%' }}
+                    />
+                </div>
+            )}
+
+            <div className="modal-actions">
+                <button className="update-tests-button" onClick={handleUpdate}>Update</button>
+                <button className="go-back-button" onClick={onClose}>Cancel</button>
             </div>
-        </Modal>
+        </>
     );
 };
 

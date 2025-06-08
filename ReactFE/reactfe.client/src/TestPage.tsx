@@ -1,6 +1,5 @@
-import './TestPage.css';
+﻿import './TestPage.css';
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { fetchWithToken } from './helpers/api';
 import { TestResultVm } from './interfaces/TestResultVmProps';
 
@@ -12,12 +11,14 @@ interface TestVm {
     name: string;
 }
 
-const TestPage: React.FC = () => {
-    const { testId } = useParams<{ testId: string }>();
-    const location = useLocation();
-    const navigate = useNavigate();
-    const folderId = location.state?.folderId; // Get folderId from navigation state
+interface TestPageProps {
+    testId: number;
+    folderId?: number;
+    onClose?: () => void;
+    isModal?: boolean;
+}
 
+const TestPage: React.FC<TestPageProps> = ({ testId, folderId, onClose, isModal }) => {
     const [test, setTest] = useState<TestVm | null>(null);
     const [testResults, setTestResults] = useState<TestResultVm[]>([]);
     const [activeTab, setActiveTab] = useState<number | null>(null);
@@ -43,11 +44,6 @@ const TestPage: React.FC = () => {
         fetchTest();
     }, [testId]);
 
-    const goBack = () => {
-        // Navigate back to the RunPage with the correct folderId
-        navigate(`/RunPage/${test?.runId}`, { state: { folderId } });
-    };
-
     if (loading) {
         return <p>Loading...</p>;
     }
@@ -58,9 +54,11 @@ const TestPage: React.FC = () => {
 
     return (
         <div className="test-page">
-            
-            <h1>{test.name}
-                <button onClick={goBack} className="back-button">Back to Folder</button> {/* Add Back button */}
+            <h1>
+                {test.name}
+                {isModal && onClose && (
+                    <button onClick={onClose} className="testpage-close-btn">Закрыть</button>
+                )}
             </h1>
             <div className="test-results-tabs">
                 <ul className="tabs-list">

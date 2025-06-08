@@ -15,6 +15,8 @@ import { putWithToken } from './helpers/api'; // обязательно импо
 import * as signalR from '@microsoft/signalr'; // Import SignalR
 import { testOutcome } from './enums/testOutcome';
 import { capitalizeFirstLetter } from './helpers/render';
+import Modal from './Modal';
+import TestPage from './TestPage';
 
 interface FolderVm {
     id: number;
@@ -64,6 +66,9 @@ const RunPage: React.FC = () => {
     const [editingOutcomeId, setEditingOutcomeId] = useState<number | null>(null);
     const [editingReviewerId, setEditingReviewerId] = useState<number | null>(null);
     const [bugNumber, setBugNumber] = useState<string>(''); // для Product Bug
+    const [testPageModalOpen, setTestPageModalOpen] = useState(false);
+    const [testPageTestId, setTestPageTestId] = useState<number | null>(null);
+    const [testPageFolderId, setTestPageFolderId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -179,7 +184,9 @@ const RunPage: React.FC = () => {
     }, [connection]);
 
     const handleTestClick = (testId: number, folderId: number) => {
-        navigate(`/TestPage/${testId}`, { state: { folderId } });
+        setTestPageTestId(testId);
+        setTestPageFolderId(folderId);
+        setTestPageModalOpen(true);
     };
 
     const openModalForCell = (mode: EditTestReviewMode, test: TestVm) => {
@@ -674,13 +681,25 @@ const RunPage: React.FC = () => {
                 {renderActions()}
             </div>
             {renderFoldersAndTests(currentFolderId !== null ? currentFolderId : initialParentId)}
-            <EditTestReviewModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                users={users}
-                testReviews={testReviews}
-                editMode={editMode}
-            />
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} contentClass="modal-small">
+                <EditTestReviewModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    users={users}
+                    testReviews={testReviews}
+                    editMode={editMode}
+                />
+            </Modal>
+            <Modal isOpen={testPageModalOpen} onClose={() => setTestPageModalOpen(false)}>
+                {testPageModalOpen && testPageTestId && (
+                    <TestPage
+                        testId={testPageTestId}
+                        folderId={testPageFolderId}
+                        onClose={() => setTestPageModalOpen(false)}
+                        isModal={true}
+                    />
+                )}
+            </Modal>
         </div>
     );
 };
