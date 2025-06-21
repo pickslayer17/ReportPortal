@@ -14,7 +14,17 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<IEnumerable<Folder>> GetAllByAsync(Expression<Func<Folder, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Folders.Where(predicate).ToListAsync(cancellationToken);
+            return await _dbContext.Folders
+                .Where(predicate)
+                .Select(f => new Folder
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    ParentId = f.ParentId,
+                    // ... другие нужные поля
+                    Tests = f.Tests.Select(t => new Test { Id = t.Id }).ToList()
+                })
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Folder> GetByAsync(Expression<Func<Folder, bool>> predicate, CancellationToken cancellationToken = default)

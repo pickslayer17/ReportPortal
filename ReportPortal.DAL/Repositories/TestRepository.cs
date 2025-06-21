@@ -14,7 +14,25 @@ namespace ReportPortal.DAL.Repositories
 
         public async Task<IEnumerable<Test>> GetAllByAsync(Expression<Func<Test, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Tests.Where(predicate).ToListAsync(cancellationToken);
+            return await _dbContext.Tests
+                .Where(predicate)
+                .Select(t => new Test
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    RunId = t.RunId,
+                    FolderId = t.FolderId,
+                    TestResults = t.TestResults
+                        .Select(tr => new TestResult
+                        {
+                            Id = tr.Id,
+                            TestId = tr.TestId,
+                            TestOutcome = tr.TestOutcome
+                            // Не включаем ErrorMessage, StackTrace, ScreenShot!
+                        }).ToList(),
+                    TestReview = t.TestReview
+                })
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Test> GetByAsync(Expression<Func<Test, bool>> predicate, CancellationToken cancellationToken = default)
