@@ -327,6 +327,7 @@ const RunPage: React.FC = () => {
                             />
                         </th>
                         <th className="col-name">Name</th>
+                        <th className="col-testresult">Result</th>
                         <th className="col-outcome">Outcome</th>
                         <th className="col-reviewer">Reviewer</th>
                         <th className="col-comments">Comments</th>
@@ -359,6 +360,16 @@ const RunPage: React.FC = () => {
                                 >
                                     {capitalizeFirstLetter(test.name)}
                                 </span>
+                            </td>
+                            <td className="col-testresult">
+                                {(() => {
+                                    const lastResult = test.testResults?.[test.testResults.length - 1];
+                                    if (!lastResult) return <span style={{ color: '#aaa' }}>—</span>;
+                                    if (lastResult.testOutcome === testOutcome.Passed) return <span style={{ color: 'green' }}>Passed</span>;
+                                    if (lastResult.testOutcome === testOutcome.Failed) return <span style={{ color: 'red' }}>Failed</span>;
+                                    if (lastResult.testOutcome === testOutcome.NotRun) return <span style={{ color: '#aaa' }}>Not Run</span>;
+                                    return <span>{lastResult.testOutcome}</span>;
+                                })()}
                             </td>
                             <td className="col-outcome">
                                 {editingOutcomeId === test.id ? (
