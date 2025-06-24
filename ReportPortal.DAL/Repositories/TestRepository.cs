@@ -30,7 +30,15 @@ namespace ReportPortal.DAL.Repositories
                             TestOutcome = tr.TestOutcome
                             // Не включаем ErrorMessage, StackTrace, ScreenShot!
                         }).ToList(),
-                    TestReview = t.TestReview
+                    TestReview = new TestReview
+                    {
+                        Id = t.TestReview.Id,
+                        Comments = t.TestReview.Comments,
+                        TestId = t.TestReview.TestId,
+                        ProductBug = t.TestReview.ProductBug,
+                        ReviewerId = t.TestReview.ReviewerId,
+                        TestReviewOutcome = t.TestReview.TestReviewOutcome
+                    }
                 })
                 .ToListAsync(cancellationToken);
         }
