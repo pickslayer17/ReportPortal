@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import Layout from './Layout';
 import Login from './Login';
 import MainPage from './MainPage';
@@ -7,6 +7,11 @@ import ProjectPage from './ProjectPage';
 import RunPage from './RunPage';
 import TestPage from './TestPage';
 import ProtectedRoute from './ProtectedRoute';
+
+function TestPageWrapper() {
+    const { testId } = useParams();
+    return <TestPage testId={Number(testId)} />;
+}
 
 function App() {
     return (
@@ -18,7 +23,7 @@ function App() {
                     <Route path="settings" element={<SettingsPage />} />
                     <Route path="ProjectPage/:projectId" element={<ProjectPage />} />
                     <Route path="RunPage/:runId" element={<RunPage />} />
-                    <Route path="TestPage/:testId" element={<TestPage />} />
+                    <Route path="TestPage/:testId" element={<TestPageWrapper />} />
                 </Route>
             </Routes>
         </Router>

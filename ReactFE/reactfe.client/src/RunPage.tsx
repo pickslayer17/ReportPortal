@@ -8,7 +8,7 @@ import { EditTestReviewMode } from './enums/EditTestReviewMode'
 import { TestVm, TestReviewOutcome, TestReviewVm } from './interfaces/TestVmProps';
 import { UserVm } from './interfaces/UserVmProps';
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { deleteWithToken } from './helpers/api';
 import { fetchWithToken } from './helpers/api';
 import { putWithToken } from './helpers/api'; // обязательно импортировать
@@ -48,7 +48,6 @@ const RunPage: React.FC = () => {
     const { runId } = useParams<{ runId: string }>();
     const location = useLocation();
     const state = location.state as TestPageState;
-    const navigate = useNavigate();
     const [folders, setFolders] = useState<FolderVm[]>([]);
     const [tests, setTests] = useState<TestVm[]>([]);
     const [users, setUsers] = useState<UserVm[]>([]);
@@ -65,10 +64,8 @@ const RunPage: React.FC = () => {
     const [editMode, setEditMode] = useState<EditTestReviewMode>(EditTestReviewMode.all);
     const [editingOutcomeId, setEditingOutcomeId] = useState<number | null>(null);
     const [editingReviewerId, setEditingReviewerId] = useState<number | null>(null);
-    const [bugNumber, setBugNumber] = useState<string>(''); // для Product Bug
     const [testPageModalOpen, setTestPageModalOpen] = useState(false);
     const [testPageTestId, setTestPageTestId] = useState<number | null>(null);
-    const [testPageFolderId, setTestPageFolderId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchFoldersAndTests = async () => {
@@ -183,9 +180,8 @@ const RunPage: React.FC = () => {
         }
     }, [connection]);
 
-    const handleTestClick = (testId: number, folderId: number) => {
+    const handleTestClick = (testId: number) => {
         setTestPageTestId(testId);
-        setTestPageFolderId(folderId);
         setTestPageModalOpen(true);
     };
 
@@ -356,7 +352,7 @@ const RunPage: React.FC = () => {
                                 <span
                                     className="test-name"
                                     title={test.name}
-                                    onClick={() => handleTestClick(test.id, test.folderId)}
+                                    onClick={() => handleTestClick(test.id)}
                                 >
                                     {capitalizeFirstLetter(test.name)}
                                 </span>
@@ -464,45 +460,6 @@ const RunPage: React.FC = () => {
         );
     };
 
-    const renderTestComments = (test: TestVm) => (
-        <td
-            className="test-comment-container"
-            onClick={() => openModalForCell(EditTestReviewMode.comments, test)}
-            style={{ cursor: 'pointer' }} // Add pointer cursor for clickable effect
-        >
-            {test.testReview.comments}
-        </td>
-    );
-
-    const renderTestReviewer = (test: TestVm) => (
-        <td
-            className="test-reviewer-container"
-            onClick={() => openModalForCell(EditTestReviewMode.reviewer, test)}
-            style={{ cursor: 'pointer' }} // Add pointer cursor for clickable effect
-        >
-            {reviewerEmails[test.testReview.reviewerId] || '-'}
-        </td>
-    );
-
-    const renderTestOutcome = (outcome: TestReviewOutcome, test: TestVm) => {
-        return (
-            <td
-                className="test-review-outcome-container"
-                onClick={() => openModalForCell(EditTestReviewMode.outcome, test)}
-                style={{ cursor: 'pointer' }} // Add pointer cursor for clickable effect
-            >
-                {outcome === TestReviewOutcome.ToInvestigate && <span className="to-investigate">?</span>}
-                {outcome === TestReviewOutcome.NotRepro && <span className="not-repro">NR</span>}
-                {outcome === TestReviewOutcome.ProductBug && (
-                    <div className="product-bug">
-                        BUG
-                        <span className="bug-id">{test.testReview.productBug?? ''}</span>
-                    </div>
-                )}
-            </td>
-        );
-    };
-
     const getBreadcrumbPath = (): { name: string; id: number | null }[] => {
         const path: { name: string; id: number | null }[] = [];
         let currentFolder = folders.find(folder => folder.id === currentFolderId);
@@ -552,7 +509,6 @@ const RunPage: React.FC = () => {
         );
     };
 
-
     const handleActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const action = event.target.value;
 
@@ -575,7 +531,7 @@ const RunPage: React.FC = () => {
                 mode = null;
         }
 
-        if (mode!=null) {
+        if (mode != null) {
             openModal(mode);
         }
 
@@ -616,7 +572,6 @@ const RunPage: React.FC = () => {
 
         // Если выбран Product Bug — открываем попап с выбранным Product Bug
         if (newOutcome === TestReviewOutcome.ProductBug) {
-            // Передаём в testReview нужный outcome
             setTestReviews([
                 {
                     ...test.testReview,
@@ -629,10 +584,12 @@ const RunPage: React.FC = () => {
             return;
         }
 
+        // Исправление: productBug не трогаем, если outcome не ProductBug
+        const { productBug, ...restReview } = test.testReview;
         const updatedReview = {
-            ...test.testReview,
-            testReviewOutcome: newOutcome,
-            productBug: null
+            ...restReview,
+            testReviewOutcome: newOutcome
+            // productBug не включаем, чтобы не было null
         };
 
         try {
@@ -643,7 +600,7 @@ const RunPage: React.FC = () => {
             setTests(prev =>
                 prev.map(t =>
                     t.id === test.id
-                        ? { ...t, testReview: updatedReview }
+                        ? { ...t, testReview: { ...t.testReview, ...updatedReview } }
                         : t
                 )
             );
@@ -705,7 +662,6 @@ const RunPage: React.FC = () => {
                 {testPageModalOpen && testPageTestId && (
                     <TestPage
                         testId={testPageTestId}
-                        folderId={testPageFolderId}
                         onClose={() => setTestPageModalOpen(false)}
                         isModal={true}
                     />

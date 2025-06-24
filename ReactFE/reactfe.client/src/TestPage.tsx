@@ -15,7 +15,6 @@ interface TestVm {
 
 interface TestPageProps {
     testId: number;
-    folderId?: number;
     onClose?: () => void;
     isModal?: boolean;
 }
@@ -50,7 +49,7 @@ function renderStackTrace(stackTrace?: string) {
     );
 }
 
-const TestPage: React.FC<TestPageProps> = ({ testId, folderId, onClose, isModal }) => {
+const TestPage: React.FC<TestPageProps> = ({ testId, onClose, isModal }) => {
     const [test, setTest] = useState<TestVm | null>(null);
     const [testResults, setTestResults] = useState<TestResultVm[]>([]);
     const [activeTab, setActiveTab] = useState<number | null>(null);

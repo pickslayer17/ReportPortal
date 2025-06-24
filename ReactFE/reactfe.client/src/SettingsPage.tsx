@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react'; // Было: import React, { ... }
 import './SettingsPage.css';
 import { postWithToken, fetchWithToken } from './helpers/api';
 import { getUserRoleFromToken } from './helpers/auth';
@@ -43,7 +43,7 @@ function SettingsPage() {
 
     useEffect(() => {
         const role = getUserRoleFromToken();
-        setIsAdmin(role && role.toLowerCase() === 'admin');
+        setIsAdmin(!!role && role.toLowerCase() === 'admin'); // Было: setIsAdmin(role && role.toLowerCase() === 'admin');
     }, []);
 
     const openModal = (type: 'Project' | 'User') => {
