@@ -13,21 +13,18 @@ namespace ReportPortal.BL.Services
         private readonly ITestRepository _testRepository;
         private readonly ITestResultRepository _testResultRepository;
         private readonly IMapper _mapper;
-        private readonly IFolderService _folderService;
         private readonly IFolderRepository _folderRepository;
         private readonly ITestReviewRepository _testReviewRepository;
 
         public TestService(
             ITestRepository testRepository,
             IMapper mapper,
-            IFolderService folderService,
             ITestResultRepository testResultRepository,
             IFolderRepository folderRepository,
             ITestReviewRepository testReviewRepository)
         {
             _testRepository = testRepository;
             _mapper = mapper;
-            _folderService = folderService;
             _testResultRepository = testResultRepository;
             _folderRepository = folderRepository;
             _testReviewRepository = testReviewRepository;
@@ -35,15 +32,12 @@ namespace ReportPortal.BL.Services
 
         public async Task<TestDto> CreateAsync(TestDto testDto, int folderId, CancellationToken cancellationToken = default)
         {
-            /// verify if test with such name already exists
-            var folder = await _folderService.GetByIdAsync(folderId, cancellationToken);
-            if (folder.Tests != null && folder.Tests.Count > 0)
-            {
-                foreach (var test in folder.Tests)
-                {
-                    if (test.Name == testDto.Name) throw new TestWithSuchNameAlreadyExists($"Test with name '{testDto.Name}' already exists in folder with id {folderId}");
-                }
-            }
+            // verify if test with such name already exists in the folder (checked in SQL,
+            // so it works regardless of lazy/no-tracking loading of folder.Tests)
+            var alreadyExists = await _testRepository.ExistsAsync(
+                t => t.FolderId == folderId && t.Name == testDto.Name, cancellationToken);
+            if (alreadyExists)
+                throw new TestWithSuchNameAlreadyExists($"Test with name '{testDto.Name}' already exists in folder with id {folderId}");
 
             // insert test to databse
             var testRunItem = _mapper.Map<Test>(testDto);
@@ -89,9 +83,10 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TestDto>> GetAllByFolderIdAsync(int folderId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TestDto>> GetAllByFolderIdAsync(int folderId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var tests = await _testRepository.GetAllByAsync(t => t.FolderId == folderId, cancellationToken);
+            return tests.Select(t => _mapper.Map<TestDto>(t));
         }
 
         public async Task<IEnumerable<TestDto>> GetAllByRunIdAsync(int runId, CancellationToken cancellationToken = default)
@@ -100,6 +95,23 @@ namespace ReportPortal.BL.Services
             var testsDto = tests.Select(t => _mapper.Map<TestDto>(t));
 
             return testsDto;
+        }
+
+        public async Task<IEnumerable<FolderStatsDto>> GetFolderStatsByRunAsync(int runId, CancellationToken cancellationToken = default)
+        {
+            var stats = await _testRepository.GetFolderStatsByRunAsync(runId, cancellationToken);
+
+            return stats.Select(s => new FolderStatsDto
+            {
+                FolderId = s.FolderId,
+                Total = s.Total,
+                Passed = s.Passed,
+                Failed = s.Failed,
+                NotRun = s.NotRun,
+                ToInvestigate = s.ToInvestigate,
+                NotRepro = s.NotRepro,
+                ProductBug = s.ProductBug,
+            });
         }
 
         public Task<TestDto> GetByAsync(Expression<Func<TestDto, bool>> predicate, CancellationToken cancellationToken = default)

@@ -36,6 +36,32 @@ namespace ReportPortal.DAL.Repositories
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task RemoveRunCascadeAsync(int runId, CancellationToken cancellationToken = default)
+        {
+            // Delete children before parents to satisfy the FK graph:
+            // TestResults/TestReviews -> Tests -> Folders -> Run.
+            await _dbContext.TestResults.Where(tr => tr.Test.RunId == runId).ExecuteDeleteAsync(cancellationToken);
+            await _dbContext.TestReviews.Where(rv => rv.Test.RunId == runId).ExecuteDeleteAsync(cancellationToken);
+            await _dbContext.Tests.Where(t => t.RunId == runId).ExecuteDeleteAsync(cancellationToken);
+
+            // Folders self-reference with DeleteBehavior.Restrict, so a run's folders
+            // must be removed from the deepest level up to the root.
+            var maxLevel = await _dbContext.Folders
+                .Where(f => f.RunId == runId)
+                .Select(f => (int?)f.FolderLevel)
+                .MaxAsync(cancellationToken) ?? -1;
+
+            for (var level = maxLevel; level >= 0; level--)
+            {
+                var currentLevel = level;
+                await _dbContext.Folders
+                    .Where(f => f.RunId == runId && f.FolderLevel == currentLevel)
+                    .ExecuteDeleteAsync(cancellationToken);
+            }
+
+            await _dbContext.Runs.Where(r => r.Id == runId).ExecuteDeleteAsync(cancellationToken);
+        }
+
         public Task<Run> UpdateItemAsync(Run item, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

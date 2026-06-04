@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ReportPortal.BL.Maps;
 using ReportPortal.BL.Services;
+using ReportPortal.BL.Services.Caching;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL;
 using ReportPortal.DAL.Repositories;
@@ -16,20 +17,19 @@ using ReportPortal.Services.Interfaces;
 using ReportPortal.DAL.Seeders;
 using System.Text;
 using ReportPortal.MiddleWare;
+using ReportPortal.BL.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string backendUrl = Environment.GetEnvironmentVariable("ASPNETCORE_URLS")
-                    ?? builder.Configuration["Urls"];
+// Single source of configuration: urls, connection string and JWT all come from the
+// "AppSettings" section (appsettings.json). Standard env-var override still works via
+// AppSettings__BackendUrl / AppSettings__ConnectionString etc.
+var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>()
+                  ?? throw new InvalidOperationException("Missing 'AppSettings' configuration section.");
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
-string frontEndUrl = Environment.GetEnvironmentVariable("FrontEndUrl")
-                     ?? builder.Configuration["FrontEndUrl"];
-
-string connectionString = Environment.GetEnvironmentVariable("DefaultConnection")
-                          ?? builder.Configuration.GetConnectionString("DefaultConnection");
-
-builder.WebHost.UseUrls(backendUrl);
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString));
+builder.WebHost.UseUrls(appSettings.BackendUrl);
+builder.Services.AddDbContext<ApplicationContext>(options => options.UseLazyLoadingProxies().UseSqlServer(appSettings.ConnectionString));
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -51,6 +51,7 @@ builder.Services.AddScoped<ITestRepository, TestRepository>();
 builder.Services.AddScoped<IRunRepository, RunRepository>();
 builder.Services.AddScoped<ITestResultRepository, TestResultRepository>();
 builder.Services.AddScoped<ITestReviewRepository, TestReviewRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<IRunService, RunService>();
@@ -58,6 +59,7 @@ builder.Services.AddScoped<ITestService, TestService>();
 builder.Services.AddScoped<ITestResultService, TestResultService>();
 builder.Services.AddScoped<ITestReviewService, TestReviewService>();
 builder.Services.AddScoped<ITrxParserService, TrxParserService>();
+builder.Services.AddSingleton<IFolderTreeCache, FolderTreeCache>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(ServiceMappingProfile));
@@ -72,9 +74,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Issuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            ValidIssuer = appSettings.Jwt.Issuer,
+            ValidAudience = appSettings.Jwt.Issuer,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.Jwt.Key))
         };
     });
 
@@ -84,7 +86,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsPolicyName, builder =>
     {
-        builder.WithOrigins(frontEndUrl)
+        builder.WithOrigins(appSettings.FrontendUrl)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -112,7 +114,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(corsPolicyName);
 app.UseRouting();
 
-app.UseHttpsRedirection();
+// NOTE: running over plain HTTP for now (no UseHttpsRedirection). HTTPS/dev-cert is the next step.
 
 // Authentication and Authorization should come after CORS
 app.UseAuthentication();

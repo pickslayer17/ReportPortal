@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ReportPortal.BL.Models;
+using ReportPortal.BL.Services.Caching;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
@@ -16,6 +17,8 @@ namespace ReportPortal.BL.Services
         private readonly ITestResultRepository _testResultRepository;
         private readonly IRunRepository _runRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IFolderTreeCache _folderTreeCache;
         private readonly IMapper _mapper;
 
         public RunService(
@@ -24,6 +27,8 @@ namespace ReportPortal.BL.Services
             ITestRepository testRepository,
             ITestResultRepository testResultRepository,
             IProjectRepository projectRepository,
+            IUnitOfWork unitOfWork,
+            IFolderTreeCache folderTreeCache,
             IMapper mapper,
             IFolderService folderService)
         {
@@ -32,6 +37,8 @@ namespace ReportPortal.BL.Services
             _testRepository = testRepository;
             _testResultRepository = testResultRepository;
             _projectRepository = projectRepository;
+            _unitOfWork = unitOfWork;
+            _folderTreeCache = folderTreeCache;
             _mapper = mapper;
             _folderService = folderService;
         }
@@ -43,29 +50,46 @@ namespace ReportPortal.BL.Services
 
             var run = _mapper.Map<Run>(runForCreationDto);
 
-            var runId = await _runRepository.InsertAsync(run);
+            RunDto runCreatedDto = null;
 
-            var runCreatedDto = new RunDto
+            // Run + its root folder must be created together or not at all.
+            await _unitOfWork.ExecuteInTransactionAsync(async ct =>
             {
-                Id = runId,
-                ProjectId = project.Id,
-                Name = runForCreationDto.Name,
-            };
+                var runId = await _runRepository.InsertAsync(run, ct);
+                var rootFolderId = await _folderService.CreateRootFolderAsync(runId, ct);
 
-            var rootFolderId = _folderService.CreateRootFolderAsync(runCreatedDto.Id, cancellationToken).Result;
-            runCreatedDto.RootFolderId = rootFolderId;
+                runCreatedDto = new RunDto
+                {
+                    Id = runId,
+                    ProjectId = project.Id,
+                    Name = runForCreationDto.Name,
+                    RootFolderId = rootFolderId,
+                };
+            }, cancellationToken);
 
             return runCreatedDto;
         }
 
         public async Task DeleteByIdAsync(int runId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await _unitOfWork.ExecuteInTransactionAsync(
+                ct => _runRepository.RemoveRunCascadeAsync(runId, ct),
+                cancellationToken);
+
+            // Run and all its folders are gone -> drop its cached tree.
+            _folderTreeCache.Invalidate(runId);
         }
 
         public Task<IEnumerable<RunDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<RunDto>> GetByProjectAsync(int projectId, CancellationToken cancellationToken = default)
+        {
+            // Filter pushed to SQL (WHERE ProjectId = @p) instead of loading every run and filtering in memory.
+            var runs = await _runRepository.GetAllByAsync(r => r.ProjectId == projectId, cancellationToken);
+            return runs.Select(rm => _mapper.Map<RunDto>(rm));
         }
 
         public async Task<IEnumerable<RunDto>> GetAllByAsync(Expression<Func<RunDto, bool>> predicate, CancellationToken cancellationToken = default)

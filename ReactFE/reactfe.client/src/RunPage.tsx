@@ -12,6 +12,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { deleteWithToken } from './helpers/api';
 import { fetchWithToken } from './helpers/api';
 import { putWithToken } from './helpers/api'; // обязательно импортировать
+import { API_URL as apiUrl } from './config';
 import * as signalR from '@microsoft/signalr'; // Import SignalR
 import { testOutcome } from './enums/testOutcome';
 import { capitalizeFirstLetter } from './helpers/render';
@@ -44,7 +45,6 @@ const outcomeOptions = [
 ];
 
 const RunPage: React.FC = () => {
-    const apiUrl = import.meta.env.VITE_API_URL;
     const { runId } = useParams<{ runId: string }>();
     const location = useLocation();
     const state = location.state as TestPageState;

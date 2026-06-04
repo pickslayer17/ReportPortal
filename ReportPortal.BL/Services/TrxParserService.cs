@@ -1,26 +1,39 @@
-using ReportPortal.BL.Constatnts;
 using ReportPortal.BL.Helpers;
-using ReportPortal.BL.Models;
 using ReportPortal.BL.Models.TrxModels;
+using ReportPortal.BL.Services.Caching;
+using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
 using ReportPortal.DAL.Models.RunProjectManagement;
+using ReportPortal.DAL.Repositories.Interfaces;
 
 namespace ReportPortal.BL.Services.Interfaces
 {
     public class TrxParserService : ITrxParserService
     {
-        private readonly ITestService _testService;
         private readonly IFolderService _folderService;
-        private readonly ITestResultService _testResultService;
+        private readonly ITestRepository _testRepository;
+        private readonly ITestReviewRepository _testReviewRepository;
+        private readonly ITestResultRepository _testResultRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IFolderTreeCache _folderTreeCache;
 
-        public TrxParserService(ITestService testService, IFolderService folderService, ITestResultService testResultService)
+        public TrxParserService(
+            IFolderService folderService,
+            ITestRepository testRepository,
+            ITestReviewRepository testReviewRepository,
+            ITestResultRepository testResultRepository,
+            IUnitOfWork unitOfWork,
+            IFolderTreeCache folderTreeCache)
         {
-            _testService = testService;
             _folderService = folderService;
-            _testResultService = testResultService;
+            _testRepository = testRepository;
+            _testReviewRepository = testReviewRepository;
+            _testResultRepository = testResultRepository;
+            _unitOfWork = unitOfWork;
+            _folderTreeCache = folderTreeCache;
         }
 
-        public async Task AddTestsFromXml(string xmlFilePath, bool isNeedToRemovePassed = true, int runId = default, CancellationToken cancellationToken = default)
+        public async Task AddTestsFromXml(string xmlFilePath, int runId = default, CancellationToken cancellationToken = default)
         {
             string xml;
             using (var reader = new StreamReader(xmlFilePath))
@@ -28,54 +41,89 @@ namespace ReportPortal.BL.Services.Interfaces
                 xml = await reader.ReadToEndAsync();
             }
 
-            var tests = TrxHelper.GetTestsFromTrxXml(xml, isNeedToRemovePassed, runId);
+            var tests = TrxHelper.GetTestsFromTrxXml(xml, runId);
+            if (tests.Count == 0) return;
 
-            runId = 2;
-           
+            // Folder path for a test = its full name minus the method name.
+            var folderPathByTest = tests.ToDictionary(
+                t => t,
+                t => t.FullName.Substring(0, t.FullName.LastIndexOf('.')));
 
-            foreach (var test in tests)
+            try
             {
-                var folderPath = test.FullName.Substring(0, test.FullName.LastIndexOf('.'));
-                var testDto = new TestDto
+                await _unitOfWork.ExecuteInTransactionAsync(async ct =>
                 {
-                    Name = test.Name,
-                    RunId = runId,
-                    Path = folderPath,
+                    // 1) Resolve/create every folder in one batch (write-through to the tree cache).
+                    var folderIdByPath = await _folderService.GetIdOrAddFoldersInRunAsync(
+                        runId, folderPathByTest.Values.Distinct().ToList(), ct);
 
-                    
-                };
-                var folderId = await _folderService.GetIdOrAddFolderInRunAsync(runId, folderPath, cancellationToken);
-                var testCreated = await _testService.CreateAsync(testDto, folderId, cancellationToken);
-                var testResultDto = new TestResultDto
-                {
-                    TestId = testCreated.Id,
-                    RunId = runId,
-                    ErrorMessage = test.Message?? string.Empty,
-                    StackTrace = test.StackTrace?? string.Empty,
-                    TestOutcome = GetOutcome(test.Outcome),
-                };
+                    // 2) Dedup by (folder, name) against what's already stored and within this batch.
+                    var existing = await _testRepository.GetByRunAsync(runId, ct);
+                    var seen = new HashSet<(int folderId, string name)>(
+                        existing.Select(e => (e.FolderId, e.Name.ToLower())));
 
-                await _testResultService.AddTestResultToTestAsync(testCreated.Id, testResultDto, cancellationToken);
+                    var toInsert = new List<(UnitTestModel Source, Test Entity)>();
+                    foreach (var test in tests)
+                    {
+                        var folderId = folderIdByPath[folderPathByTest[test]];
+                        if (!seen.Add((folderId, test.Name.ToLower())))
+                            continue; // duplicate name in the same folder -> skip
+
+                        toInsert.Add((test, new Test { Name = test.Name, RunId = runId, FolderId = folderId }));
+                    }
+
+                    if (toInsert.Count == 0) return;
+
+                    // 3) Batch-insert tests, then their reviews and results.
+                    await _testRepository.InsertRangeAsync(toInsert.Select(x => x.Entity), ct);
+
+                    var reviews = toInsert.Select(x => new TestReview { TestId = x.Entity.Id }).ToList();
+                    var results = toInsert.Select(x => new TestResult
+                    {
+                        TestId = x.Entity.Id,
+                        ErrorMessage = x.Source.Message ?? string.Empty,
+                        StackTrace = x.Source.StackTrace ?? string.Empty,
+                        TestOutcome = GetOutcome(x.Source.Outcome),
+                    }).ToList();
+
+                    await _testReviewRepository.InsertRangeAsync(reviews, ct);
+                    await _testResultRepository.InsertRangeAsync(results, ct);
+                }, cancellationToken);
+            }
+            catch
+            {
+                // The folder cache is written through before later steps; if the transaction
+                // rolled back, drop the cached tree so it reloads from committed DB state.
+                _folderTreeCache.Invalidate(runId);
+                throw;
             }
         }
 
-        private TestOutcome GetOutcome(string nUnitOutcome)
+        private static TestOutcome GetOutcome(string trxOutcome)
         {
-            switch(nUnitOutcome)
+            // TRX outcomes are richer than our three buckets. Map known states; treat
+            // anything unrecognized as Failed so problems surface rather than hide.
+            switch (trxOutcome?.Trim().ToLowerInvariant())
             {
-                case TrxTestOutcome.Passed:
+                case "passed":
                     return TestOutcome.Passed;
-                    break;
-                case TrxTestOutcome.Failed:
+
+                case "failed":
+                case "error":
+                case "timeout":
+                case "aborted":
                     return TestOutcome.Failed;
-                    break;
-                case TrxTestOutcome.NotExecuted:
+
+                case "notexecuted":
+                case "inconclusive":
+                case "warning":
+                case "pending":
+                case "notrunnable":
+                case "disconnected":
                     return TestOutcome.NotRun;
-                    break;
+
                 default:
-                    throw new NotImplementedException();
-
-
+                    return TestOutcome.Failed;
             }
         }
     }

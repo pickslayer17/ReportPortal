@@ -1,4 +1,4 @@
-﻿const apiUrl = import.meta.env.VITE_API_URL;
+﻿import { API_URL as apiUrl } from '../config';
 
 export const fetchWithToken = async (endpoint: string, options: RequestInit = {}) => {
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];

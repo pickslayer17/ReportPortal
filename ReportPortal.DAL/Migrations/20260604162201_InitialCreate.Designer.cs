@@ -12,8 +12,8 @@ using ReportPortal.DAL;
 namespace ReportPortal.DAL.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250225145514_INIT")]
-    partial class INIT
+    [Migration("20260604162201_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -137,6 +137,8 @@ namespace ReportPortal.DAL.Migrations
 
                     b.HasIndex("FolderId");
 
+                    b.HasIndex("RunId");
+
                     b.ToTable("Tests", "dbo");
                 });
 
@@ -155,7 +157,6 @@ namespace ReportPortal.DAL.Migrations
                         .HasColumnName("ErrorMessage");
 
                     b.Property<byte[]>("ScreenShot")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("ScreenShot");
 
@@ -245,7 +246,7 @@ namespace ReportPortal.DAL.Migrations
                     b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Folder", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Run", "Run")
                         .WithMany("Folders")

@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Models.Dto;
+using ReportPortal.BL.Configuration;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,12 +13,12 @@ namespace ReportPortal.BL.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IConfiguration _configuration;
+        private readonly AppSettings _appSettings;
         private readonly IUserRepository _userRepository;
 
-        public AuthenticationService(IConfiguration configuration, IUserRepository userRepository)
+        public AuthenticationService(IOptions<AppSettings> appSettings, IUserRepository userRepository)
         {
-            _configuration = configuration;
+            _appSettings = appSettings.Value;
             _userRepository = userRepository;
         }
 
@@ -28,17 +29,9 @@ namespace ReportPortal.BL.Services
             var hashPasswordFromDb = userFromDb.Password;
 
             UserDto user = null;
-            try
+            if (VerifyHash(hashPasswordFromDb, login.Password))
             {
-                if (VerifyHash(hashPasswordFromDb, login.Password))
-                {
-                    user = new UserDto { Email = userFromDb.Email, UserRole = userFromDb.UserRole };
-                }
-
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                throw ex;
+                user = new UserDto { Id = userFromDb.Id ?? 0, Email = userFromDb.Email, UserRole = userFromDb.UserRole };
             }
 
             return user;
@@ -46,16 +39,17 @@ namespace ReportPortal.BL.Services
 
         public string GenerateJSONWebToken(UserDto userInfo)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Jwt.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>();
 
+            claims.Add(new Claim("UserId", userInfo.Id.ToString()));
             claims.Add(new Claim("Email", userInfo.Email));
             claims.Add(new Claim(ClaimTypes.Role, userInfo.UserRole == DAL.Enums.UserRole.Administrator? "Admin" : "User"));
 
             var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Issuer"],
+                _appSettings.Jwt.Issuer,
+                _appSettings.Jwt.Issuer,
                 claims,
                 expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials);
@@ -63,37 +57,39 @@ namespace ReportPortal.BL.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateSalt()
-        {
-            return new Guid().ToString();
-        }
+        private const int SaltSize = 16;
+        private const int HashSize = 32;
+        private const int Iterations = 210_000;
 
         public string HashPassword(string password)
         {
-            byte[] salt;
-            new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
-            byte[] hash = pbkdf2.GetBytes(20);
-            byte[] hashBytes = new byte[36];
-            Array.Copy(salt, 0, hashBytes, 0, 16);
-            Array.Copy(hash, 0, hashBytes, 16, 20);
-            string savedPasswordHash = Convert.ToBase64String(hashBytes);
+            byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
+            using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
+            byte[] hash = pbkdf2.GetBytes(HashSize);
 
-            return savedPasswordHash;
+            byte[] hashBytes = new byte[SaltSize + HashSize];
+            Array.Copy(salt, 0, hashBytes, 0, SaltSize);
+            Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
+
+            return Convert.ToBase64String(hashBytes);
         }
 
-        public bool VerifyHash(string savedPasswordHash, string userEnteredPasword)
+        public bool VerifyHash(string savedPasswordHash, string userEnteredPassword)
         {
-            byte[] salt = new byte[16];
             byte[] hashBytes = Convert.FromBase64String(savedPasswordHash);
-            Array.Copy(hashBytes, 0, salt, 0, 16);
-            var pbkdf2 = new Rfc2898DeriveBytes(userEnteredPasword, salt, 100000);
-            byte[] hash = pbkdf2.GetBytes(20);
-            for (int i = 0; i < 20; i++)
-                if (hashBytes[i + 16] != hash[i])
-                    throw new UnauthorizedAccessException();
+            if (hashBytes.Length != SaltSize + HashSize) return false;
 
-            return true;
+            byte[] salt = new byte[SaltSize];
+            Array.Copy(hashBytes, 0, salt, 0, SaltSize);
+
+            using var pbkdf2 = new Rfc2898DeriveBytes(userEnteredPassword, salt, Iterations, HashAlgorithmName.SHA256);
+            byte[] hash = pbkdf2.GetBytes(HashSize);
+
+            byte[] storedHash = new byte[HashSize];
+            Array.Copy(hashBytes, SaltSize, storedHash, 0, HashSize);
+
+            // Constant-time comparison to avoid leaking timing information.
+            return CryptographicOperations.FixedTimeEquals(hash, storedHash);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReportPortal.DAL.Enums;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.DAL.Models.RunProjectManagement;
 using ReportPortal.DAL.Repositories.Interfaces;
@@ -49,6 +50,59 @@ namespace ReportPortal.DAL.Repositories
             if (test == null) throw new TestNotFoundException($"There is no test with such predicate {predicate}");
 
             return test;
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<Test, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Tests.AnyAsync(predicate, cancellationToken);
+        }
+
+        public async Task<List<Test>> GetByRunAsync(int runId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Tests
+                .AsNoTracking()
+                .Where(t => t.RunId == runId)
+                .Select(t => new Test { Id = t.Id, Name = t.Name, FolderId = t.FolderId })
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task InsertRangeAsync(IEnumerable<Test> tests, CancellationToken cancellationToken = default)
+        {
+            await _dbContext.Tests.AddRangeAsync(tests, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<List<FolderTestStats>> GetFolderStatsByRunAsync(int runId, CancellationToken cancellationToken = default)
+        {
+            // Pull only the few columns we need (folder + latest outcome + review), never the full models.
+            var rows = await _dbContext.Tests
+                .AsNoTracking()
+                .Where(t => t.RunId == runId)
+                .Select(t => new
+                {
+                    t.FolderId,
+                    Outcome = t.TestResults
+                        .OrderByDescending(r => r.Id)
+                        .Select(r => (TestOutcome?)r.TestOutcome)
+                        .FirstOrDefault(),
+                    Review = t.TestReview != null ? (TestReviewOutcome?)t.TestReview.TestReviewOutcome : null
+                })
+                .ToListAsync(cancellationToken);
+
+            return rows
+                .GroupBy(x => x.FolderId)
+                .Select(g => new FolderTestStats
+                {
+                    FolderId = g.Key,
+                    Total = g.Count(),
+                    Passed = g.Count(x => x.Outcome == TestOutcome.Passed),
+                    Failed = g.Count(x => x.Outcome == TestOutcome.Failed),
+                    NotRun = g.Count(x => x.Outcome == TestOutcome.NotRun),
+                    ToInvestigate = g.Count(x => x.Review == TestReviewOutcome.ToInvestigate),
+                    NotRepro = g.Count(x => x.Review == TestReviewOutcome.NotRepro),
+                    ProductBug = g.Count(x => x.Review == TestReviewOutcome.ProductBug),
+                })
+                .ToList();
         }
 
         public async Task<int> InsertAsync(Test testRunItem, CancellationToken cancellationToken = default)

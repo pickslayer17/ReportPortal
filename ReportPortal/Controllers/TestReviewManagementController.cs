@@ -40,10 +40,21 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateTestReview([FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
-            var testReviewDto = _mapper.Map<TestReviewDto>(testReview);
-            var testReviewDtoUpdated = await _testReviewService.UpdateTestReviewAsync(testReviewDto, cancellationToken);
+            var reviewerId = CurrentUserId();
+            if (reviewerId == null) return Unauthorized();
 
-            var testDtoForHub = await _testService.GetByIdAsync(testReviewDto.TestId, cancellationToken);
+            // Targeted update (no blanket SetValues) and the reviewer is the authenticated user, not the body.
+            var testReviewUpdateDto = new TestReviewUpdateDto
+            {
+                Id = testReview.Id,
+                ReviewerId = new Optional<int?>(reviewerId),
+                Comments = new Optional<string?>(testReview.Comments),
+                TestReviewOutcome = new Optional<TestReviewOutcome>(testReview.TestReviewOutcome),
+                ProductBug = testReview.ProductBug
+            };
+            var testReviewDtoUpdated = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto, cancellationToken);
+
+            var testDtoForHub = await _testService.GetByIdAsync(testReviewDtoUpdated.TestId, cancellationToken);
             await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDtoUpdated));
@@ -51,12 +62,16 @@ namespace ReportPortal.Controllers
 
         [HttpPut("TestReview/{id:int}/UpdateReviewer")]
         [Authorize]
-        public async Task<IActionResult> UpdateReviewer(int id, [FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdateReviewer(int id, CancellationToken cancellationToken = default)
         {
+            var reviewerId = CurrentUserId();
+            if (reviewerId == null) return Unauthorized();
+
+            // Reviewer is taken from the authenticated user (claims), never from the request body.
             var testReviewUpdateDto = new TestReviewUpdateDto
             {
                 Id = id,
-                ReviewerId = new Optional<int?>(testReview.ReviewerId)
+                ReviewerId = new Optional<int?>(reviewerId)
             };
             var testReviewDto = await _testReviewService.UpdateTestReviewAsync(testReviewUpdateDto, cancellationToken);
 
@@ -100,6 +115,11 @@ namespace ReportPortal.Controllers
             await _hubContext.Clients.Group(testDtoForHub.RunId.ToString()).SendAsync("UpdateTest", _mapper.Map<TestVm>(testDtoForHub), cancellationToken);
 
             return Ok(_mapper.Map<TestReviewVm>(testReviewDto));
+        }
+
+        private int? CurrentUserId()
+        {
+            return int.TryParse(User.FindFirst("UserId")?.Value, out var id) ? id : null;
         }
     }
 }

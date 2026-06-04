@@ -32,6 +32,12 @@ namespace ReportPortal.DAL.Repositories
             return testReview.Id;
         }
 
+        public async Task InsertRangeAsync(IEnumerable<TestReview> testReviews, CancellationToken cancellationToken = default)
+        {
+            await _dbContext.TestReviews.AddRangeAsync(testReviews, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         public Task RemoveByIdAsync(int itemId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

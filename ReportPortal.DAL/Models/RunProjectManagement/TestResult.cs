@@ -9,7 +9,7 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
         public virtual Test Test { get; set; }
         public string ErrorMessage { get; set; }
         public string StackTrace { get; set; }
-        public byte[] ScreenShot { get; set; }
+        public byte[]? ScreenShot { get; set; }
         public TestOutcome TestOutcome { get; set; }
     }
 

@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /ReportPortal.DAL/Migrations/20241022074803_TestReview.cs
 /ReportPortal.DAL/Migrations/20241022074803_TestReview.Designer.cs
+
+# Claude Code local session state & permissions (may contain secrets — never commit)
+.claude/

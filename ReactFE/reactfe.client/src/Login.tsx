@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { fetchWithToken } from './helpers/api';
-
-const apiUrl = import.meta.env.VITE_API_URL;
+import { API_URL as apiUrl } from './config';
 
 function Login() {
     const [email, setEmail] = useState('');

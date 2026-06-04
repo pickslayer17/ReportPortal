@@ -33,6 +33,12 @@ namespace ReportPortal.DAL.Repositories
             return testResult.Id;
         }
 
+        public async Task InsertRangeAsync(IEnumerable<TestResult> testResults, CancellationToken cancellationToken = default)
+        {
+            await _dbContext.TestResults.AddRangeAsync(testResults, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task RemoveByIdAsync(int testResultId, CancellationToken cancellationToken = default)
         {
             var testResult = await GetByAsync(tr => tr.Id == testResultId, cancellationToken);

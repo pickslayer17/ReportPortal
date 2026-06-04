@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // Assuming you store the token in cookies
-
-const apiUrl = import.meta.env.VITE_API_URL;
+import { API_URL as apiUrl } from './config';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const [isTokenValid, setIsTokenValid] = useState<boolean | null>(null);

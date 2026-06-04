@@ -134,6 +134,8 @@ namespace ReportPortal.DAL.Migrations
 
                     b.HasIndex("FolderId");
 
+                    b.HasIndex("RunId");
+
                     b.ToTable("Tests", "dbo");
                 });
 
@@ -152,7 +154,6 @@ namespace ReportPortal.DAL.Migrations
                         .HasColumnName("ErrorMessage");
 
                     b.Property<byte[]>("ScreenShot")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("ScreenShot");
 

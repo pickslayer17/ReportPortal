@@ -24,13 +24,6 @@ namespace ReportPortal.BL.Services
             return _mapper.Map<TestReviewDto>(testReview);
         }
 
-        public async Task<TestReviewDto> UpdateTestReviewAsync(TestReviewDto testReviewDto, CancellationToken cancellationToken = default)
-        {
-            var testReviewUpdated = await _testReviewRepository.UpdateItemAsync(_mapper.Map<TestReview>(testReviewDto), cancellationToken);
-
-            return _mapper.Map<TestReviewDto>(testReviewUpdated);
-        }
-
         public async Task<TestReviewDto> UpdateTestReviewAsync(TestReviewUpdateDto testReviewUpdateDto, CancellationToken cancellationToken = default)
         {
             var testReview = await _testReviewRepository.GetByAsync(testReview => testReview.Id == testReviewUpdateDto.Id, cancellationToken);

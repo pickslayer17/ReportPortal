@@ -46,7 +46,8 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> AddProject([FromBody] ProjectCreateVm projectForCreationVm, CancellationToken cancellationToken = default)
         {
             var projectDto = _mapper.Map<ProjectDto>(projectForCreationVm);
-            return Ok(_mapper.Map<ProjectVm>( _projectService.CreateAsync(projectDto, cancellationToken).Result));
+            var createdProject = await _projectService.CreateAsync(projectDto, cancellationToken);
+            return Ok(_mapper.Map<ProjectVm>(createdProject));
         }
 
         [HttpPost("DeleteProject/{projectId:int}")]

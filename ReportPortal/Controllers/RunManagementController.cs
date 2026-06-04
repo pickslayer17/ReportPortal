@@ -56,7 +56,7 @@ namespace ReportPortal.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllRuns(int projectId, CancellationToken cancellationToken = default)
         {
-            var allRunsDto = await _runService.GetAllByAsync(r => r.ProjectId == projectId, cancellationToken);
+            var allRunsDto = await _runService.GetByProjectAsync(projectId, cancellationToken);
             var resultVms = allRunsDto.Select(rdto => _mapper.Map<RunVm>(rdto));
 
             return Ok(resultVms);
@@ -81,29 +81,54 @@ namespace ReportPortal.Controllers
         [HttpPost("Project/{projectId:int}/upload-trx")]
         [Authorize]
         [RequestSizeLimit(524288000)] // 500 MB, при необходимости увеличьте
-        public async Task<IActionResult> UploadTrxFile([FromForm] IFormFile file, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UploadTrxFile(int projectId, [FromForm] IFormFile file, CancellationToken cancellationToken = default)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Файл не выбран или пустой.");
 
-            if(!file.FileName.EndsWith(".trx", StringComparison.OrdinalIgnoreCase))
+            if (!file.FileName.EndsWith(".trx", StringComparison.OrdinalIgnoreCase))
                 return BadRequest("Неверный формат файла. Ожидается .trx файл.");
 
-            // Пример: сохраняем файл во временную папку
+            // Each uploaded TRX represents one NUnit test run -> create a fresh Run for it.
+            var safeFileName = Path.GetFileName(file.FileName);
+            RunDto run;
+            try
+            {
+                run = await _runService.CreateAsync(
+                    new RunDto
+                    {
+                        ProjectId = projectId,
+                        Name = $"{Path.GetFileNameWithoutExtension(safeFileName)} ({DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC)"
+                    },
+                    cancellationToken);
+            }
+            catch (ProjectNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
             var uploadsFolder = Path.Combine(Path.GetTempPath(), "trx_uploads");
             Directory.CreateDirectory(uploadsFolder);
 
-            var filePath = Path.Combine(uploadsFolder, $"{Guid.NewGuid()}_{file.FileName}");
+            // GetFileName strips any path components to avoid path traversal via FileName.
+            var filePath = Path.Combine(uploadsFolder, $"{Guid.NewGuid()}_{safeFileName}");
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await file.CopyToAsync(stream, cancellationToken);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream, cancellationToken);
+                }
+
+                await _trxParserService.AddTestsFromXml(filePath, runId: run.Id, cancellationToken: cancellationToken);
+            }
+            finally
+            {
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
             }
 
-            await _trxParserService.AddTestsFromXml(filePath);
-            // Здесь можно добавить обработку .trx файла
-
-            return Ok(new { message = "Файл успешно загружен", filePath });
+            return Ok(new { message = "Файл успешно загружен", runId = run.Id });
         }
     }
 }

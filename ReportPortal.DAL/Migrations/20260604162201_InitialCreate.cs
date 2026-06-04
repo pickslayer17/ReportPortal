@@ -5,7 +5,7 @@
 namespace ReportPortal.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class INIT : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -85,7 +85,8 @@ namespace ReportPortal.DAL.Migrations
                         column: x => x.ParentId,
                         principalSchema: "dbo",
                         principalTable: "Folders",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Folders_Runs_RunId",
                         column: x => x.RunId,
@@ -128,7 +129,7 @@ namespace ReportPortal.DAL.Migrations
                     TestId = table.Column<int>(type: "int", nullable: false),
                     ErrorMessage = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
                     StackTrace = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
-                    ScreenShot = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    ScreenShot = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     TestOutcome = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -216,6 +217,12 @@ namespace ReportPortal.DAL.Migrations
                 schema: "dbo",
                 table: "Tests",
                 column: "FolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tests_RunId",
+                schema: "dbo",
+                table: "Tests",
+                column: "RunId");
         }
 
         /// <inheritdoc />

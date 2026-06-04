@@ -89,6 +89,24 @@ namespace ReportPortal.Controllers
             return Ok(tests.Select(t => _mapper.Map<TestVm>(t)));
         }
 
+        [HttpGet("Runs/{runId:int}/folder-stats")]
+        [Authorize]
+        public async Task<IActionResult> GetRunFolderStats(int runId, CancellationToken cancellationToken = default)
+        {
+            var stats = await _testService.GetFolderStatsByRunAsync(runId, cancellationToken);
+            return Ok(stats.Select(s => new FolderStatsVm
+            {
+                FolderId = s.FolderId,
+                Total = s.Total,
+                Passed = s.Passed,
+                Failed = s.Failed,
+                NotRun = s.NotRun,
+                ToInvestigate = s.ToInvestigate,
+                NotRepro = s.NotRepro,
+                ProductBug = s.ProductBug,
+            }));
+        }
+
         [HttpGet("Folder/{folderId:int}/tests")]
         [Authorize]
         public async Task<IActionResult> GetAllFolderTests(int folderId, CancellationToken cancellationToken = default)

@@ -8,7 +8,7 @@ namespace ReportPortal.BL.Helpers
 {
     public static class TrxHelper
     {
-        public static List<UnitTestModel> GetTestsFromTrxXml(string xml, bool isNeedToRemovePassed = true, int runId = default)
+        public static List<UnitTestModel> GetTestsFromTrxXml(string xml, int runId = default)
         {
             if (HasAnyTests(xml))
             {
@@ -22,12 +22,20 @@ namespace ReportPortal.BL.Helpers
                 var unitTests = trxModel.TestEntries?.Select(te => new UnitTestModel { Id = te.testId }).ToList();
                 if (!unitTests.IsNullOrEmpty())
                 {
-                    var testsToRemove = new List<UnitTestModel>();
+                    var malformedTests = new List<UnitTestModel>(); // always removed (can't be rendered)
 
-                    // Collect test results
+                    // Collect test results. We keep every test (passed included) — the app
+                    // stores the full run and lets the UI filter, it does not drop greens.
                     foreach (var test in unitTests)
                     {
-                        var results = trxModel.Results.First(td => td.testId == test.Id);
+                        var results = trxModel.Results?.FirstOrDefault(td => td.testId == test.Id);
+
+                        // A test entry without a matching result is malformed; drop it.
+                        if (results == null)
+                        {
+                            malformedTests.Add(test);
+                            continue;
+                        }
 
                         if (runId != default)
                         {
@@ -36,35 +44,35 @@ namespace ReportPortal.BL.Helpers
 
                         test.Outcome = results.outcome;
 
-                        // Verify if test Passed or not and add passed to removeList
+                        // Passed tests carry no error info; nothing else to extract.
                         if (test.Outcome == TrxTestOutcome.Passed)
                         {
-                            testsToRemove.Add(test);
                             continue;
                         }
 
-                        var output = results.Output;
-                        var errorMessaage = output.ErrorInfo.Message;
-                        var callStack = output.ErrorInfo.StackTrace;
-                        test.Message = errorMessaage;
-                        test.StackTrace = callStack;
-                    }
-
-                    if (isNeedToRemovePassed)
-                    {
-                        testsToRemove.ForEach(ttr => unitTests.Remove(ttr));
+                        var errorInfo = results.Output?.ErrorInfo;
+                        test.Message = errorInfo?.Message;
+                        test.StackTrace = errorInfo?.StackTrace;
                     }
 
                     // Collect test info
                     foreach (var test in unitTests)
                     {
-                        var testDefinitions = trxModel.TestDefinitions.First(td => td.id == test.Id);
-                        var name = testDefinitions.TestMethod.name;
-                        var className = testDefinitions.TestMethod.className;
+                        var testDefinition = trxModel.TestDefinitions?.FirstOrDefault(td => td.id == test.Id);
+                        var testMethod = testDefinition?.TestMethod;
 
-                        test.Name = name;
-                        test.FullName = $"{className}.{name}";
+                        // No definition / method => we can't build a name or folder path; drop it.
+                        if (testMethod?.name == null)
+                        {
+                            malformedTests.Add(test);
+                            continue;
+                        }
+
+                        test.Name = testMethod.name;
+                        test.FullName = $"{testMethod.className}.{testMethod.name}";
                     }
+
+                    malformedTests.ForEach(ttr => unitTests.Remove(ttr));
 
                     return unitTests;
                 }
