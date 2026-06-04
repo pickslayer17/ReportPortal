@@ -14,7 +14,6 @@ using ReportPortal.Interfaces;
 using ReportPortal.Maps;
 using ReportPortal.Services;
 using ReportPortal.Services.Interfaces;
-using ReportPortal.DAL.Seeders;
 using System.Text;
 using ReportPortal.MiddleWare;
 using ReportPortal.BL.Configuration;
@@ -96,12 +95,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-    var seeder = new UserSeeder(dbContext);
-    await seeder.SeedAsync();
-}
+// No user seeding: the first admin is created explicitly via POST api/UserManagement/SetupAdmin
+// (allowed only while the Users table is empty).
 
 if (app.Environment.IsDevelopment())
 {

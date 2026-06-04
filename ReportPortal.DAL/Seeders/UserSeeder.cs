@@ -17,7 +17,10 @@ namespace ReportPortal.DAL.Seeders
                 var user = new User
                 {
                     Email = "d",
-                    Password = "uZM5dclrT6HDUzQnkBjS/+IJ94Ct6/4JR3KW7pAZtkO4qqGV",
+                    // PBKDF2-SHA256 hash of password "admin" (matches AuthenticationService).
+                    // TODO (users epic): seed via the live hashing function instead of a literal,
+                    // so it never drifts from the algorithm again.
+                    Password = "Bn8t377tgXGbZ4BOPLAcoylA/gIF3ixobn4cdMBt09RBBEZaJcZkuTOSmT1CQGzA",
                     UserRole = UserRole.Administrator
                 };
 

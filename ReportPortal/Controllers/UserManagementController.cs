@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Constants;
+using ReportPortal.DAL.Enums;
 using ReportPortal.DAL.Exceptions;
 using ReportPortal.Services.Interfaces;
 using ReportPortal.ViewModels.UserManagement;
@@ -42,6 +43,22 @@ namespace ReportPortal.Controllers
             var usersVm = usersDto.Select(u => _mapper.Map<UserVm>(u));
 
             return Ok(usersVm);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("SetupAdmin")]
+        public async Task<IActionResult> SetupAdmin([FromBody] UserCreateVm model, CancellationToken cancellationToken = default)
+        {
+            // First-run bootstrap: allowed only while there are no users yet.
+            var anyUserExists = (await _userService.GetAllAsync(cancellationToken)).Any();
+            if (anyUserExists)
+                return Conflict(new { message = "Setup already completed: an administrator already exists." });
+
+            var userDto = _mapper.Map<UserDto>(model);
+            userDto.UserRole = UserRole.Administrator; // force admin regardless of the payload
+            var createdAdmin = await _userService.CreateAsync(userDto, cancellationToken);
+
+            return Ok(_mapper.Map<UserVm>(createdAdmin));
         }
 
         [HttpPost("CreateUser")]
