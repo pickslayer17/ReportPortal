@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using ReportPortal.Authorization;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
@@ -28,7 +29,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("AddTest")]
-        [Authorize]
+        [Authorize(Policy = Permissions.UploadResults)]
         public async Task<IActionResult> AddTest([FromBody] TestSaveVm testVm, CancellationToken cancellationToken = default)
         {
             var testDto = _mapper.Map<TestDto>(testVm);
@@ -59,7 +60,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpDelete("tests/{testId:int}")]
-        [Authorize]
+        [Authorize(Policy = Permissions.DeleteRuns)]
         public async Task<IActionResult> DeleteTestById(int testId, CancellationToken cancellationToken = default)
         {
             var test = await _testService.GetByIdAsync(testId, cancellationToken);
@@ -74,7 +75,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("tests/{testId:int}")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetTestById(int testId, CancellationToken cancellationToken = default)
         {
             var test = await _testService.GetByIdAsync(testId, cancellationToken);
@@ -82,7 +83,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("Runs/{runId:int}/tests")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetAllRunTests(int runId, CancellationToken cancellationToken = default)
         {
             var tests = await _testService.GetAllByRunIdAsync(runId, cancellationToken);
@@ -90,7 +91,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("Runs/{runId:int}/folder-stats")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetRunFolderStats(int runId, CancellationToken cancellationToken = default)
         {
             var stats = await _testService.GetFolderStatsByRunAsync(runId, cancellationToken);
@@ -108,7 +109,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("Folder/{folderId:int}/tests")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetAllFolderTests(int folderId, CancellationToken cancellationToken = default)
         {
             var tests = await _testService.GetAllByFolderIdAsync(folderId, cancellationToken);
@@ -116,7 +117,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("Test/{testId:int}/delete")]
-        [Authorize]
+        [Authorize(Policy = Permissions.DeleteRuns)]
         public async Task<IActionResult> DeleteTest(int testId, CancellationToken cancellationToken = default)
         {
             try

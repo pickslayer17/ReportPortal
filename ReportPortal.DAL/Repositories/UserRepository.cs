@@ -19,12 +19,51 @@ namespace ReportPortal.Services
             return await _dbContext.Users.Where(predicate).ToListAsync();
         }
 
+        public async Task<IEnumerable<User>> GetUsersSharingProjectsAsync(int userId, CancellationToken cancellationToken = default)
+        {
+            var myProjectIds = _dbContext.UserProjects
+                .Where(up => up.UserId == userId)
+                .Select(up => up.ProjectId);
+
+            // The user themselves is always included so the reviewer dropdown is never empty.
+            return await _dbContext.Users
+                .Where(u => u.Id == userId || u.UserProjects.Any(up => myProjectIds.Contains(up.ProjectId)))
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task AddUserToProjectAsync(int userId, int projectId, CancellationToken cancellationToken = default)
+        {
+            var alreadyMember = await _dbContext.UserProjects
+                .AnyAsync(up => up.UserId == userId && up.ProjectId == projectId, cancellationToken);
+            if (alreadyMember) return;
+
+            _dbContext.UserProjects.Add(new UserProject { UserId = userId, ProjectId = projectId });
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task RemoveUserFromProjectAsync(int userId, int projectId, CancellationToken cancellationToken = default)
+        {
+            var membership = await _dbContext.UserProjects
+                .FirstOrDefaultAsync(up => up.UserId == userId && up.ProjectId == projectId, cancellationToken);
+            if (membership == null) return;
+
+            _dbContext.UserProjects.Remove(membership);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<User>> GetProjectMembersAsync(int projectId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Users
+                .Where(u => u.UserProjects.Any(up => up.ProjectId == projectId))
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<int> InsertAsync(User user, CancellationToken cancellationToken = default)
         {
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return user.Id.Value;
+            return user.Id;
         }
 
         public async Task RemoveByIdAsync(int uesrId, CancellationToken cancellationToken = default)
@@ -42,9 +81,12 @@ namespace ReportPortal.Services
             return user;
         }
 
-        public Task<User> UpdateItemAsync(User item, CancellationToken cancellationToken = default)
+        public async Task<User> UpdateItemAsync(User item, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            _dbContext.Users.Update(item);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return item;
         }
     }
 }

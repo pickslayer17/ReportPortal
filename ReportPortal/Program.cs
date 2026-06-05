@@ -17,6 +17,7 @@ using ReportPortal.Services.Interfaces;
 using System.Text;
 using ReportPortal.MiddleWare;
 using ReportPortal.BL.Configuration;
+using ReportPortal.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,6 +79,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.Jwt.Key))
         };
     });
+
+// Permission-based authorization: a policy per discrete permission, mapped from roles.
+builder.Services.AddAuthorization(options => options.AddPermissionPolicies());
 
 // CORS
 var corsPolicyName = "CorsPolicy";

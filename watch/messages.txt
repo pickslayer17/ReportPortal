@@ -27,3 +27,26 @@ hi denis
 [готово] Эпик юзеров шаг 1: хэширование обновлено (PBKDF2-SHA256, 210k, per-user соль, FixedTimeEquals), мёртвый код убран. Сборка зелёная.
 [нужно решение] Дальше эпик = крупная авторизация/мультиарендность (членство user<->project, policy-права, scoped GetUsers, /me, смена пароля). Это компилируется, но КОРРЕКТНОСТЬ фильтрации/авторизации честно проверяется только вживую (тест-фаза). Гоним весь эпик backend сейчас (build-verified) или часть оставим на тест-фазу? Скажи темп.
 [блокер] По твоей команде глушу API и сношу базу ReportPortal из LocalDB (ты сам будешь заводить). Будет апрув на команду (kill/sqlcmd/drop). База пустая — ничего не теряем.
+[готово] СЕССИЯ ЗАВЕРШЕНА. Итог: приложение ПОДНЯЛОСЬ на LocalDB (логин→JWT). Сделаны P0 целиком, большинство P1, инфра/конфиг, эпик юзеров шаг 1, сид заменён на SetupAdmin. Прогресс+цели+баги записаны в .claude/SESSION_HANDOFF.md и память. Следующий раз начинаем с «добить эпик юзеров». Записан баг: логин с неверным email отдаёт 500 вместо 401.
+[тест] Проверяю, как VS Code показывает запрос на разрешение. Сейчас попробую WebFetch к api.telegram.org — должен всплыть апрув-диалог в редакторе.
+[claude 20:24] Claude needs your permission to run sqlcmd
+[claude 12:11] Claude is waiting for your input/approval in the session.
+[claude 12:15] Claude is waiting for your input/approval in the session.
+[claude 12:21] Claude is waiting for your input/approval in the session.
+[claude 12:21] Claude is waiting for your input/approval in the session.
+[claude 12:22] Claude is waiting for your input/approval in the session.
+[claude 12:59] Claude is waiting for your input/approval in the session.
+[claude 13:01] Claude is waiting for your input/approval in the session.
+[claude 13:03] Claude is waiting for your input/approval in the session.
+[claude 13:05] Claude is waiting for your input/approval in the session.
+[готово] Эпик юзеров backend целиком: #22 (User cleanup + unique email), UserProject (членство+миграция, применена к LocalDB), permission-модель + policy-авторизация (свопнул все [Authorize(Roles)]->[Authorize(Policy)]), scoped GetUsers + GetAllProjectsUsers, /me + смена пароля + профиль + валидация. Сборка зелёная, приложение поднимается, smoke-проверки (401/409/Swagger) ок.
+[нужно решение] Для ПОЛНОГО live E2E мультиарендности не хватает: (1) пароля текущего админа в LocalDB (или ОК пересоздать его через SetupAdmin с известным паролем); (2) эндпоинта назначения user<->project (admin assigns membership) — без него членство нельзя задать через API. Добавить такой эндпоинт? Жду слова.
+[claude 13:07] Claude is waiting for your input/approval in the session.
+[claude 13:10] Claude is waiting for your input/approval in the session.
+[claude 13:10] Claude is waiting for your input/approval in the session.
+[claude 13:14] Claude is waiting for your input/approval in the session.
+[claude 13:15] Claude is waiting for your input/approval in the session.
+[claude 13:16] Claude is waiting for your input/approval in the session.
+[claude 13:17] Claude is waiting for your input/approval in the session.
+[claude 13:19] Claude is waiting for your input/approval in the session.
+[готово] Membership-эндпоинты добавлены: ProjectManagement {projectId}/members (GET=ViewProjects), POST/DELETE {projectId}/members/{userId} (ManageProjects). Сборка зелёная, приложение поднимается, DI ок, маршруты в Swagger. E2E оставляю тебе (как договорились). Админ-бутстрап оставил как есть: только SetupAdmin пока Users пуст, потом 409.

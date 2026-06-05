@@ -8,6 +8,7 @@ namespace ReportPortal.DAL
     public class ApplicationContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<UserProject> UserProjects { get; set; }
 
         public DbSet<Run> Runs { get; set; }
         public DbSet<Project> Projects { get; set; }
@@ -22,6 +23,8 @@ namespace ReportPortal.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserProjectConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new RunConfiguration());
             modelBuilder.ApplyConfiguration(new FolderConfiguration());

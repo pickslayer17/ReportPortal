@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using ReportPortal.Authorization;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Enums;
@@ -28,7 +29,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("test/{testId:int}/TestReview")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetTestReview(int testId, CancellationToken cancellationToken = default)
         {
             var testReviewDto = await _testReviewService.GetTestReviewAsync(testId, cancellationToken);
@@ -37,7 +38,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPut("UpdateTestReview")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ReviewTests)]
         public async Task<IActionResult> UpdateTestReview([FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
             var reviewerId = CurrentUserId();
@@ -61,7 +62,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPut("TestReview/{id:int}/UpdateReviewer")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ReviewTests)]
         public async Task<IActionResult> UpdateReviewer(int id, CancellationToken cancellationToken = default)
         {
             var reviewerId = CurrentUserId();
@@ -83,7 +84,7 @@ namespace ReportPortal.Controllers
 
 
         [HttpPut("TestReview/{id:int}/UpdateOutcome")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ReviewTests)]
         public async Task<IActionResult> UpdateOutcome(int id, [FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto
@@ -101,7 +102,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPut("TestReview/{id:int}/UpdateComments")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ReviewTests)]
         public async Task<IActionResult> UpdateComments(int id, [FromBody] TestReviewVm testReview, CancellationToken cancellationToken = default)
         {
             var testReviewUpdateDto = new TestReviewUpdateDto

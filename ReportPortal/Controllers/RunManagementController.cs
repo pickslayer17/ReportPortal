@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ReportPortal.Authorization;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
@@ -26,7 +27,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("AddRun")]
-        [Authorize]
+        [Authorize(Policy = Permissions.UploadResults)]
         public async Task<IActionResult> AddRun([FromBody] RunCreateVm runVm, CancellationToken cancellationToken = default)
         {
             var runDto = _mapper.Map<RunDto>(runVm);
@@ -44,7 +45,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("Runs/{runId:int}")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetRun(int runId, CancellationToken cancellationToken = default)
         {
             var run = await _runService.GetByIdAsync(runId, cancellationToken);
@@ -53,7 +54,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("Project/{projectId:int}/Runs")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetAllRuns(int projectId, CancellationToken cancellationToken = default)
         {
             var allRunsDto = await _runService.GetByProjectAsync(projectId, cancellationToken);
@@ -63,7 +64,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("Runs/{runId:int}/delete")]
-        [Authorize]
+        [Authorize(Policy = Permissions.DeleteRuns)]
         public async Task<IActionResult> DeleteRun(int runId, CancellationToken cancellationToken = default)
         {
             try
@@ -79,7 +80,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("Project/{projectId:int}/upload-trx")]
-        [Authorize]
+        [Authorize(Policy = Permissions.UploadResults)]
         [RequestSizeLimit(524288000)] // 500 MB, при необходимости увеличьте
         public async Task<IActionResult> UploadTrxFile(int projectId, [FromForm] IFormFile file, CancellationToken cancellationToken = default)
         {

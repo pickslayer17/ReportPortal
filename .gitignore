@@ -366,3 +366,5 @@ FodyWeavers.xsd
 
 # Claude Code local session state & permissions (may contain secrets — never commit)
 .claude/
+CLAUDE.md
+watch/

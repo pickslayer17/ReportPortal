@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using ReportPortal.Authorization;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services;
 using ReportPortal.BL.Services.Interfaces;
@@ -28,7 +29,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpPost("test/{testId:int}/AddTestResult")]
-        [Authorize]
+        [Authorize(Policy = Permissions.UploadResults)]
         public async Task<IActionResult> AddTestResult(int testId, [FromBody] TestResultCreateVm testResultVm, CancellationToken cancellationToken = default)
         {
             var testResultDto = _mapper.Map<TestResultDto>(testResultVm);
@@ -41,7 +42,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("test/{testId:int}/TestResults")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetTestResultIds(int testId, CancellationToken cancellationToken = default)
         {
             var testResult = await _testResultService.GetTestTestResultsAsync(testId, cancellationToken);
@@ -51,7 +52,7 @@ namespace ReportPortal.Controllers
 
 
         [HttpGet("TestResult/{testResultId:int}")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetTestResult(int testResultId, CancellationToken cancellationToken = default)
         {
             var testResultDto = await _testResultService.GetByIdAsync(testResultId, cancellationToken);

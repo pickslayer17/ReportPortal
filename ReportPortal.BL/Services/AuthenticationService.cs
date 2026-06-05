@@ -31,7 +31,7 @@ namespace ReportPortal.BL.Services
             UserDto user = null;
             if (VerifyHash(hashPasswordFromDb, login.Password))
             {
-                user = new UserDto { Id = userFromDb.Id ?? 0, Email = userFromDb.Email, UserRole = userFromDb.UserRole };
+                user = new UserDto { Id = userFromDb.Id, Email = userFromDb.Email, UserRole = userFromDb.UserRole };
             }
 
             return user;

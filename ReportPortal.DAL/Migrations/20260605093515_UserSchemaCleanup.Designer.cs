@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReportPortal.DAL;
 
@@ -11,9 +12,11 @@ using ReportPortal.DAL;
 namespace ReportPortal.DAL.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20260605093515_UserSchemaCleanup")]
+    partial class UserSchemaCleanup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,23 +250,6 @@ namespace ReportPortal.DAL.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.UserProject", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int")
-                        .HasColumnName("ProjectId");
-
-                    b.HasKey("UserId", "ProjectId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("UserProjects", (string)null);
-                });
-
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Folder", b =>
                 {
                     b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Folder", "Parent")
@@ -332,25 +318,6 @@ namespace ReportPortal.DAL.Migrations
                     b.Navigation("Test");
                 });
 
-            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.UserProject", b =>
-                {
-                    b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Project", "Project")
-                        .WithMany("UserProjects")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ReportPortal.DAL.Models.UserManagement.User", "User")
-                        .WithMany("UserProjects")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Folder", b =>
                 {
                     b.Navigation("Children");
@@ -361,8 +328,6 @@ namespace ReportPortal.DAL.Migrations
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Project", b =>
                 {
                     b.Navigation("Runs");
-
-                    b.Navigation("UserProjects");
                 });
 
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Run", b =>
@@ -376,11 +341,6 @@ namespace ReportPortal.DAL.Migrations
 
                     b.Navigation("TestReview")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.User", b =>
-                {
-                    b.Navigation("UserProjects");
                 });
 #pragma warning restore 612, 618
         }

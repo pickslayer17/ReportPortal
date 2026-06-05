@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using ReportPortal.Authorization;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
@@ -25,7 +26,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpGet("Runs/{runId:int}/folders")]
-        [Authorize]
+        [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetAllFolders(int runId, CancellationToken cancellationToken = default)
         {
             var allFoldersDto = await _folderService.GetAllFoldersAsync(runId, cancellationToken);
@@ -34,7 +35,7 @@ namespace ReportPortal.Controllers
         }
 
         [HttpDelete("folder/{folderId:int}/delete")]
-        [Authorize]
+        [Authorize(Policy = Permissions.DeleteRuns)]
         public async Task<IActionResult> DeleteFolder(int folderId, CancellationToken cancellationToken = default)
         {
             var folder = await _folderService.GetByIdAsync(folderId, cancellationToken);

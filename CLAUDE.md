@@ -88,9 +88,16 @@ dotnet ef database update --project ReportPortal.DAL --startup-project ReportPor
 
 ---
 ## Прогресс
-- [x] Полный анализ (сессия 2026-06-04).
-- [x] **P0 (пункты 1–6) реализованы (2026-06-04).** Билд зелёный.
-  - #1 аплоад создаёт Run и пробрасывает id (хардкод `runId=2` убран); #4 парсер исходов не падает + `.First()`→`FirstOrDefault`; #6 path traversal (`Path.GetFileName`) + чистка temp в `finally`; #5 `TestResult.ScreenShot`→nullable + миграция `ScreenShotNullable`; #3 дубли тестов через SQL `EXISTS`; #2 каскадное удаление прогона в транзакции (UoW).
-  - Доп.: passed-тесты больше не выкидываются (фильтр убран); `RunService.CreateAsync` в транзакции, блокирующий `.Result` убран.
-  - ⚠️ Миграция `ScreenShotNullable` создана, но к БД НЕ применена (`dotnet ef database update`).
-- [ ] Дальше: P1 (пункты 7–17).
+> 📌 Полное «где мы и с чего начать» — в `.claude/SESSION_HANDOFF.md` (раздел «ТЕКУЩЕЕ СОСТОЯНИЕ»). Здесь — кратко.
+
+- [x] **Приложение поднимается и работает** на LocalDB (`http://localhost:5002`, Swagger, логин → JWT) — 2026-06-04.
+- [x] **P0 (#1–#6)** — все.
+- [x] **P1 (большинство)**: #7 индекс RunId, #8 N+1 в ingest убран через `FolderTreeCache`, #9 фильтр в SQL,
+  #10 UoW+батчи, #11 `.Result`→await, #12 транзакция create-run, #13 reviewer из claims (+UserId в JWT),
+  #14 точечный апдейт ревью, #15 **backend** (серверные агрегаты folder-stats + тесты по папке).
+- [x] **Инфра/чистота**: конфиг централизован в `AppSettings` (+ фронт `config.ts`, ноль хардкод-URL, env-ready);
+  миграции схлопнуты в один `InitialCreate` и применены; `dotnet ef` — локальный тул.
+- [x] **Эпик юзеров шаг 1**: хэширование PBKDF2-SHA256; сид убран → первый админ через `SetupAdmin`.
+- [ ] **СЛЕДУЮЩЕЕ: добить эпик юзеров** — членство user↔project, policy-права, scoped `GetUsers`+`GetAllProjectsUsers`,
+  `/me`, смена пароля, профиль, валидация. Дизайн в памяти `users-permissions-epic`. Делаем против живой БД.
+- [ ] Долги: фикс AUTH 500→401, NU1903 (AutoMapper), HTTPS/сертификат, фронт #16/#17, NUnit-тесты. (детали в SESSION_HANDOFF)

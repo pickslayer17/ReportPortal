@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto;
+using ReportPortal.Authorization;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.Constants;
 using ReportPortal.DAL.Enums;
@@ -35,9 +36,32 @@ namespace ReportPortal.Controllers
             return Ok(userVm);
         }
 
+        // Contextual user list (e.g. reviewer dropdown). Non-admins only see colleagues
+        // they share a project with; admins see everyone.
         [HttpGet("GetUsers")]
         [Authorize]
         public async Task<IActionResult> GetUsers(CancellationToken cancellationToken = default)
+        {
+            IEnumerable<UserDto> usersDto;
+            if (User.IsInRole(UserRoles.Admin))
+            {
+                usersDto = await _userService.GetAllAsync(cancellationToken);
+            }
+            else
+            {
+                var currentUserId = CurrentUserId();
+                if (currentUserId == null) return Unauthorized();
+                usersDto = await _userService.GetColleaguesAsync(currentUserId.Value, cancellationToken);
+            }
+
+            var usersVm = usersDto.Select(u => _mapper.Map<UserVm>(u));
+            return Ok(usersVm);
+        }
+
+        // Admin-only: every user in the system, regardless of project membership.
+        [HttpGet("GetAllProjectsUsers")]
+        [Authorize(Policy = Permissions.ManageUsers)]
+        public async Task<IActionResult> GetAllProjectsUsers(CancellationToken cancellationToken = default)
         {
             var usersDto = await _userService.GetAllAsync(cancellationToken);
             var usersVm = usersDto.Select(u => _mapper.Map<UserVm>(u));
@@ -56,24 +80,37 @@ namespace ReportPortal.Controllers
 
             var userDto = _mapper.Map<UserDto>(model);
             userDto.UserRole = UserRole.Administrator; // force admin regardless of the payload
-            var createdAdmin = await _userService.CreateAsync(userDto, cancellationToken);
 
-            return Ok(_mapper.Map<UserVm>(createdAdmin));
+            try
+            {
+                var createdAdmin = await _userService.CreateAsync(userDto, cancellationToken);
+                return Ok(_mapper.Map<UserVm>(createdAdmin));
+            }
+            catch (EmailAlreadyExistsException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
 
         [HttpPost("CreateUser")]
-        [Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Policy = Permissions.ManageUsers)]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateVm userModel, CancellationToken cancellationToken = default)
         {
             var userDto = _mapper.Map<UserDto>(userModel);
 
-            var userCreated = await _userService.CreateAsync(userDto, cancellationToken);
-
-            return Ok(_mapper.Map<UserVm>(userCreated));
+            try
+            {
+                var userCreated = await _userService.CreateAsync(userDto, cancellationToken);
+                return Ok(_mapper.Map<UserVm>(userCreated));
+            }
+            catch (EmailAlreadyExistsException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
 
         [HttpPost("DeleteUser/{userId:int}")]
-        [Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Policy = Permissions.ManageUsers)]
         public async Task<IActionResult> DeleteUser(int userId, CancellationToken cancellationToken = default)
         {
             try
@@ -110,6 +147,53 @@ namespace ReportPortal.Controllers
         public async Task<IActionResult> ValidateToken(CancellationToken cancellationToken = default)
         {
             return Ok();
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> Me(CancellationToken cancellationToken = default)
+        {
+            var currentUserId = CurrentUserId();
+            if (currentUserId == null) return Unauthorized();
+
+            var userDto = await _userService.GetByIdAsync(currentUserId.Value, cancellationToken);
+            return Ok(_mapper.Map<UserVm>(userDto));
+        }
+
+        [HttpPut("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileVm model, CancellationToken cancellationToken = default)
+        {
+            var currentUserId = CurrentUserId();
+            if (currentUserId == null) return Unauthorized();
+
+            try
+            {
+                var userDto = await _userService.UpdateProfileAsync(currentUserId.Value, model.Email, cancellationToken);
+                return Ok(_mapper.Map<UserVm>(userDto));
+            }
+            catch (EmailAlreadyExistsException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("me/change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordVm model, CancellationToken cancellationToken = default)
+        {
+            var currentUserId = CurrentUserId();
+            if (currentUserId == null) return Unauthorized();
+
+            var changed = await _userService.ChangePasswordAsync(currentUserId.Value, model.CurrentPassword, model.NewPassword, cancellationToken);
+            if (!changed) return BadRequest(new { message = "Current password is incorrect." });
+
+            return Ok();
+        }
+
+        private int? CurrentUserId()
+        {
+            return int.TryParse(User.FindFirst("UserId")?.Value, out var id) ? id : null;
         }
     }
 }
