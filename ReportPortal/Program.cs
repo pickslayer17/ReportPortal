@@ -32,7 +32,8 @@ builder.WebHost.UseUrls(appSettings.BackendUrl);
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseLazyLoadingProxies().UseSqlServer(appSettings.ConnectionString));
 
 // Add services to the container.
-builder.Services.AddControllers();
+// Global tenant-scope guard: non-admins can only touch resources in their own projects.
+builder.Services.AddControllers(options => options.Filters.Add<ProjectScopeFilter>());
 
 // hub settings
 builder.Services.AddRazorPages();
@@ -45,6 +46,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProjectScopeRepository, ProjectScopeRepository>();
+builder.Services.AddScoped<ISubprojectRepository, SubprojectRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IFolderRepository, FolderRepository>();
 builder.Services.AddScoped<ITestRepository, TestRepository>();
@@ -53,6 +56,7 @@ builder.Services.AddScoped<ITestResultRepository, TestResultRepository>();
 builder.Services.AddScoped<ITestReviewRepository, TestReviewRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ISubprojectService, SubprojectService>();
 builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<IRunService, RunService>();
 builder.Services.AddScoped<ITestService, TestService>();
@@ -106,7 +110,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
+    // NOTE: no UseDeveloperExceptionPage — ExceptionHandlingMiddleware is the single handler so
+    // domain exceptions map to proper status codes (404/409/403) without leaking stack traces.
 }
 
 // Use CORS first

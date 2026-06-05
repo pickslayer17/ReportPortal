@@ -81,15 +81,8 @@ namespace ReportPortal.Controllers
             var userDto = _mapper.Map<UserDto>(model);
             userDto.UserRole = UserRole.Administrator; // force admin regardless of the payload
 
-            try
-            {
-                var createdAdmin = await _userService.CreateAsync(userDto, cancellationToken);
-                return Ok(_mapper.Map<UserVm>(createdAdmin));
-            }
-            catch (EmailAlreadyExistsException ex)
-            {
-                return Conflict(new { message = ex.Message });
-            }
+            var createdAdmin = await _userService.CreateAsync(userDto, cancellationToken);
+            return Ok(_mapper.Map<UserVm>(createdAdmin));
         }
 
         [HttpPost("CreateUser")]
@@ -98,30 +91,15 @@ namespace ReportPortal.Controllers
         {
             var userDto = _mapper.Map<UserDto>(userModel);
 
-            try
-            {
-                var userCreated = await _userService.CreateAsync(userDto, cancellationToken);
-                return Ok(_mapper.Map<UserVm>(userCreated));
-            }
-            catch (EmailAlreadyExistsException ex)
-            {
-                return Conflict(new { message = ex.Message });
-            }
+            var userCreated = await _userService.CreateAsync(userDto, cancellationToken);
+            return Ok(_mapper.Map<UserVm>(userCreated));
         }
 
         [HttpPost("DeleteUser/{userId:int}")]
         [Authorize(Policy = Permissions.ManageUsers)]
         public async Task<IActionResult> DeleteUser(int userId, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                await _userService.DeleteByIdAsync(userId, cancellationToken);
-            }
-            catch (UserNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            await _userService.DeleteByIdAsync(userId, cancellationToken);
             return Ok();
         }
 
@@ -167,15 +145,8 @@ namespace ReportPortal.Controllers
             var currentUserId = CurrentUserId();
             if (currentUserId == null) return Unauthorized();
 
-            try
-            {
-                var userDto = await _userService.UpdateProfileAsync(currentUserId.Value, model.Email, cancellationToken);
-                return Ok(_mapper.Map<UserVm>(userDto));
-            }
-            catch (EmailAlreadyExistsException ex)
-            {
-                return Conflict(new { message = ex.Message });
-            }
+            var userDto = await _userService.UpdateProfileAsync(currentUserId.Value, model.Email, cancellationToken);
+            return Ok(_mapper.Map<UserVm>(userDto));
         }
 
         [HttpPost("me/change-password")]

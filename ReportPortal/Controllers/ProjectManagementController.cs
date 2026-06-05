@@ -31,7 +31,18 @@ namespace ReportPortal.Controllers
         [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetAllProjects(CancellationToken cancellationToken = default)
         {
-            var allProjectsDto = await _projectService.GetAllAsync(cancellationToken);
+            // Non-admins only see projects they are a member of; admins see everything.
+            IEnumerable<ProjectDto> allProjectsDto;
+            if (User.IsInRole(UserRoles.Admin))
+            {
+                allProjectsDto = await _projectService.GetAllAsync(cancellationToken);
+            }
+            else
+            {
+                if (!int.TryParse(User.FindFirst("UserId")?.Value, out var userId)) return Unauthorized();
+                allProjectsDto = await _projectService.GetForUserAsync(userId, cancellationToken);
+            }
+
             var allProjectsVm = allProjectsDto.Select(pr => _mapper.Map<ProjectVm>(pr));
             return Ok(allProjectsVm);
         }
@@ -58,15 +69,7 @@ namespace ReportPortal.Controllers
         [Authorize(Policy = Permissions.ManageProjects)]
         public async Task<IActionResult> DeleteProject(int projectId, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                await _projectService.DeleteByIdAsync(projectId, cancellationToken);
-            }
-            catch (ProjectNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            await _projectService.DeleteByIdAsync(projectId, cancellationToken);
             return Ok(new { message = "Проект был удален" });
         }
 
@@ -76,34 +79,16 @@ namespace ReportPortal.Controllers
         [Authorize(Policy = Permissions.ViewProjects)]
         public async Task<IActionResult> GetProjectMembers(int projectId, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var membersDto = await _userService.GetProjectMembersAsync(projectId, cancellationToken);
-                return Ok(membersDto.Select(u => _mapper.Map<UserVm>(u)));
-            }
-            catch (ProjectNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            var membersDto = await _userService.GetProjectMembersAsync(projectId, cancellationToken);
+            return Ok(membersDto.Select(u => _mapper.Map<UserVm>(u)));
         }
 
         [HttpPost("{projectId:int}/members/{userId:int}")]
         [Authorize(Policy = Permissions.ManageProjects)]
         public async Task<IActionResult> AddProjectMember(int projectId, int userId, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                await _userService.AddMemberAsync(projectId, userId, cancellationToken);
-                return Ok();
-            }
-            catch (ProjectNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (UserNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _userService.AddMemberAsync(projectId, userId, cancellationToken);
+            return Ok();
         }
 
         [HttpDelete("{projectId:int}/members/{userId:int}")]

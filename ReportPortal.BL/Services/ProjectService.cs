@@ -62,6 +62,12 @@ namespace ReportPortal.BL.Services
             return allProjectsDto;
         }
 
+        public async Task<IEnumerable<ProjectDto>> GetForUserAsync(int userId, CancellationToken cancellationToken = default)
+        {
+            var projects = await _projectRepository.GetForUserAsync(userId, cancellationToken);
+            return projects.Select(pr => _mapper.Map<ProjectDto>(pr));
+        }
+
         public Task<IEnumerable<ProjectDto>> GetAllByAsync(Expression<Func<ProjectDto, bool>> predicate, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

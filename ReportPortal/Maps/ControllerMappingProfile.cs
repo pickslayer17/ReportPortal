@@ -13,6 +13,8 @@ namespace ReportPortal.Maps
             CreateMap<TestVm, TestDto>().ReverseMap();
             CreateMap<RunVm, RunDto>().ReverseMap();
             CreateMap<RunCreateVm, RunDto>().ReverseMap();
+            CreateMap<SubprojectVm, SubprojectDto>().ReverseMap();
+            CreateMap<SubprojectCreateVm, SubprojectDto>().ReverseMap();
             CreateMap<ProjectDto, ProjectVm>().ReverseMap();
             CreateMap<UserVm, UserDto>().ReverseMap();
             CreateMap<UserLoginVm, UserDto>().ReverseMap();

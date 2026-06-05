@@ -12,8 +12,9 @@ namespace ReportPortal.DAL.ConfigurationMaps
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).HasColumnName("Id").HasColumnType("int").IsRequired().UseIdentityColumn();
             builder.Property(e => e.Name).HasColumnName("Name").HasColumnType("nvarchar(MAX)").IsRequired();
-            builder.Property(e => e.ProjectId).HasColumnName("ProjectId").HasColumnType("int");
-            builder.HasOne(e => e.Project).WithMany(e => e.Runs).HasForeignKey(e => e.ProjectId).OnDelete(deleteBehavior: DeleteBehavior.Cascade);
+            builder.Property(e => e.SubprojectId).HasColumnName("SubprojectId").HasColumnType("int");
+            builder.HasOne(e => e.Subproject).WithMany(e => e.Runs).HasForeignKey(e => e.SubprojectId).OnDelete(deleteBehavior: DeleteBehavior.Cascade);
+            builder.HasIndex(e => e.SubprojectId);
         }
     }
 }

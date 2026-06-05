@@ -16,7 +16,7 @@ namespace ReportPortal.BL.Services
         private readonly ITestRepository _testRepository;
         private readonly ITestResultRepository _testResultRepository;
         private readonly IRunRepository _runRepository;
-        private readonly IProjectRepository _projectRepository;
+        private readonly ISubprojectRepository _subprojectRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFolderTreeCache _folderTreeCache;
         private readonly IMapper _mapper;
@@ -26,7 +26,7 @@ namespace ReportPortal.BL.Services
             IFolderRepository folderRepository,
             ITestRepository testRepository,
             ITestResultRepository testResultRepository,
-            IProjectRepository projectRepository,
+            ISubprojectRepository subprojectRepository,
             IUnitOfWork unitOfWork,
             IFolderTreeCache folderTreeCache,
             IMapper mapper,
@@ -36,7 +36,7 @@ namespace ReportPortal.BL.Services
             _folderRepository = folderRepository;
             _testRepository = testRepository;
             _testResultRepository = testResultRepository;
-            _projectRepository = projectRepository;
+            _subprojectRepository = subprojectRepository;
             _unitOfWork = unitOfWork;
             _folderTreeCache = folderTreeCache;
             _mapper = mapper;
@@ -45,8 +45,8 @@ namespace ReportPortal.BL.Services
 
         public async Task<RunDto> CreateAsync(RunDto runForCreationDto, CancellationToken cancellationToken = default)
         {
-            var project = await _projectRepository.GetByAsync(p => p.Id == runForCreationDto.ProjectId);
-            if (project == null) throw new ProjectNotFoundException($"no project with such id: {runForCreationDto.ProjectId}");
+            var subproject = await _subprojectRepository.GetByIdAsync(runForCreationDto.SubprojectId, cancellationToken);
+            if (subproject == null) throw new SubprojectNotFoundException($"no subproject with such id: {runForCreationDto.SubprojectId}");
 
             var run = _mapper.Map<Run>(runForCreationDto);
 
@@ -61,7 +61,7 @@ namespace ReportPortal.BL.Services
                 runCreatedDto = new RunDto
                 {
                     Id = runId,
-                    ProjectId = project.Id,
+                    SubprojectId = subproject.Id,
                     Name = runForCreationDto.Name,
                     RootFolderId = rootFolderId,
                 };
@@ -85,10 +85,10 @@ namespace ReportPortal.BL.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<RunDto>> GetByProjectAsync(int projectId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<RunDto>> GetBySubprojectAsync(int subprojectId, CancellationToken cancellationToken = default)
         {
-            // Filter pushed to SQL (WHERE ProjectId = @p) instead of loading every run and filtering in memory.
-            var runs = await _runRepository.GetAllByAsync(r => r.ProjectId == projectId, cancellationToken);
+            // Filter pushed to SQL (WHERE SubprojectId = @s).
+            var runs = await _runRepository.GetAllByAsync(r => r.SubprojectId == subprojectId, cancellationToken);
             return runs.Select(rm => _mapper.Map<RunDto>(rm));
         }
 

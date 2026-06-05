@@ -12,5 +12,6 @@ namespace ReportPortal.DAL.Models.UserManagement
         public string Password { get; set; }
         public UserRole UserRole { get; set; }
         public virtual ICollection<UserProject> UserProjects { get; set; } = new List<UserProject>();
+        public virtual ICollection<UserSubproject> UserSubprojects { get; set; } = new List<UserSubproject>();
     }
 }

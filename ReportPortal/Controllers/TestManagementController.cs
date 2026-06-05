@@ -6,6 +6,7 @@ using ReportPortal.Authorization;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
+using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.Hubs;
 using ReportPortal.ViewModels.TestRun;
 
@@ -19,19 +20,24 @@ namespace ReportPortal.Controllers
         private readonly IFolderService _folderService;
         private readonly IMapper _mapper;
         private readonly IHubContext<RunUpdatesHub> _hubContext;
+        private readonly IProjectScopeRepository _scope;
 
-        public TestManagementController(ITestService testService, IFolderService folderService, IMapper mapper, IHubContext<RunUpdatesHub> hubContext)
+        public TestManagementController(ITestService testService, IFolderService folderService, IMapper mapper, IHubContext<RunUpdatesHub> hubContext, IProjectScopeRepository scope)
         {
             _testService = testService;
             _folderService = folderService;
             _mapper = mapper;
             _hubContext = hubContext;
+            _scope = scope;
         }
 
         [HttpPost("AddTest")]
         [Authorize(Policy = Permissions.UploadResults)]
         public async Task<IActionResult> AddTest([FromBody] TestSaveVm testVm, CancellationToken cancellationToken = default)
         {
+            // runId is in the body, not the route: guard membership here.
+            await ScopeGuard.EnsureAccessAsync(User, _scope, ScopeResource.Run, testVm.RunId, cancellationToken);
+
             var testDto = _mapper.Map<TestDto>(testVm);
             var folderId = await _folderService.GetIdOrAddFolderInRunAsync(testVm.RunId, testVm.Path, cancellationToken);
             var testCreated = await _testService.CreateAsync(testDto, folderId, cancellationToken);

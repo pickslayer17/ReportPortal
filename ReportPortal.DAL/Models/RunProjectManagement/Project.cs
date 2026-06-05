@@ -8,7 +8,7 @@ namespace ReportPortal.DAL.Models.RunProjectManagement
         public int Id { get; set; }
         public string Name { get; set; }
         public ProjectStatus ProjectStatus { get; set; }
-        public virtual ICollection<Run> Runs { get; set; }
+        public virtual ICollection<Subproject> Subprojects { get; set; } = new List<Subproject>();
         public virtual ICollection<UserProject> UserProjects { get; set; } = new List<UserProject>();
     }
 }

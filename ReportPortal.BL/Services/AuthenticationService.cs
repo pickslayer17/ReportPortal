@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Models.Dto;
 using ReportPortal.BL.Configuration;
 using ReportPortal.BL.Services.Interfaces;
+using ReportPortal.DAL.Exceptions;
 using ReportPortal.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,14 +25,19 @@ namespace ReportPortal.BL.Services
 
         public async Task<UserDto> AuthenticateUserAsync(UserDto login, CancellationToken cancellationToken = default)
         {
-            var userFromDb = await _userRepository.GetByAsync(u => u.Email == login.Email);
-            if (userFromDb == null) throw new UnauthorizedAccessException();
-            var hashPasswordFromDb = userFromDb.Password;
-
             UserDto user = null;
-            if (VerifyHash(hashPasswordFromDb, login.Password))
+            try
             {
-                user = new UserDto { Id = userFromDb.Id, Email = userFromDb.Email, UserRole = userFromDb.UserRole };
+                var userFromDb = await _userRepository.GetByAsync(u => u.Email == login.Email, cancellationToken);
+                if (VerifyHash(userFromDb.Password, login.Password))
+                {
+                    user = new UserDto { Id = userFromDb.Id, Email = userFromDb.Email, UserRole = userFromDb.UserRole };
+                }
+            }
+            catch (UserNotFoundException)
+            {
+                // Unknown email: treat as invalid credentials. Returning null makes Login answer 401
+                // without revealing whether the email or the password was wrong.
             }
 
             return user;

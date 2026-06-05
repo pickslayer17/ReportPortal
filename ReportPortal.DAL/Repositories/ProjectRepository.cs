@@ -24,6 +24,13 @@ namespace ReportPortal.DAL.Repositories
             return project;
         }
 
+        public async Task<IEnumerable<Project>> GetForUserAsync(int userId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Projects
+                .Where(p => p.UserProjects.Any(up => up.UserId == userId))
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<int> InsertAsync(Project project, CancellationToken cancellationToken = default)
         {
             _dbContext.Projects.Add(project);

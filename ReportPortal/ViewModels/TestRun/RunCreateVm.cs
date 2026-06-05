@@ -3,6 +3,6 @@
     public class RunCreateVm
     {
         public string Name { get; set; }
-        public int ProjectId { get; set; }
+        public int SubprojectId { get; set; }
     }
 }

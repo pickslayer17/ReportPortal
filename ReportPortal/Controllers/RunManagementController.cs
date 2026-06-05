@@ -5,6 +5,7 @@ using ReportPortal.Authorization;
 using ReportPortal.BL.Models;
 using ReportPortal.BL.Services.Interfaces;
 using ReportPortal.DAL.Exceptions;
+using ReportPortal.DAL.Repositories.Interfaces;
 using ReportPortal.ViewModels.TestRun;
 
 namespace ReportPortal.Controllers
@@ -17,29 +18,26 @@ namespace ReportPortal.Controllers
         private readonly IMapper _mapper;
         private readonly IFolderService _folderService;
         private readonly ITrxParserService _trxParserService;
+        private readonly IProjectScopeRepository _scope;
 
-        public RunManagementController(IRunService runService, IMapper mapper, IFolderService folderService, ITrxParserService trxParserService)
+        public RunManagementController(IRunService runService, IMapper mapper, IFolderService folderService, ITrxParserService trxParserService, IProjectScopeRepository scope)
         {
             _runService = runService;
             _mapper = mapper;
             _folderService = folderService;
             _trxParserService = trxParserService;
+            _scope = scope;
         }
 
         [HttpPost("AddRun")]
         [Authorize(Policy = Permissions.UploadResults)]
         public async Task<IActionResult> AddRun([FromBody] RunCreateVm runVm, CancellationToken cancellationToken = default)
         {
+            // Body carries the subprojectId, so the route-based ProjectScopeFilter can't see it: guard here.
+            await ScopeGuard.EnsureAccessAsync(User, _scope, ScopeResource.Subproject, runVm.SubprojectId, cancellationToken);
+
             var runDto = _mapper.Map<RunDto>(runVm);
-            RunDto runCreatedDto = null;
-            try
-            {
-                runCreatedDto = await _runService.CreateAsync(runDto, cancellationToken);
-            }
-            catch (ProjectNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var runCreatedDto = await _runService.CreateAsync(runDto, cancellationToken);
 
             return Ok(_mapper.Map<RunVm>(runCreatedDto));
         }
@@ -53,11 +51,11 @@ namespace ReportPortal.Controllers
             return Ok(_mapper.Map<RunVm>(run));
         }
 
-        [HttpGet("Project/{projectId:int}/Runs")]
+        [HttpGet("Subproject/{subprojectId:int}/Runs")]
         [Authorize(Policy = Permissions.ViewProjects)]
-        public async Task<IActionResult> GetAllRuns(int projectId, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllRuns(int subprojectId, CancellationToken cancellationToken = default)
         {
-            var allRunsDto = await _runService.GetByProjectAsync(projectId, cancellationToken);
+            var allRunsDto = await _runService.GetBySubprojectAsync(subprojectId, cancellationToken);
             var resultVms = allRunsDto.Select(rdto => _mapper.Map<RunVm>(rdto));
 
             return Ok(resultVms);
@@ -79,10 +77,10 @@ namespace ReportPortal.Controllers
             }
         }
 
-        [HttpPost("Project/{projectId:int}/upload-trx")]
+        [HttpPost("Subproject/{subprojectId:int}/upload-trx")]
         [Authorize(Policy = Permissions.UploadResults)]
         [RequestSizeLimit(524288000)] // 500 MB, при необходимости увеличьте
-        public async Task<IActionResult> UploadTrxFile(int projectId, [FromForm] IFormFile file, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UploadTrxFile(int subprojectId, [FromForm] IFormFile file, CancellationToken cancellationToken = default)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Файл не выбран или пустой.");
@@ -92,21 +90,13 @@ namespace ReportPortal.Controllers
 
             // Each uploaded TRX represents one NUnit test run -> create a fresh Run for it.
             var safeFileName = Path.GetFileName(file.FileName);
-            RunDto run;
-            try
-            {
-                run = await _runService.CreateAsync(
-                    new RunDto
-                    {
-                        ProjectId = projectId,
-                        Name = $"{Path.GetFileNameWithoutExtension(safeFileName)} ({DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC)"
-                    },
-                    cancellationToken);
-            }
-            catch (ProjectNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var run = await _runService.CreateAsync(
+                new RunDto
+                {
+                    SubprojectId = subprojectId,
+                    Name = $"{Path.GetFileNameWithoutExtension(safeFileName)} ({DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC)"
+                },
+                cancellationToken);
 
             var uploadsFolder = Path.Combine(Path.GetTempPath(), "trx_uploads");
             Directory.CreateDirectory(uploadsFolder);

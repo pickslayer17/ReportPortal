@@ -50,3 +50,31 @@ hi denis
 [claude 13:17] Claude is waiting for your input/approval in the session.
 [claude 13:19] Claude is waiting for your input/approval in the session.
 [готово] Membership-эндпоинты добавлены: ProjectManagement {projectId}/members (GET=ViewProjects), POST/DELETE {projectId}/members/{userId} (ManageProjects). Сборка зелёная, приложение поднимается, DI ок, маршруты в Swagger. E2E оставляю тебе (как договорились). Админ-бутстрап оставил как есть: только SetupAdmin пока Users пуст, потом 409.
+[claude 15:42] Claude is waiting for your input/approval in the session.
+[claude 15:44] Claude is waiting for your input/approval in the session.
+[claude 15:46] Claude is waiting for your input/approval in the session.
+[claude 15:47] Claude is waiting for your input/approval in the session.
+[готово] E2E прогон по ВСЕМ эндпоинтам (живая LocalDB, ~50 вызовов) — почти всё зелёное: auth/валидация/права/мультиарендность GetUsers/membership/runs/tests/results/review/смена пароля/профиль/каскадные delete. Данные убрал за собой. Находки (нужно твоё слово, чинить?): (1) мультиарендность частичная — scoped только GetUsers, проекты/раны по членству НЕ фильтруются; (2) доменные исключения → 500+стектрейс (AddTest дубль, GetTestById missing, leak предиката) — должно 409/404; (3) TestResultCreateVm.ScreenShot обязателен → AddTestResult без скрина = 400 (надо byte[]?). Детали в SESSION_HANDOFF.
+[claude 15:49] Claude is waiting for your input/approval in the session.
+[claude 15:49] Claude is waiting for your input/approval in the session.
+[claude 15:49] Claude is waiting for your input/approval in the session.
+[claude 15:54] Claude is waiting for your input/approval in the session.
+[claude 16:08] Claude is waiting for your input/approval in the session.
+[claude 16:18] Claude is waiting for your input/approval in the session.
+[claude 16:20] Claude is waiting for your input/approval in the session.
+[claude 16:37] Claude is waiting for your input/approval in the session.
+[claude 16:39] Claude is waiting for your input/approval in the session.
+[claude 16:39] Claude is waiting for your input/approval in the session.
+[claude 16:43] Claude is waiting for your input/approval in the session.
+[claude 16:43] Claude is waiting for your input/approval in the session.
+[claude 16:43] Claude is waiting for your input/approval in the session.
+[готово] Все 4 фикса сделаны и ПЕРЕПРОВЕРЕНЫ вживую (зелёные): (1) мультиарендность теперь полная — глобальный ProjectScopeFilter резолвит ресурс→проект→членство (1 запрос на реквест, не на сущность), bob-не-член → 403 везде, член → 200; GetAllProjects scoped; (2) доменные исключения → 404/409/403 чисто (убрал UseDeveloperExceptionPage — он перехватывал в dev); (3) ScreenShot опционален; (4) AUTH неверный email→401. Приложение поднято на :5002, БД чистая (только админ). Готов принять TRX-файл и тест-сценарий.
+[claude 16:57] Claude is waiting for your input/approval in the session.
+[claude 17:01] Claude is waiting for your input/approval in the session.
+[claude 17:03] Claude is waiting for your input/approval in the session.
+[claude 17:17] Claude is waiting for your input/approval in the session.
+[claude 17:20] Claude is waiting for your input/approval in the session.
+[claude 17:21] Claude is waiting for your input/approval in the session.
+[claude 17:23] Claude is waiting for your input/approval in the session.
+[claude 17:23] Claude is waiting for your input/approval in the session.
+[готово] Subproject-слой добавлен (Project→Subproject→Run): доступ на уровне проекта, ревьювер — только из сабпроекта (UserSubproject many-to-many). Миграция применена. Полный сценарий прогнан вживую — 21/21 PASS: 2 проекта/3 юзера, сабпроект, ран, дерево common→{groupb→leaf(3 теста),groupa}, ревью, GetUsers project-scoped (1→2), назначение ревьювера не-член сабпроекта→400/член→200, кросс-проект userB→403 везде. Данные оставил как демо-набор (ProjA=4,ProjB=5,SubA1=1,run=5). Наблюдение на UI-фазу: folder-stats не считает passed/failed/notRun из TestResult. Бэк на :5002. Сказать — почищу данные.
