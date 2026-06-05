@@ -174,7 +174,6 @@ namespace ReportPortal.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ErrorMessage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(MAX)")
                         .HasColumnName("ErrorMessage");
 
@@ -183,7 +182,6 @@ namespace ReportPortal.DAL.Migrations
                         .HasColumnName("ScreenShot");
 
                     b.Property<string>("StackTrace")
-                        .IsRequired()
                         .HasColumnType("nvarchar(MAX)")
                         .HasColumnName("StackTrace");
 

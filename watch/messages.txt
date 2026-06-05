@@ -78,3 +78,15 @@ hi denis
 [claude 17:23] Claude is waiting for your input/approval in the session.
 [claude 17:23] Claude is waiting for your input/approval in the session.
 [готово] Subproject-слой добавлен (Project→Subproject→Run): доступ на уровне проекта, ревьювер — только из сабпроекта (UserSubproject many-to-many). Миграция применена. Полный сценарий прогнан вживую — 21/21 PASS: 2 проекта/3 юзера, сабпроект, ран, дерево common→{groupb→leaf(3 теста),groupa}, ревью, GetUsers project-scoped (1→2), назначение ревьювера не-член сабпроекта→400/член→200, кросс-проект userB→403 везде. Данные оставил как демо-набор (ProjA=4,ProjB=5,SubA1=1,run=5). Наблюдение на UI-фазу: folder-stats не считает passed/failed/notRun из TestResult. Бэк на :5002. Сказать — почищу данные.
+[claude 17:33] Claude is waiting for your input/approval in the session.
+[claude 17:33] Claude is waiting for your input/approval in the session.
+[claude 17:36] Claude is waiting for your input/approval in the session.
+[claude 17:36] Claude is waiting for your input/approval in the session.
+[claude 17:36] Claude is waiting for your input/approval in the session.
+[claude 17:38] Claude is waiting for your input/approval in the session.
+[claude 17:42] Claude is waiting for your input/approval in the session.
+[claude 17:44] Claude is waiting for your input/approval in the session.
+[claude 17:52] Claude is waiting for your input/approval in the session.
+[claude 17:56] Claude is waiting for your input/approval in the session.
+[готово] (1) Миграции схлопнул в одну InitialCreate, БД дропнул и пересоздал с нуля. (2) Новый проект ReportPortal.IntegrationTests (NUnit + WebApplicationFactory + отдельная disposable LocalDB) — весь сценарий = 20 упорядоченных тестов, `dotnet test` зелёный за ~1с. Дальше дополняем по ходу. БОНУС: тесты поймали реальный баг — TestResult.ErrorMessage/StackTrace были NOT NULL, результат без них падал 500 (поэтому folder-stats и был 0). Починил (string?), миграцию пересоздал. Как запускать и детали — в SESSION_HANDOFF + память integration-tests.
+[claude 17:59] Claude is waiting for your input/approval in the session.

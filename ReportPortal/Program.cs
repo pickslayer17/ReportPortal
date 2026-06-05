@@ -130,6 +130,9 @@ app.MapHub<RunUpdatesHub>("/hubs/runUpdates");
 
 app.Run();
 
+// Exposed so the integration test project can boot the real app via WebApplicationFactory<Program>.
+public partial class Program { }
+
 
 
 

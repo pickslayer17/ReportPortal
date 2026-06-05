@@ -12,8 +12,8 @@ using ReportPortal.DAL;
 namespace ReportPortal.DAL.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20260605093515_UserSchemaCleanup")]
-    partial class UserSchemaCleanup
+    [Migration("20260605145520_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -100,6 +100,31 @@ namespace ReportPortal.DAL.Migrations
                         .HasColumnType("nvarchar(MAX)")
                         .HasColumnName("Name");
 
+                    b.Property<int>("SubprojectId")
+                        .HasColumnType("int")
+                        .HasColumnName("SubprojectId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubprojectId");
+
+                    b.ToTable("Runs", "dbo");
+                });
+
+            modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Subproject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("Name");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("int")
                         .HasColumnName("ProjectId");
@@ -108,7 +133,7 @@ namespace ReportPortal.DAL.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Runs", "dbo");
+                    b.ToTable("Subprojects", "dbo");
                 });
 
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Test", b =>
@@ -152,7 +177,6 @@ namespace ReportPortal.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ErrorMessage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(MAX)")
                         .HasColumnName("ErrorMessage");
 
@@ -161,7 +185,6 @@ namespace ReportPortal.DAL.Migrations
                         .HasColumnName("ScreenShot");
 
                     b.Property<string>("StackTrace")
-                        .IsRequired()
                         .HasColumnType("nvarchar(MAX)")
                         .HasColumnName("StackTrace");
 
@@ -250,6 +273,40 @@ namespace ReportPortal.DAL.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.UserProject", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int")
+                        .HasColumnName("ProjectId");
+
+                    b.HasKey("UserId", "ProjectId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("UserProjects", (string)null);
+                });
+
+            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.UserSubproject", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.Property<int>("SubprojectId")
+                        .HasColumnType("int")
+                        .HasColumnName("SubprojectId");
+
+                    b.HasKey("UserId", "SubprojectId");
+
+                    b.HasIndex("SubprojectId");
+
+                    b.ToTable("UserSubprojects", (string)null);
+                });
+
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Folder", b =>
                 {
                     b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Folder", "Parent")
@@ -269,8 +326,19 @@ namespace ReportPortal.DAL.Migrations
 
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Run", b =>
                 {
-                    b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Project", "Project")
+                    b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Subproject", "Subproject")
                         .WithMany("Runs")
+                        .HasForeignKey("SubprojectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subproject");
+                });
+
+            modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Subproject", b =>
+                {
+                    b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Project", "Project")
+                        .WithMany("Subprojects")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -318,6 +386,44 @@ namespace ReportPortal.DAL.Migrations
                     b.Navigation("Test");
                 });
 
+            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.UserProject", b =>
+                {
+                    b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Project", "Project")
+                        .WithMany("UserProjects")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ReportPortal.DAL.Models.UserManagement.User", "User")
+                        .WithMany("UserProjects")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.UserSubproject", b =>
+                {
+                    b.HasOne("ReportPortal.DAL.Models.RunProjectManagement.Subproject", "Subproject")
+                        .WithMany("UserSubprojects")
+                        .HasForeignKey("SubprojectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ReportPortal.DAL.Models.UserManagement.User", "User")
+                        .WithMany("UserSubprojects")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subproject");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Folder", b =>
                 {
                     b.Navigation("Children");
@@ -327,12 +433,21 @@ namespace ReportPortal.DAL.Migrations
 
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Project", b =>
                 {
-                    b.Navigation("Runs");
+                    b.Navigation("Subprojects");
+
+                    b.Navigation("UserProjects");
                 });
 
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Run", b =>
                 {
                     b.Navigation("Folders");
+                });
+
+            modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Subproject", b =>
+                {
+                    b.Navigation("Runs");
+
+                    b.Navigation("UserSubprojects");
                 });
 
             modelBuilder.Entity("ReportPortal.DAL.Models.RunProjectManagement.Test", b =>
@@ -341,6 +456,13 @@ namespace ReportPortal.DAL.Migrations
 
                     b.Navigation("TestReview")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ReportPortal.DAL.Models.UserManagement.User", b =>
+                {
+                    b.Navigation("UserProjects");
+
+                    b.Navigation("UserSubprojects");
                 });
 #pragma warning restore 612, 618
         }

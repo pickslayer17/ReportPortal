@@ -34,13 +34,60 @@ namespace ReportPortal.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(512)", nullable: false),
                     UserRole = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Subprojects",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(256)", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subprojects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subprojects_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalSchema: "dbo",
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserProjects",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProjects", x => new { x.UserId, x.ProjectId });
+                    table.ForeignKey(
+                        name: "FK_UserProjects_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalSchema: "dbo",
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserProjects_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -51,16 +98,41 @@ namespace ReportPortal.DAL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
-                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                    SubprojectId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Runs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Runs_Projects_ProjectId",
-                        column: x => x.ProjectId,
+                        name: "FK_Runs_Subprojects_SubprojectId",
+                        column: x => x.SubprojectId,
                         principalSchema: "dbo",
-                        principalTable: "Projects",
+                        principalTable: "Subprojects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserSubprojects",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    SubprojectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSubprojects", x => new { x.UserId, x.SubprojectId });
+                    table.ForeignKey(
+                        name: "FK_UserSubprojects_Subprojects_SubprojectId",
+                        column: x => x.SubprojectId,
+                        principalSchema: "dbo",
+                        principalTable: "Subprojects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserSubprojects_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -127,8 +199,8 @@ namespace ReportPortal.DAL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TestId = table.Column<int>(type: "int", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
-                    StackTrace = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
+                    StackTrace = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
                     ScreenShot = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     TestOutcome = table.Column<int>(type: "int", nullable: false)
                 },
@@ -188,9 +260,15 @@ namespace ReportPortal.DAL.Migrations
                 column: "RunId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Runs_ProjectId",
+                name: "IX_Runs_SubprojectId",
                 schema: "dbo",
                 table: "Runs",
+                column: "SubprojectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subprojects_ProjectId",
+                schema: "dbo",
+                table: "Subprojects",
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
@@ -223,6 +301,22 @@ namespace ReportPortal.DAL.Migrations
                 schema: "dbo",
                 table: "Tests",
                 column: "RunId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProjects_ProjectId",
+                table: "UserProjects",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubprojects_SubprojectId",
+                table: "UserSubprojects",
+                column: "SubprojectId");
         }
 
         /// <inheritdoc />
@@ -237,6 +331,12 @@ namespace ReportPortal.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "UserProjects");
+
+            migrationBuilder.DropTable(
+                name: "UserSubprojects");
+
+            migrationBuilder.DropTable(
                 name: "Tests",
                 schema: "dbo");
 
@@ -249,6 +349,10 @@ namespace ReportPortal.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Runs",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "Subprojects",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
