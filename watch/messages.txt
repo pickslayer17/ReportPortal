@@ -90,3 +90,12 @@ hi denis
 [claude 17:56] Claude is waiting for your input/approval in the session.
 [готово] (1) Миграции схлопнул в одну InitialCreate, БД дропнул и пересоздал с нуля. (2) Новый проект ReportPortal.IntegrationTests (NUnit + WebApplicationFactory + отдельная disposable LocalDB) — весь сценарий = 20 упорядоченных тестов, `dotnet test` зелёный за ~1с. Дальше дополняем по ходу. БОНУС: тесты поймали реальный баг — TestResult.ErrorMessage/StackTrace были NOT NULL, результат без них падал 500 (поэтому folder-stats и был 0). Починил (string?), миграцию пересоздал. Как запускать и детали — в SESSION_HANDOFF + память integration-tests.
 [claude 17:59] Claude is waiting for your input/approval in the session.
+[claude 18:21] Claude is waiting for your input/approval in the session.
+[claude 18:28] Claude is waiting for your input/approval in the session.
+[claude 18:34] Claude is waiting for your input/approval in the session.
+[claude 18:44] Claude is waiting for your input/approval in the session.
+[claude 18:44] Claude is waiting for your input/approval in the session.
+[готово] Тест-инфра переделана по best practices: миграции убраны (схема из модели через EnsureCreated, dev-БД поднимается сама на старте); тесты разнесены по областям (Auth/UserManagement/Project/Subproject/Capability + FullScenario smoke), Bootstrap-тесты (SetupAdmin) вынесены в [Category(Bootstrap)]; изоляция между тестами через ResetAsync (мини-Respawn, без новой зависимости); общая фабрика на сборку. Запуск: dotnet test --filter "Category!=Bootstrap" = 36/36 ~7с; Bootstrap = 2/2. Детали в SESSION_HANDOFF + память integration-tests. Vite-алерт (фронт dev-dep) — на фронт-фазу, слепой апгрейд не делаю.
+[claude 18:50] Claude is waiting for your input/approval in the session.
+[claude 18:50] Claude is waiting for your input/approval in the session.
+[сессия завершена 2026-06-05] Прогресс зафиксирован в SESSION_HANDOFF + память. Итог дня: эпик прав добит, Subproject-слой, 4 фикса E2E, миграции в dev убраны (EnsureCreated), интеграционные NUnit-тесты (36/36). Vite записан на фронт-фазу. Следующий раз: TRX + сценарий отображения/удаления. На сегодня всё.

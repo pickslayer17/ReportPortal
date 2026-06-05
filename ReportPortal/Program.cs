@@ -101,6 +101,15 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// During development we don't keep migrations — the schema is materialized straight from the
+// model. This lets the app (and a freshly cloned checkout) bring the database up on its own.
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    scope.ServiceProvider.GetRequiredService<ApplicationContext>().Database.EnsureCreated();
+}
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // No user seeding: the first admin is created explicitly via POST api/UserManagement/SetupAdmin
