@@ -19,4 +19,9 @@
     <ProjectReference Include="..\ReportPortal\ReportPortal.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Real .trx fixtures copied next to the test assembly so the suite is self-contained. -->
+    <None Include="TestData\**\*.trx" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
