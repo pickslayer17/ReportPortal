@@ -4,7 +4,6 @@ namespace ReportPortal.DAL.Repositories.Interfaces
     public enum ScopeResource
     {
         Project,
-        Subproject,
         Run,
         Folder,
         Test,
@@ -22,11 +21,5 @@ namespace ReportPortal.DAL.Repositories.Interfaces
         Task<int?> ResolveProjectIdAsync(ScopeResource resource, int id, CancellationToken cancellationToken = default);
 
         Task<bool> IsMemberAsync(int userId, int projectId, CancellationToken cancellationToken = default);
-
-        /// <summary>Subproject id that owns a review (review -> test -> run -> subproject), or null.</summary>
-        Task<int?> ResolveSubprojectIdForReviewAsync(int reviewId, CancellationToken cancellationToken = default);
-
-        /// <summary>Subproject-level membership (governs reviewer eligibility).</summary>
-        Task<bool> IsSubprojectMemberAsync(int userId, int subprojectId, CancellationToken cancellationToken = default);
     }
 }

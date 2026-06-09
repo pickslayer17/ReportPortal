@@ -40,7 +40,6 @@ namespace ReportPortal.MiddleWare
         {
             UserNotFoundException => (StatusCodes.Status404NotFound, "User not found."),
             ProjectNotFoundException => (StatusCodes.Status404NotFound, "Project not found."),
-            SubprojectNotFoundException => (StatusCodes.Status404NotFound, "Subproject not found."),
             TestNotFoundException => (StatusCodes.Status404NotFound, "Test not found."),
             FolderNotFoundException => (StatusCodes.Status404NotFound, "Folder not found."),
             TestResultNotFoundException => (StatusCodes.Status404NotFound, "Test result not found."),

@@ -5,8 +5,8 @@ namespace ReportPortal.IntegrationTests;
 
 /// <summary>
 /// End-to-end TRX upload, run on top of the Initialize baseline: the main user (a regular,
-/// non-admin project + subproject member) uploads a .trx to the main subproject and we verify the
-/// parsed run, folder tree and tests. Covers both upload modes (all tests / failed only) and the
+/// non-admin project member) uploads a .trx to the main project and we verify the parsed run,
+/// folder tree and tests. Covers both upload modes (all tests / failed only) and the
 /// HasAnyTests fix (a fully "Completed"/all-passed run must still import). Fixtures live in
 /// TestData/ and are copied next to the test assembly (see the .csproj).
 /// </summary>
@@ -34,15 +34,15 @@ public class TrxUploadTests : SmokeTestBase
 
         var fields = failedOnly is null ? null : new Dictionary<string, string> { ["failedOnly"] = failedOnly.Value.ToString() };
         var upload = await Client.ApiUploadFile(
-            $"/api/RunManagement/Subproject/{MainSubprojectId}/upload-trx", MainUserToken, path, fields: fields);
+            $"/api/RunManagement/Project/{MainProjectId}/upload-trx", MainUserToken, path, fields: fields);
 
         Assert.That(upload.Status, Is.EqualTo(HttpStatusCode.OK), $"upload should succeed; body: {upload.Body}");
         var runId = upload.Int("runId");
         Assert.That(runId, Is.GreaterThan(0), "upload should report the created run id");
 
-        // The new run must show up among the main subproject's runs.
-        var runs = await Client.ApiGet($"/api/RunManagement/Subproject/{MainSubprojectId}/Runs", MainUserToken);
-        Assert.That(runs.Ids(), Does.Contain(runId), "uploaded run appears in the subproject run list");
+        // The new run must show up among the main project's runs.
+        var runs = await Client.ApiGet($"/api/RunManagement/Project/{MainProjectId}/Runs", MainUserToken);
+        Assert.That(runs.Ids(), Does.Contain(runId), "uploaded run appears in the project run list");
         return runId;
     }
 

@@ -5,17 +5,17 @@ namespace ReportPortal.IntegrationTests;
 
 /// <summary>
 /// One end-to-end smoke "story" covering the whole flow in a single test: 2 projects / 3 users,
-/// a subproject, a run with a folder tree and three tests, reviews, project-scoped user listing,
-/// the subproject-scoped reviewer rule, and cross-project denial. All entities are uniquely named
-/// so the story is self-contained. The focused per-feature fixtures assert the details; this
-/// guards the happy path as a whole.
+/// a run with a folder tree and three tests, reviews, project-scoped user listing, the
+/// project-scoped reviewer rule, and cross-project denial. All entities are uniquely named so the
+/// story is self-contained. The focused per-feature fixtures assert the details; this guards the
+/// happy path as a whole.
 /// </summary>
 [TestFixture]
 [Category("Smoke")]
 public class FullScenarioTests : SmokeTestBase
 {
     [Test]
-    public async Task Full_project_subproject_run_review_and_isolation_flow()
+    public async Task Full_project_run_review_and_isolation_flow()
     {
         // ----- arrange: users, projects, memberships -----
         var emailA = UniqueEmail("usera");
@@ -28,10 +28,7 @@ public class FullScenarioTests : SmokeTestBase
         await Data.AddProjectMemberAsync(projA, userA);
         await Data.AddProjectMemberAsync(projB, userB);
 
-        var subA = await Data.CreateSubprojectAsync(projA, Unique("SubA1"));
-        await Data.AddSubprojectMemberAsync(subA, userA);
-
-        var runId = await Data.CreateRunAsync(subA, "Run 1");
+        var runId = await Data.CreateRunAsync(projA, "Run 1");
         var (failTest, _) = await Data.AddTestAsync(runId, "common.groupb.leaf", "test_fail");
         var (passTest, _) = await Data.AddTestAsync(runId, "common.groupb.leaf", "test_pass");
         var (otherTest, _) = await Data.AddTestAsync(runId, "common.groupb.leaf", "test_other");
@@ -40,7 +37,7 @@ public class FullScenarioTests : SmokeTestBase
         await Data.AddResultAsync(failTest, OutcomeFailed);
         await Data.AddResultAsync(otherTest, OutcomeNotRun);
 
-        // ----- walk as userA (member of ProjA + SubA1) -----
+        // ----- walk as userA (member of ProjA) -----
         var tokA = await Client.LoginAsync(emailA, "passa123");
 
         Assert.That((await Client.ApiGet($"/api/RunManagement/Runs/{runId}", tokA)).Status, Is.EqualTo(HttpStatusCode.OK));
@@ -60,9 +57,8 @@ public class FullScenarioTests : SmokeTestBase
         await Data.AddProjectMemberAsync(projA, userC);
         Assert.That((await Client.ApiGet("/api/UserManagement/GetUsers", tokA)).Ids(), Is.EquivalentTo(new[] { userA, userC }));
 
-        // subproject-scoped reviewer rule
-        Assert.That((await Client.ApiPut($"/api/TestReviewManagement/TestReview/{reviewId}/UpdateReviewer/{userC}", tokA)).Status, Is.EqualTo(HttpStatusCode.BadRequest));
-        await Data.AddSubprojectMemberAsync(subA, userC);
+        // project-scoped reviewer rule: userB (not a ProjA member) is rejected; userC (member) is accepted.
+        Assert.That((await Client.ApiPut($"/api/TestReviewManagement/TestReview/{reviewId}/UpdateReviewer/{userB}", tokA)).Status, Is.EqualTo(HttpStatusCode.BadRequest));
         Assert.That((await Client.ApiPut($"/api/TestReviewManagement/TestReview/{reviewId}/UpdateReviewer/{userC}", tokA)).Status, Is.EqualTo(HttpStatusCode.OK));
 
         // ----- cross-project: userB (ProjB) denied on every ProjA resource -----
@@ -70,7 +66,7 @@ public class FullScenarioTests : SmokeTestBase
         var denied = new[]
         {
             (await Client.ApiGet($"/api/RunManagement/Runs/{runId}", tokB)).Status,
-            (await Client.ApiGet($"/api/RunManagement/Subproject/{subA}/Runs", tokB)).Status,
+            (await Client.ApiGet($"/api/RunManagement/Project/{projA}/Runs", tokB)).Status,
             (await Client.ApiGet($"/api/FolderManagement/Runs/{runId}/folders", tokB)).Status,
             (await Client.ApiGet($"/api/TestManagement/Runs/{runId}/tests", tokB)).Status,
             (await Client.ApiGet($"/api/TestManagement/tests/{failTest}", tokB)).Status,

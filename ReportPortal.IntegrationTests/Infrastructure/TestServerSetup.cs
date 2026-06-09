@@ -7,7 +7,7 @@ namespace ReportPortal.IntegrationTests;
 /// the test database is NOT created or dropped here and is NOT wiped between tests — it persists
 /// across runs. The workflow is manual and two-step:
 ///   1) run the Initialize category once   (dotnet test --filter "Category=Initialize")
-///      -> builds the schema from scratch and seeds the shared baseline (admin/project/user/subproject);
+///      -> builds the schema from scratch and seeds the shared baseline (admin/project/user);
 ///   2) run Smoke / SmokeE2E as often as you like against that baseline.
 /// Booting the host still ensures the schema exists (the app calls EnsureCreated on startup in
 /// Development), so a Smoke run never crashes on a missing table — it just needs Initialize to

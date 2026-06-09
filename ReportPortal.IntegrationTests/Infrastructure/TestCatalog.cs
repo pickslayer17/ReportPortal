@@ -14,5 +14,4 @@ public static class TestCatalog
     public const string MainUserPassword = "mainpass123";
 
     public const string MainProjectName = "Main Project";
-    public const string MainSubprojectName = "Main Subproject";
 }

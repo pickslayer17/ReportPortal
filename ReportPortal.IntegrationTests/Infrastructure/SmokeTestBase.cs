@@ -6,7 +6,7 @@ namespace ReportPortal.IntegrationTests;
 /// <summary>
 /// Base for Smoke / SmokeE2E tests. These run on top of the persisted baseline created by the
 /// Initialize category: they do NOT wipe the database. Each test logs in as the existing admin,
-/// resolves the shared baseline (main project / subproject / user), and creates its OWN
+/// resolves the shared baseline (main project / user), and creates its OWN
 /// uniquely-named data so repeated runs never collide. Assertions are about a test's own data,
 /// not global counts.
 /// </summary>
@@ -27,7 +27,6 @@ public abstract class SmokeTestBase
 
     // Shared baseline resolved from the Initialize seed.
     protected int MainProjectId;
-    protected int MainSubprojectId;
     protected int MainUserId;
     protected string MainUserToken = null!;
 
@@ -47,8 +46,6 @@ public abstract class SmokeTestBase
 
         MainProjectId = (await Client.ApiGet("/api/ProjectManagement/GetAllProject", AdminToken))
             .IdByName(TestCatalog.MainProjectName);
-        MainSubprojectId = (await Client.ApiGet($"/api/SubprojectManagement/Project/{MainProjectId}/subprojects", AdminToken))
-            .IdByName(TestCatalog.MainSubprojectName);
         MainUserToken = await Client.LoginAsync(TestCatalog.MainUserEmail, TestCatalog.MainUserPassword);
         MainUserId = (await Client.ApiGet("/api/UserManagement/me", MainUserToken)).Id();
     }

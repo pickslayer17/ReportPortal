@@ -20,8 +20,8 @@ public class ApiFactory : WebApplicationFactory<Program>
     // Child-before-parent order so the wipe respects foreign keys.
     private static readonly string[] TablesInDeleteOrder =
     {
-        "UserSubprojects", "UserProjects", "TestReviews", "TestResults",
-        "Tests", "Folders", "Runs", "Subprojects", "Projects", "Users"
+        "UserProjects", "TestReviews", "TestResults",
+        "Tests", "Folders", "Runs", "Projects", "Users"
     };
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

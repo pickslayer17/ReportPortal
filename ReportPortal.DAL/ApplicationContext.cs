@@ -9,11 +9,9 @@ namespace ReportPortal.DAL
     {
         public DbSet<User> Users { get; set; }
         public DbSet<UserProject> UserProjects { get; set; }
-        public DbSet<UserSubproject> UserSubprojects { get; set; }
 
         public DbSet<Run> Runs { get; set; }
         public DbSet<Project> Projects { get; set; }
-        public DbSet<Subproject> Subprojects { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
@@ -27,9 +25,7 @@ namespace ReportPortal.DAL
         {
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new UserProjectConfiguration());
-            modelBuilder.ApplyConfiguration(new UserSubprojectConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
-            modelBuilder.ApplyConfiguration(new SubprojectConfiguration());
             modelBuilder.ApplyConfiguration(new RunConfiguration());
             modelBuilder.ApplyConfiguration(new FolderConfiguration());
             modelBuilder.ApplyConfiguration(new TestConfiguration());

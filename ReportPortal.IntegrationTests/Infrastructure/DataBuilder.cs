@@ -26,14 +26,8 @@ public class DataBuilder
     public Task AddProjectMemberAsync(int projectId, int userId)
         => _client.ApiPost($"/api/ProjectManagement/{projectId}/members/{userId}", _admin);
 
-    public async Task<int> CreateSubprojectAsync(int projectId, string name)
-        => (await _client.ApiPost($"/api/SubprojectManagement/Project/{projectId}/subprojects", _admin, new { name })).Id();
-
-    public Task AddSubprojectMemberAsync(int subprojectId, int userId)
-        => _client.ApiPost($"/api/SubprojectManagement/Subproject/{subprojectId}/members/{userId}", _admin);
-
-    public async Task<int> CreateRunAsync(int subprojectId, string name = "Run 1")
-        => (await _client.ApiPost("/api/RunManagement/AddRun", _admin, new { name, subprojectId })).Id();
+    public async Task<int> CreateRunAsync(int projectId, string name = "Run 1")
+        => (await _client.ApiPost("/api/RunManagement/AddRun", _admin, new { name, projectId })).Id();
 
     public async Task<(int testId, int folderId)> AddTestAsync(int runId, string path, string name)
     {

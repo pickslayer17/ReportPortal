@@ -4,6 +4,6 @@ namespace ReportPortal.BL.Services.Interfaces
 {
     public interface IRunService : IServiceBase<RunDto>
     {
-        Task<IEnumerable<RunDto>> GetBySubprojectAsync(int subprojectId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<RunDto>> GetByProjectAsync(int projectId, CancellationToken cancellationToken = default);
     }
 }

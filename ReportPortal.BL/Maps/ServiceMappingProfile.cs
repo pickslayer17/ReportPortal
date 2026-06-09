@@ -12,7 +12,6 @@ namespace ReportPortal.BL.Maps
         {
             CreateMap<Test, TestDto>().ReverseMap();
             CreateMap<Project, ProjectDto>().ReverseMap();
-            CreateMap<Subproject, SubprojectDto>().ReverseMap();
             CreateMap<UserDto, User>().ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<Run, RunDto>().ReverseMap();

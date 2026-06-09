@@ -4,7 +4,9 @@ using NUnit.Framework;
 namespace ReportPortal.IntegrationTests;
 
 /// <summary>
-/// The Initialize category: builds the shared baseline from scratch and LEAVES it in the database.
+/// The Initialize category: builds the shared baseline FROM SCRATCH and LEAVES it in the database.
+/// Its [OneTimeSetUp] drops the DB (if any) and recreates the schema from the model, so this run
+/// also doubles as a deploy-readiness check ("does everything stand up on a clean database?").
 /// Run it once, then run Smoke / SmokeE2E against the result as many times as you like:
 ///   dotnet test --filter "Category=Initialize"
 ///   dotnet test --filter "Category=Smoke"   (repeatable)
@@ -61,17 +63,5 @@ public class InitializeTests
 
         var member = await _client.ApiPost($"/api/ProjectManagement/{_mainProjectId}/members/{_mainUserId}", _adminToken);
         Assert.That(member.Status, Is.EqualTo(HttpStatusCode.OK), "main user joins the main project");
-    }
-
-    [Test, Order(4)]
-    public async Task Step4_Admin_CreatesMainSubproject_AndAddsMainUser()
-    {
-        var sub = await _client.ApiPost($"/api/SubprojectManagement/Project/{_mainProjectId}/subprojects", _adminToken,
-            new { name = TestCatalog.MainSubprojectName });
-        Assert.That(sub.Status, Is.EqualTo(HttpStatusCode.OK));
-        var subId = sub.Id();
-
-        var member = await _client.ApiPost($"/api/SubprojectManagement/Subproject/{subId}/members/{_mainUserId}", _adminToken);
-        Assert.That(member.Status, Is.EqualTo(HttpStatusCode.OK), "main user becomes a subproject reviewer");
     }
 }

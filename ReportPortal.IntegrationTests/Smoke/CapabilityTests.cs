@@ -5,35 +5,33 @@ namespace ReportPortal.IntegrationTests;
 
 /// <summary>
 /// Authorization "capabilities": role/permission policies (what you may do) and tenant scoping
-/// (which project's data you may touch), plus the subproject-scoped reviewer rule. Each test
-/// builds its own isolated project graph with unique names, so it is independent of the shared
-/// baseline and of other runs.
+/// (which project's data you may touch), plus the project-scoped reviewer rule. Each test builds
+/// its own isolated project graph with unique names, so it is independent of the shared baseline
+/// and of other runs.
 /// </summary>
 [TestFixture]
 [Category("Smoke")]
 public class CapabilityTests : SmokeTestBase
 {
-    // Project A with a member (userA, also a subproject member), a run, and one reviewed test.
-    private async Task<(int pA, int subA, int runId, int testId, int reviewId, int userA, string tokA)> ArrangeProjectAAsync()
+    // Project A with a member (userA), a run, and one reviewed test.
+    private async Task<(int pA, int runId, int testId, int reviewId, int userA, string tokA)> ArrangeProjectAAsync()
     {
         var emailA = UniqueEmail("usera");
         var userA = await Data.CreateUserAsync(emailA, "passa123");
         var pA = await Data.CreateProjectAsync(Unique("ProjA"));
         await Data.AddProjectMemberAsync(pA, userA);
-        var subA = await Data.CreateSubprojectAsync(pA, Unique("SubA"));
-        await Data.AddSubprojectMemberAsync(subA, userA);
-        var runId = await Data.CreateRunAsync(subA);
+        var runId = await Data.CreateRunAsync(pA);
         var (testId, _) = await Data.AddTestAsync(runId, "common.leaf", "t1");
         await Data.AddResultAsync(testId, OutcomeFailed);
         var reviewId = await Data.GetReviewIdAsync(testId);
         var tokA = await Client.LoginAsync(emailA, "passa123");
-        return (pA, subA, runId, testId, reviewId, userA, tokA);
+        return (pA, runId, testId, reviewId, userA, tokA);
     }
 
     [Test]
     public async Task NonAdmin_CannotCreateUser()
     {
-        var (_, _, _, _, _, _, tokA) = await ArrangeProjectAAsync();
+        var (_, _, _, _, _, tokA) = await ArrangeProjectAAsync();
         var res = await Client.ApiPost("/api/UserManagement/CreateUser", tokA, new { email = UniqueEmail("x"), password = "password1", userRole = RoleUser });
         Assert.That(res.Status, Is.EqualTo(HttpStatusCode.Forbidden));
     }
@@ -41,7 +39,7 @@ public class CapabilityTests : SmokeTestBase
     [Test]
     public async Task ProjectMember_CannotDeleteRun_PolicyIsAdminOnly()
     {
-        var (_, _, runId, _, _, _, tokA) = await ArrangeProjectAAsync();
+        var (_, runId, _, _, _, tokA) = await ArrangeProjectAAsync();
         // userA has access to the run (member) but DeleteRuns is an admin-only capability.
         var res = await Client.ApiPost($"/api/RunManagement/Runs/{runId}/delete", tokA);
         Assert.That(res.Status, Is.EqualTo(HttpStatusCode.Forbidden));
@@ -50,11 +48,11 @@ public class CapabilityTests : SmokeTestBase
     [Test]
     public async Task Member_CanReadRunResources()
     {
-        var (_, subA, runId, testId, _, _, tokA) = await ArrangeProjectAAsync();
+        var (pA, runId, testId, _, _, tokA) = await ArrangeProjectAAsync();
         var statuses = new[]
         {
             (await Client.ApiGet($"/api/RunManagement/Runs/{runId}", tokA)).Status,
-            (await Client.ApiGet($"/api/RunManagement/Subproject/{subA}/Runs", tokA)).Status,
+            (await Client.ApiGet($"/api/RunManagement/Project/{pA}/Runs", tokA)).Status,
             (await Client.ApiGet($"/api/FolderManagement/Runs/{runId}/folders", tokA)).Status,
             (await Client.ApiGet($"/api/TestManagement/tests/{testId}", tokA)).Status,
         };
@@ -64,7 +62,7 @@ public class CapabilityTests : SmokeTestBase
     [Test]
     public async Task NonMember_IsDeniedAcrossProjectAResources()
     {
-        var (pA, subA, runId, testId, _, _, _) = await ArrangeProjectAAsync();
+        var (pA, runId, testId, _, _, _) = await ArrangeProjectAAsync();
 
         // userB belongs to a different project only.
         var emailB = UniqueEmail("userb");
@@ -76,7 +74,7 @@ public class CapabilityTests : SmokeTestBase
         var statuses = new[]
         {
             (await Client.ApiGet($"/api/RunManagement/Runs/{runId}", tokB)).Status,
-            (await Client.ApiGet($"/api/RunManagement/Subproject/{subA}/Runs", tokB)).Status,
+            (await Client.ApiGet($"/api/RunManagement/Project/{pA}/Runs", tokB)).Status,
             (await Client.ApiGet($"/api/FolderManagement/Runs/{runId}/folders", tokB)).Status,
             (await Client.ApiGet($"/api/TestManagement/Runs/{runId}/tests", tokB)).Status,
             (await Client.ApiGet($"/api/TestManagement/tests/{testId}", tokB)).Status,
@@ -88,18 +86,17 @@ public class CapabilityTests : SmokeTestBase
     }
 
     [Test]
-    public async Task Reviewer_MustBelongToSubproject()
+    public async Task Reviewer_MustBelongToProject()
     {
-        var (pA, subA, _, _, reviewId, _, tokA) = await ArrangeProjectAAsync();
+        var (pA, _, _, reviewId, _, tokA) = await ArrangeProjectAAsync();
 
-        // userC is a project member but NOT a subproject member yet.
+        // userC is not a member of project A yet -> cannot be assigned as a reviewer.
         var userC = await Data.CreateUserAsync(UniqueEmail("userc"), "passc123");
-        await Data.AddProjectMemberAsync(pA, userC);
 
         var rejected = await Client.ApiPut($"/api/TestReviewManagement/TestReview/{reviewId}/UpdateReviewer/{userC}", tokA);
-        Assert.That(rejected.Status, Is.EqualTo(HttpStatusCode.BadRequest), "not a subproject member yet");
+        Assert.That(rejected.Status, Is.EqualTo(HttpStatusCode.BadRequest), "not a project member yet");
 
-        await Data.AddSubprojectMemberAsync(subA, userC);
+        await Data.AddProjectMemberAsync(pA, userC);
         var accepted = await Client.ApiPut($"/api/TestReviewManagement/TestReview/{reviewId}/UpdateReviewer/{userC}", tokA);
         Assert.That(accepted.Status, Is.EqualTo(HttpStatusCode.OK));
     }

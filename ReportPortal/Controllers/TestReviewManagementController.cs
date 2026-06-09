@@ -74,11 +74,11 @@ namespace ReportPortal.Controllers
         [Authorize(Policy = Permissions.ReviewTests)]
         public async Task<IActionResult> UpdateReviewer(int reviewId, int reviewerId, CancellationToken cancellationToken = default)
         {
-            // Reviewer must belong to the SUBPROJECT that owns this review (subproject-scoped eligibility).
-            var subprojectId = await _scope.ResolveSubprojectIdForReviewAsync(reviewId, cancellationToken);
-            if (subprojectId == null) return NotFound();
-            if (!await _scope.IsSubprojectMemberAsync(reviewerId, subprojectId.Value, cancellationToken))
-                return BadRequest(new { message = "Reviewer must be a member of the subproject." });
+            // Reviewer must belong to the project that owns this review.
+            var projectId = await _scope.ResolveProjectIdAsync(ScopeResource.TestReview, reviewId, cancellationToken);
+            if (projectId == null) return NotFound();
+            if (!await _scope.IsMemberAsync(reviewerId, projectId.Value, cancellationToken))
+                return BadRequest(new { message = "Reviewer must be a member of the project." });
 
             var testReviewUpdateDto = new TestReviewUpdateDto
             {

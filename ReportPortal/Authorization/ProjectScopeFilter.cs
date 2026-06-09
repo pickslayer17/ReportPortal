@@ -23,7 +23,6 @@ namespace ReportPortal.Authorization
             ("testId", ScopeResource.Test),
             ("folderId", ScopeResource.Folder),
             ("runId", ScopeResource.Run),
-            ("subprojectId", ScopeResource.Subproject),
             ("projectId", ScopeResource.Project),
         };
 

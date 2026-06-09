@@ -33,8 +33,8 @@ namespace ReportPortal.Controllers
         [Authorize(Policy = Permissions.UploadResults)]
         public async Task<IActionResult> AddRun([FromBody] RunCreateVm runVm, CancellationToken cancellationToken = default)
         {
-            // Body carries the subprojectId, so the route-based ProjectScopeFilter can't see it: guard here.
-            await ScopeGuard.EnsureAccessAsync(User, _scope, ScopeResource.Subproject, runVm.SubprojectId, cancellationToken);
+            // Body carries the projectId, so the route-based ProjectScopeFilter can't see it: guard here.
+            await ScopeGuard.EnsureAccessAsync(User, _scope, ScopeResource.Project, runVm.ProjectId, cancellationToken);
 
             var runDto = _mapper.Map<RunDto>(runVm);
             var runCreatedDto = await _runService.CreateAsync(runDto, cancellationToken);
@@ -51,11 +51,11 @@ namespace ReportPortal.Controllers
             return Ok(_mapper.Map<RunVm>(run));
         }
 
-        [HttpGet("Subproject/{subprojectId:int}/Runs")]
+        [HttpGet("Project/{projectId:int}/Runs")]
         [Authorize(Policy = Permissions.ViewProjects)]
-        public async Task<IActionResult> GetAllRuns(int subprojectId, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllRuns(int projectId, CancellationToken cancellationToken = default)
         {
-            var allRunsDto = await _runService.GetBySubprojectAsync(subprojectId, cancellationToken);
+            var allRunsDto = await _runService.GetByProjectAsync(projectId, cancellationToken);
             var resultVms = allRunsDto.Select(rdto => _mapper.Map<RunVm>(rdto));
 
             return Ok(resultVms);
@@ -77,10 +77,10 @@ namespace ReportPortal.Controllers
             }
         }
 
-        [HttpPost("Subproject/{subprojectId:int}/upload-trx")]
+        [HttpPost("Project/{projectId:int}/upload-trx")]
         [Authorize(Policy = Permissions.UploadResults)]
         [RequestSizeLimit(524288000)] // 500 MB, при необходимости увеличьте
-        public async Task<IActionResult> UploadTrxFile(int subprojectId, [FromForm] IFormFile file, [FromForm] bool failedOnly = false, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UploadTrxFile(int projectId, [FromForm] IFormFile file, [FromForm] bool failedOnly = false, CancellationToken cancellationToken = default)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Файл не выбран или пустой.");
@@ -93,7 +93,7 @@ namespace ReportPortal.Controllers
             var run = await _runService.CreateAsync(
                 new RunDto
                 {
-                    SubprojectId = subprojectId,
+                    ProjectId = projectId,
                     Name = $"{Path.GetFileNameWithoutExtension(safeFileName)} ({DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC)"
                 },
                 cancellationToken);
