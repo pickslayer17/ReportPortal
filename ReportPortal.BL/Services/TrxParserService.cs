@@ -33,7 +33,7 @@ namespace ReportPortal.BL.Services.Interfaces
             _folderTreeCache = folderTreeCache;
         }
 
-        public async Task AddTestsFromXml(string xmlFilePath, int runId = default, CancellationToken cancellationToken = default)
+        public async Task AddTestsFromXml(string xmlFilePath, int runId = default, bool failedOnly = false, CancellationToken cancellationToken = default)
         {
             string xml;
             using (var reader = new StreamReader(xmlFilePath))
@@ -42,6 +42,12 @@ namespace ReportPortal.BL.Services.Interfaces
             }
 
             var tests = TrxHelper.GetTestsFromTrxXml(xml, runId);
+
+            // Optional filter: keep only failed tests. Done before folder resolution so empty
+            // folders aren't materialised for tests we're dropping.
+            if (failedOnly)
+                tests = tests.Where(t => GetOutcome(t.Outcome) == TestOutcome.Failed).ToList();
+
             if (tests.Count == 0) return;
 
             // Folder path for a test = its full name minus the method name.

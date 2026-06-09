@@ -98,9 +98,11 @@ namespace ReportPortal.BL.Helpers
                 return false;
             }
 
-            var resultSummary = xml.SelectSingleNode("//*[name()='TestRun']/*[name()='ResultSummary']").Attributes["outcome"].Value;
+            // A file is worth parsing if it actually carries test results — regardless of the
+            // run-level outcome. (A fully "Completed"/all-passed run still has tests to import.)
+            var results = xml.SelectNodes("//*[name()='Results']/*[name()='UnitTestResult']");
 
-            return resultSummary != "Completed";
+            return results != null && results.Count > 0;
         }
 
         private static Stream GenerateStreamFromString(string s)

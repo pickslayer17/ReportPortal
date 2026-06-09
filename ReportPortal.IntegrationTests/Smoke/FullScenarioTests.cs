@@ -6,25 +6,29 @@ namespace ReportPortal.IntegrationTests;
 /// <summary>
 /// One end-to-end smoke "story" covering the whole flow in a single test: 2 projects / 3 users,
 /// a subproject, a run with a folder tree and three tests, reviews, project-scoped user listing,
-/// the subproject-scoped reviewer rule, and cross-project denial. The focused per-feature
-/// fixtures assert the details; this guards the happy path as a whole.
+/// the subproject-scoped reviewer rule, and cross-project denial. All entities are uniquely named
+/// so the story is self-contained. The focused per-feature fixtures assert the details; this
+/// guards the happy path as a whole.
 /// </summary>
 [TestFixture]
-public class FullScenarioTests : IntegrationTestBase
+[Category("Smoke")]
+public class FullScenarioTests : SmokeTestBase
 {
     [Test]
     public async Task Full_project_subproject_run_review_and_isolation_flow()
     {
         // ----- arrange: users, projects, memberships -----
-        var userA = await Data.CreateUserAsync("usera@test.com", "passa123");
-        var userB = await Data.CreateUserAsync("userb@test.com", "passb123");
-        var userC = await Data.CreateUserAsync("userc@test.com", "passc123");
-        var projA = await Data.CreateProjectAsync("ProjA");
-        var projB = await Data.CreateProjectAsync("ProjB");
+        var emailA = UniqueEmail("usera");
+        var emailB = UniqueEmail("userb");
+        var userA = await Data.CreateUserAsync(emailA, "passa123");
+        var userB = await Data.CreateUserAsync(emailB, "passb123");
+        var userC = await Data.CreateUserAsync(UniqueEmail("userc"), "passc123");
+        var projA = await Data.CreateProjectAsync(Unique("ProjA"));
+        var projB = await Data.CreateProjectAsync(Unique("ProjB"));
         await Data.AddProjectMemberAsync(projA, userA);
         await Data.AddProjectMemberAsync(projB, userB);
 
-        var subA = await Data.CreateSubprojectAsync(projA, "SubA1");
+        var subA = await Data.CreateSubprojectAsync(projA, Unique("SubA1"));
         await Data.AddSubprojectMemberAsync(subA, userA);
 
         var runId = await Data.CreateRunAsync(subA, "Run 1");
@@ -37,7 +41,7 @@ public class FullScenarioTests : IntegrationTestBase
         await Data.AddResultAsync(otherTest, OutcomeNotRun);
 
         // ----- walk as userA (member of ProjA + SubA1) -----
-        var tokA = await Client.LoginAsync("usera@test.com", "passa123");
+        var tokA = await Client.LoginAsync(emailA, "passa123");
 
         Assert.That((await Client.ApiGet($"/api/RunManagement/Runs/{runId}", tokA)).Status, Is.EqualTo(HttpStatusCode.OK));
 
@@ -62,7 +66,7 @@ public class FullScenarioTests : IntegrationTestBase
         Assert.That((await Client.ApiPut($"/api/TestReviewManagement/TestReview/{reviewId}/UpdateReviewer/{userC}", tokA)).Status, Is.EqualTo(HttpStatusCode.OK));
 
         // ----- cross-project: userB (ProjB) denied on every ProjA resource -----
-        var tokB = await Client.LoginAsync("userb@test.com", "passb123");
+        var tokB = await Client.LoginAsync(emailB, "passb123");
         var denied = new[]
         {
             (await Client.ApiGet($"/api/RunManagement/Runs/{runId}", tokB)).Status,

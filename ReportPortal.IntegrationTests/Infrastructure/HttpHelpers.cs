@@ -15,6 +15,11 @@ public record ApiResponse(HttpStatusCode Status, string Body)
     public IEnumerable<int> Ids() => Root.EnumerateArray().Select(e => e.GetProperty("id").GetInt32());
     public IEnumerable<int> IntsOf(string property) => Root.EnumerateArray().Select(e => e.GetProperty(property).GetInt32());
     public IEnumerable<string> Names() => Root.EnumerateArray().Select(e => e.GetProperty("name").GetString()!);
+
+    /// <summary>Finds the "id" of the array element whose "name" matches (used to resolve base entities by name).</summary>
+    public int IdByName(string name) => Root.EnumerateArray()
+        .First(e => e.GetProperty("name").GetString() == name)
+        .GetProperty("id").GetInt32();
 }
 
 public static class HttpHelpers
@@ -36,8 +41,12 @@ public static class HttpHelpers
     public static async Task<string> LoginAsync(this HttpClient c, string email, string password)
         => (await c.ApiPost("/api/UserManagement/Login", body: new { email, password })).Token();
 
-    /// <summary>Posts a single file as multipart/form-data (the shape the upload-trx endpoint expects).</summary>
-    public static async Task<ApiResponse> ApiUploadFile(this HttpClient client, string path, string? token, string filePath, string formField = "file")
+    /// <summary>
+    /// Posts a single file as multipart/form-data (the shape the upload-trx endpoint expects),
+    /// optionally with extra form fields (e.g. the failedOnly flag).
+    /// </summary>
+    public static async Task<ApiResponse> ApiUploadFile(this HttpClient client, string path, string? token, string filePath,
+        string formField = "file", IReadOnlyDictionary<string, string>? fields = null)
     {
         using var req = new HttpRequestMessage(HttpMethod.Post, path);
         if (token != null) req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -46,6 +55,9 @@ public static class HttpHelpers
         var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         content.Add(fileContent, formField, Path.GetFileName(filePath));
+        if (fields != null)
+            foreach (var (key, value) in fields)
+                content.Add(new StringContent(value), key);
         req.Content = content;
 
         using var resp = await client.SendAsync(req);

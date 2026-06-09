@@ -80,7 +80,7 @@ namespace ReportPortal.Controllers
         [HttpPost("Subproject/{subprojectId:int}/upload-trx")]
         [Authorize(Policy = Permissions.UploadResults)]
         [RequestSizeLimit(524288000)] // 500 MB, при необходимости увеличьте
-        public async Task<IActionResult> UploadTrxFile(int subprojectId, [FromForm] IFormFile file, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UploadTrxFile(int subprojectId, [FromForm] IFormFile file, [FromForm] bool failedOnly = false, CancellationToken cancellationToken = default)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Файл не выбран или пустой.");
@@ -111,7 +111,7 @@ namespace ReportPortal.Controllers
                     await file.CopyToAsync(stream, cancellationToken);
                 }
 
-                await _trxParserService.AddTestsFromXml(filePath, runId: run.Id, cancellationToken: cancellationToken);
+                await _trxParserService.AddTestsFromXml(filePath, runId: run.Id, failedOnly: failedOnly, cancellationToken: cancellationToken);
             }
             finally
             {
